@@ -1,9 +1,9 @@
-%define tarball_name boost_1_31_0
+%define tarball_name boost_1_32_0
 
 Name: boost
 Summary: The Boost C++ Libraries
-Version: 1.31.0
-Release: 9
+Version: 1.32.0
+Release: 1
 License: Boost Software License
 URL: http://www.boost.org/
 Group: System Environment/Libraries
@@ -11,12 +11,12 @@ Source: %{tarball_name}.tar.bz2
 BuildRoot: %{_tmppath}/boost-%{version}-root
 Prereq: /sbin/ldconfig
 BuildRequires: libstdc++-devel python 
+Obsoletes: boost <= 1.31.0
+Obsoletes: boost-devel <= 1.31.0
 Obsoletes: boost-doc <= 1.30.2
 Obsoletes: boost-python <= 1.30.2
-Patch0: boost-compiler.patch
-Patch1: boost-base.patch
-Patch2: boost-gcc-tools.patch
-Patch3: boost-lambda.patch
+Patch0: boost-base.patch
+Patch1: boost-gcc-tools.patch
 
 %description
 Boost provides free peer-reviewed portable C++ source libraries.  The
@@ -43,8 +43,6 @@ rm -rf $RPM_BUILD_ROOT
 %setup -n %{tarball_name} -q
 %patch0 -p0
 %patch1 -p0
-%patch2 -p0
-%patch3 -p0
 
 %build
 #build bjam
@@ -53,37 +51,39 @@ rm -rf $RPM_BUILD_ROOT
 BJAM=`find tools/build/jam_src/ -name bjam -a -type f`
 PYTHON_VERSION=`python -V 2>&1 |sed 's,.* \([0-9]\.[0-9]\)\(\.[0-9]\)\?.*,\1,'`
 PYTHON_FLAGS="-sPYTHON_ROOT=/usr -sPYTHON_VERSION=$PYTHON_VERSION"
-#$BJAM $PYTHON_FLAGS "-sTOOLS=gcc" "-sBUILD=release <dllversion>1" 
-$BJAM $PYTHON_FLAGS "-sTOOLS=gcc" "-sBUILD=release" 
+#$BJAM $PYTHON_FLAGS "-sTOOLS=gcc" "-sBUILD=release <dllversion>1" stage 
+$BJAM $PYTHON_FLAGS "-sTOOLS=gcc" "-sBUILD=release" stage 
 
 %install
 mkdir -p $RPM_BUILD_ROOT%{_libdir}
 mkdir -p $RPM_BUILD_ROOT%{_includedir}
 
 # install lib
-for i in `find bin -type f -name \*.a`; do
-  NAME=`basename $i | sed 's,-gcc,,' | sed 's,-mt,,' | sed 's,-1_31,,'`;
-  install -m 644 $i $RPM_BUILD_ROOT%{_libdir}/$NAME;
+for i in `find stage -type f -name \*.a`; do
+  NAME=`basename $i`;
+  install -m 755 $i $RPM_BUILD_ROOT%{_libdir}/$NAME;
 done;
-for i in `find bin -type f -name \*.so.1.31.0`; do
-  NAME=`basename $i | sed 's,-gcc,,' | sed 's,-mt,,' | sed 's,-1_31,,'`;
-  install -m 644 $i $RPM_BUILD_ROOT%{_libdir}/$NAME;
+for i in `find stage -type f -name \*.so.*`; do
+  NAME=`basename $i`;
+  install -m 755 $i $RPM_BUILD_ROOT%{_libdir}/$NAME;
 done;
 
 # install include files
 for i in `find boost -type d`; do
-	mkdir -p $RPM_BUILD_ROOT%{_includedir}/$i
+  mkdir -p $RPM_BUILD_ROOT%{_includedir}/$i
 done
 for i in `find boost -type f`; do
-	install -m 644 $i $RPM_BUILD_ROOT%{_includedir}/$i
+  install -m 644 $i $RPM_BUILD_ROOT%{_includedir}/$i
 done
 
 %clean
 rm -rf $RPM_BUILD_ROOT 
 
-%post -p /sbin/ldconfig
+%post 
+/sbin/ldconfig
 
-%postun -p /sbin/ldconfig
+%postun 
+/sbin/ldconfig
 
 %files
 %defattr(-, root, root)
@@ -95,6 +95,10 @@ rm -rf $RPM_BUILD_ROOT
 %{_libdir}/*.a
 
 %changelog
+* Mon Nov 29 2004 Benjamin Kosnik <bkoz@redhat.com> 1.32.0-1
+- Update to 1.32.0
+- (#122817: libboost_*.so symlinks missing)
+
 * Wed Sep 22 2004 Than Ngo <than@redhat.com> 1.31.0-9
 - cleanup specfile
 - fix multiarch problem

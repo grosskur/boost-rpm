@@ -1,19 +1,36 @@
-*** tools/build/v1/gcc-tools.jam.orig	2004-04-01 20:08:47.000000000 -0600
---- tools/build/v1/gcc-tools.jam	2004-04-01 20:11:02.000000000 -0600
-*************** actions gcc-Link-action bind NEEDLIBS NE
-*** 430,436 ****
-  {
-      $(SHELL_SET)$(gSHELL_LIBPATH)=$(LINK_LIBPATH)$(gAPPEND_LD_LIBRARY_PATH)
-      $(SHELL_EXPORT)$(gSHELL_LIBPATH)
-!     $(.GXX[1]:R=$(GCC_BIN_DIR)) $(.GXX[2-]) $(IMPLIB_COMMAND)$(<[2]) $(LINKFLAGS) -o "$(<[1])$(OUTTAG)" -L"$(LIBPATH:T)" -L"$(STDLIBPATH:T)" "$(>)" "$(NEEDLIBS)" "$(NEEDLIBS)" "$(IMPLIB_FLAGS)$(NEEDIMPS)" -l$(FINDLIBS) $(LNOPT)$(RPATH_LINK). $(LNOPT)$(SONAME)$(<[1]:D=)$(SOTAG)
-      $(ACTION_1)$(LN)$(_)-fs$(_)"$(<[1]:D=)$(OUTTAG)"$(_)"$(<[1])"
-  }
+*** tools/build/v1/gcc-tools.jam	2004-11-29 17:38:40.295847046 -0600
+--- tools/build/v1/gcc-tools.jam.new	2004-11-29 17:39:37.962664115 -0600
+*************** flags gcc LINKFLAGS <runtime-link>static
+*** 60,66 ****
+  flags gcc CFLAGS <debug-symbols>on : -g ;
+  flags gcc LINKFLAGS <debug-symbols>on : -g ;
+  flags gcc CFLAGS <optimization>off : -O0 ;
+! flags gcc CFLAGS <optimization>speed : -O3 ;
   
---- 430,436 ----
-  {
-      $(SHELL_SET)$(gSHELL_LIBPATH)=$(LINK_LIBPATH)$(gAPPEND_LD_LIBRARY_PATH)
-      $(SHELL_EXPORT)$(gSHELL_LIBPATH)
-!     $(.GXX[1]:R=$(GCC_BIN_DIR)) $(.GXX[2-]) $(IMPLIB_COMMAND)$(<[2]) $(LINKFLAGS) -o "$(<[1])$(OUTTAG)" -L"$(LIBPATH:T)" -L"$(STDLIBPATH:T)" "$(>)" "$(NEEDLIBS)" "$(NEEDLIBS)" "$(IMPLIB_FLAGS)$(NEEDIMPS)" -l$(FINDLIBS) $(LNOPT)$(RPATH_LINK). $(LNOPT)$(SONAME)$(<[1]:D=).1
-      $(ACTION_1)$(LN)$(_)-fs$(_)"$(<[1]:D=)$(OUTTAG)"$(_)"$(<[1])"
-  }
+  # Other optimizations we might want for GCC
+  # -fforce-mem -fomit-frame-pointer
+--- 60,66 ----
+  flags gcc CFLAGS <debug-symbols>on : -g ;
+  flags gcc LINKFLAGS <debug-symbols>on : -g ;
+  flags gcc CFLAGS <optimization>off : -O0 ;
+! flags gcc CFLAGS <optimization>speed : -O2 ;
   
+  # Other optimizations we might want for GCC
+  # -fforce-mem -fomit-frame-pointer
+*************** rule Link-action
+*** 387,393 ****
+      if $(DLLVERSION) && $(TARGET_TYPE) in $(SHARED_TYPES) && ( $(OS) = LINUX || $(OS) = OPENBSD ) && ! $(NO_GNU_LN)
+      {
+          OUTTAG on $(<) = ".$(DLLVERSION)" ;
+!         SOTAG on $(<) = ".$(DLLVERSION)" ;
+          ACTION_1 on $(<) = "" ;
+      }
+      else
+--- 387,393 ----
+      if $(DLLVERSION) && $(TARGET_TYPE) in $(SHARED_TYPES) && ( $(OS) = LINUX || $(OS) = OPENBSD ) && ! $(NO_GNU_LN)
+      {
+          OUTTAG on $(<) = ".$(DLLVERSION)" ;
+!         SOTAG on $(<) = ".1" ;
+          ACTION_1 on $(<) = "" ;
+      }
+      else
