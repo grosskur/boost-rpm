@@ -1,5 +1,5 @@
-*** tools/build/v1/gcc-tools.jam.orig	2005-03-15 22:41:36.879694255 -0600
---- tools/build/v1/gcc-tools.jam	2005-03-15 22:42:01.449887423 -0600
+*** tools/build/v1/gcc-tools.jam.orig	2005-03-18 09:58:30.227128264 -0600
+--- tools/build/v1/gcc-tools.jam	2005-03-18 10:00:20.235025969 -0600
 *************** flags gcc LINKFLAGS <runtime-link>static
 *** 60,66 ****
   flags gcc CFLAGS <debug-symbols>on : -g ;
@@ -17,3 +17,30 @@
   
   # Other optimizations we might want for GCC
   # -fforce-mem -fomit-frame-pointer
+*************** flags gcc FINDLIBS <find-library> ;
+*** 352,357 ****
+--- 352,358 ----
+  flags gcc DLLVERSION <dllversion> ;
+  DLLVERSION = $(DLLVERSION[1]) ;
+  DLLVERSION ?= $(BOOST_VERSION) ;
++ SONAMEVERSION = 1 ;
+  
+  flags gcc TARGET_TYPE <target-type> ;
+  
+*************** rule Link-action
+*** 387,393 ****
+      if $(DLLVERSION) && $(TARGET_TYPE) in $(SHARED_TYPES) && ( $(OS) = LINUX || $(OS) = OPENBSD ) && ! $(NO_GNU_LN)
+      {
+          OUTTAG on $(<) = ".$(DLLVERSION)" ;
+!         SOTAG on $(<) = ".$(DLLVERSION)" ;
+          ACTION_1 on $(<) = "" ;
+      }
+      else
+--- 388,394 ----
+      if $(DLLVERSION) && $(TARGET_TYPE) in $(SHARED_TYPES) && ( $(OS) = LINUX || $(OS) = OPENBSD ) && ! $(NO_GNU_LN)
+      {
+          OUTTAG on $(<) = ".$(DLLVERSION)" ;
+!         SOTAG on $(<) = ".$(SONAMEVERSION)" ;
+          ACTION_1 on $(<) = "" ;
+      }
+      else
