@@ -30,7 +30,7 @@
       if $(DLLVERSION) && $(TARGET_TYPE) in $(SHARED_TYPES) && ( $(OS) = LINUX || $(OS) = OPENBSD ) && ! $(NO_GNU_LN)
       {
           OUTTAG on $(<) = ".$(DLLVERSION)" ;
-!         SOTAG on $(<) = ".1" ;
+!         SOTAG on $(<) = "" ;
           ACTION_1 on $(<) = "" ;
       }
       else

@@ -3,7 +3,7 @@
 Name: boost
 Summary: The Boost C++ Libraries
 Version: 1.32.0
-Release: 2
+Release: 3
 License: Boost Software License
 URL: http://www.boost.org/
 Group: System Environment/Libraries
@@ -93,12 +93,16 @@ rm -rf $RPM_BUILD_ROOT
 %{_libdir}/*.a
 
 %changelog
+* Thu Dec 02 2004 Benjamin Kosnik <bkoz@redhat.com> 1.32.0-3
+- (#122817: libboost_*.so symlinks missing)
+- (#141574: half of the package is missing)
+- (#141617: bad patch boost-base.patch)
+
 * Wed Dec 01 2004 Benjamin Kosnik <bkoz@redhat.com> 1.32.0-2
 - Remove bogus Obsoletes.
 
 * Mon Nov 29 2004 Benjamin Kosnik <bkoz@redhat.com> 1.32.0-1
 - Update to 1.32.0
-- (#122817: libboost_*.so symlinks missing)
 
 * Wed Sep 22 2004 Than Ngo <than@redhat.com> 1.31.0-9
 - cleanup specfile
