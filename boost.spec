@@ -3,7 +3,7 @@
 Name: boost
 Summary: The Boost C++ Libraries
 Version: 1.32.0
-Release: 3
+Release: 4
 License: Boost Software License
 URL: http://www.boost.org/
 Group: System Environment/Libraries
@@ -15,6 +15,8 @@ Obsoletes: boost-doc <= 1.30.2
 Obsoletes: boost-python <= 1.30.2
 Patch0: boost-base.patch
 Patch1: boost-gcc-tools.patch
+Patch2: boost-thread.patch
+Patch3: boost-config-compiler-gcc.patch
 
 %description
 Boost provides free peer-reviewed portable C++ source libraries.  The
@@ -41,6 +43,8 @@ rm -rf $RPM_BUILD_ROOT
 %setup -n %{tarball_name} -q
 %patch0 -p0
 %patch1 -p0
+%patch2 -p0
+%patch3 -p0
 
 %build
 #build bjam
@@ -49,8 +53,7 @@ rm -rf $RPM_BUILD_ROOT
 BJAM=`find tools/build/jam_src/ -name bjam -a -type f`
 PYTHON_VERSION=`python -V 2>&1 |sed 's,.* \([0-9]\.[0-9]\)\(\.[0-9]\)\?.*,\1,'`
 PYTHON_FLAGS="-sPYTHON_ROOT=/usr -sPYTHON_VERSION=$PYTHON_VERSION"
-#$BJAM $PYTHON_FLAGS "-sTOOLS=gcc" "-sBUILD=release <dllversion>1" stage 
-$BJAM $PYTHON_FLAGS "-sTOOLS=gcc" "-sBUILD=release" stage 
+$BJAM $PYTHON_FLAGS "-sTOOLS=gcc" "-sBUILD=release <dllversion>1" stage 
 
 %install
 mkdir -p $RPM_BUILD_ROOT%{_libdir}
@@ -64,6 +67,10 @@ done;
 for i in `find stage -type f -name \*.so.*`; do
   NAME=`basename $i`;
   install -m 755 $i $RPM_BUILD_ROOT%{_libdir}/$NAME;
+done;
+for i in `find stage -type l -name \*.so`; do
+  NAME=`basename $i`;
+  mv $i $RPM_BUILD_ROOT%{_libdir}/$NAME;
 done;
 
 # install include files
@@ -83,9 +90,10 @@ rm -rf $RPM_BUILD_ROOT
 %postun 
 /sbin/ldconfig
 
-%files
+%files 
 %defattr(-, root, root)
 %{_libdir}/*.so.*
+%{_libdir}/*.so
 
 %files devel
 %defattr(-, root, root)
@@ -93,6 +101,17 @@ rm -rf $RPM_BUILD_ROOT
 %{_libdir}/*.a
 
 %changelog
+* Wed Mar 16 2005 Benjamin Kosnik <bkoz@redhat.com> 1.32.0-4
+- (#142612: Compiling Boost 1.32.0 Failed in RHEL 3.0 on Itanium2) 
+- (#150069: libboost_python.so is missing)
+- (#141617: bad patch boost-base.patch)
+- (#122817: libboost_*.so symlinks missing)
+- Re-add boost-thread.patch.
+- Change boost-base.patch to show thread tags.
+- Change boost-gcc-tools.patch to use SOTAG, compile with dllversion.
+- Add symbolic links to files.
+- Sanity check can compile with gcc-3.3.x, gcc-3.4.2.
+
 * Thu Dec 02 2004 Benjamin Kosnik <bkoz@redhat.com> 1.32.0-3
 - (#122817: libboost_*.so symlinks missing)
 - (#141574: half of the package is missing)

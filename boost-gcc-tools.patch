@@ -1,5 +1,5 @@
-*** tools/build/v1/gcc-tools.jam	2004-11-29 17:38:40.295847046 -0600
---- tools/build/v1/gcc-tools.jam.new	2004-11-29 17:39:37.962664115 -0600
+*** tools/build/v1/gcc-tools.jam.orig	2005-03-15 22:41:36.879694255 -0600
+--- tools/build/v1/gcc-tools.jam	2005-03-15 22:42:01.449887423 -0600
 *************** flags gcc LINKFLAGS <runtime-link>static
 *** 60,66 ****
   flags gcc CFLAGS <debug-symbols>on : -g ;
@@ -17,20 +17,3 @@
   
   # Other optimizations we might want for GCC
   # -fforce-mem -fomit-frame-pointer
-*************** rule Link-action
-*** 387,393 ****
-      if $(DLLVERSION) && $(TARGET_TYPE) in $(SHARED_TYPES) && ( $(OS) = LINUX || $(OS) = OPENBSD ) && ! $(NO_GNU_LN)
-      {
-          OUTTAG on $(<) = ".$(DLLVERSION)" ;
-!         SOTAG on $(<) = ".$(DLLVERSION)" ;
-          ACTION_1 on $(<) = "" ;
-      }
-      else
---- 387,393 ----
-      if $(DLLVERSION) && $(TARGET_TYPE) in $(SHARED_TYPES) && ( $(OS) = LINUX || $(OS) = OPENBSD ) && ! $(NO_GNU_LN)
-      {
-          OUTTAG on $(<) = ".$(DLLVERSION)" ;
-!         SOTAG on $(<) = "" ;
-          ACTION_1 on $(<) = "" ;
-      }
-      else
