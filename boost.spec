@@ -3,7 +3,7 @@
 Name: boost
 Summary: The Boost C++ Libraries
 Version: 1.31.0
-Release: 7
+Release: 8
 License: Boost Software License
 URL: http://www.boost.org/
 Group: System Environment/Libraries
@@ -275,6 +275,9 @@ rm -rf $RPM_BUILD_ROOT
 %dir /usr/include/boost/variant/detail
 
 %changelog
+* Tue Jun 15 2004 Elliot Lee <sopwith@redhat.com>
+- rebuilt
+
 * Wed May 05 2004 Warren Togami <wtogami@redhat.com> 1.31.0-7
 - missing Obsoletes boost-python
 
