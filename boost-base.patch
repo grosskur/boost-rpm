@@ -1,0 +1,30 @@
+Index: tools/build/v1/boost-base.jam
+===================================================================
+RCS file: /cvsroot/boost/boost/tools/build/v1/boost-base.jam,v
+retrieving revision 1.129
+diff -c -p -r1.129 boost-base.jam
+*** tools/build/v1/boost-base.jam	28 Jan 2004 22:50:17 -0000	1.129
+--- tools/build/v1/boost-base.jam	1 Apr 2004 22:48:45 -0000
+*************** rule common-variant-tag ( toolset varian
+*** 2621,2630 ****
+      local version-tag = [ MATCH "^([^.]+).([^.]+)" : $(version-number[1]) ] ;
+      version-tag = $(version-tag:J="_") ;
+      
+!     tags += $(toolset-tag:J=) ;
+!     tags += $(thread-tag:J=) ;
+!     tags += $(runtime-tag:J=) ;
+!     tags += $(version-tag) ;
+      
+      if $(tags)
+      {
+--- 2621,2630 ----
+      local version-tag = [ MATCH "^([^.]+).([^.]+)" : $(version-number[1]) ] ;
+      version-tag = $(version-tag:J="_") ;
+      
+! #    tags += $(toolset-tag:J=) ;
+! #    tags += $(thread-tag:J=) ;
+! #    tags += $(runtime-tag:J=) ;
+! #    tags += $(version-tag) ;
+      
+      if $(tags)
+      {
