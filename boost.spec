@@ -1,5 +1,5 @@
 %define version 1.31.0
-%define release 1
+%define release 2
 %define version_name 1.31.0
 
 Name: boost
@@ -13,7 +13,6 @@ Source: boost-%{version_name}.tar.bz2
 BuildRoot: %{_tmppath}/boost-%{version}-root
 BuildRequires: boost-jam >= 3.1.7 libstdc++-devel python 
 Patch0: boost-config-gcc.patch
-Patch1: boost-tools-build.patch
 
 %description
 Boost provides free peer-reviewed portable C++ source libraries.  The
@@ -37,7 +36,6 @@ rm -rf $RPM_BUILD_ROOT
 
 %setup -n boost-%{version_name} -q
 %patch0 -p0
-%patch1 -p0
 
 %build
 PYTHON_VERSION=`python -V 2>&1 | sed 's,.* \([0-9]\.[0-9]\)\(\.[0-9]\)\?.*,\1,'`
@@ -46,6 +44,9 @@ BOOST_FLAGS="-sTOOLS=gcc -sBUILD=release"
 bjam $PYTHON_FLAGS $BOOST_FLAGS --prefix=%{_prefix}
 
 %install
+PYTHON_VERSION=`python -V 2>&1 | sed 's,.* \([0-9]\.[0-9]\)\(\.[0-9]\)\?.*,\1,'`
+PYTHON_FLAGS="-sPYTHON_ROOT=/usr -sPYTHON_VERSION=$PYTHON_VERSION"
+BOOST_FLAGS="-sTOOLS=gcc -sBUILD=release"
 rm -rf $RPM_BUILD_ROOT
 rm -f boost.list boost-devel.list
 bjam $PYTHON_FLAGS $BOOST_FLAGS --prefix=$RPM_BUILD_ROOT%{_prefix} install
@@ -73,8 +74,14 @@ rm -rf $RPM_BUILD_ROOT
 %files -f boost.list
 %defattr(-, root, root)
 
+# Manually generate this via
+# 1) cd $prefix
+# 2) for i in `find include -type d`; do
+#      echo $i >> boost-dir.list
+#    done
 %files devel -f boost-devel.list
 %defattr(-, root, root)
+%dir /usr/include
 %dir /usr/include/boost-1_31
 %dir /usr/include/boost-1_31/boost
 %dir /usr/include/boost-1_31/boost/compatibility
@@ -213,14 +220,6 @@ rm -rf $RPM_BUILD_ROOT
 %dir /usr/include/boost-1_31/boost/spirit/dynamic/impl
 %dir /usr/include/boost-1_31/boost/spirit/error_handling
 %dir /usr/include/boost-1_31/boost/spirit/error_handling/impl
-%dir /usr/include/boost-1_31/boost/spirit/fusion
-%dir /usr/include/boost-1_31/boost/spirit/fusion/detail
-%dir /usr/include/boost-1_31/boost/spirit/fusion/iterator
-%dir /usr/include/boost-1_31/boost/spirit/fusion/iterator/detail
-%dir /usr/include/boost-1_31/boost/spirit/fusion/iterator/detail/tuple_iterator
-%dir /usr/include/boost-1_31/boost/spirit/fusion/iterator/detail/single_view_iterator
-%dir /usr/include/boost-1_31/boost/spirit/fusion/sequence
-%dir /usr/include/boost-1_31/boost/spirit/fusion/sequence/detail
 %dir /usr/include/boost-1_31/boost/spirit/iterator
 %dir /usr/include/boost-1_31/boost/spirit/iterator/impl
 %dir /usr/include/boost-1_31/boost/spirit/meta
@@ -247,7 +246,10 @@ rm -rf $RPM_BUILD_ROOT
 %dir /usr/include/boost-1_31/boost/variant/detail
 
 %changelog
-* Thu Jan  22 2004 Benjamin Kosnik <bkoz@redhat.com> 1.31.0
+* Mon Feb  09 2004 Benjamin Kosnik <bkoz@redhat.com> 1.31.0-2
+- Update to boost-1.31.0
+
+* Thu Jan  22 2004 Benjamin Kosnik <bkoz@redhat.com> 1.31.0-1
 - Update to boost-1.31.0.rc2
 - (#109307:  Compile Failure with boost libraries)
 - (#104831:  Compile errors in apps using Boost.Python...)
