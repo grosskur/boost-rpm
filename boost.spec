@@ -3,7 +3,7 @@
 Name: boost
 Summary: The Boost C++ Libraries
 Version: 1.32.0
-Release: 1
+Release: 2
 License: Boost Software License
 URL: http://www.boost.org/
 Group: System Environment/Libraries
@@ -11,8 +11,6 @@ Source: %{tarball_name}.tar.bz2
 BuildRoot: %{_tmppath}/boost-%{version}-root
 Prereq: /sbin/ldconfig
 BuildRequires: libstdc++-devel python 
-Obsoletes: boost <= 1.31.0
-Obsoletes: boost-devel <= 1.31.0
 Obsoletes: boost-doc <= 1.30.2
 Obsoletes: boost-python <= 1.30.2
 Patch0: boost-base.patch
@@ -95,6 +93,9 @@ rm -rf $RPM_BUILD_ROOT
 %{_libdir}/*.a
 
 %changelog
+* Wed Dec 01 2004 Benjamin Kosnik <bkoz@redhat.com> 1.32.0-2
+- Remove bogus Obsoletes.
+
 * Mon Nov 29 2004 Benjamin Kosnik <bkoz@redhat.com> 1.32.0-1
 - Update to 1.32.0
 - (#122817: libboost_*.so symlinks missing)
