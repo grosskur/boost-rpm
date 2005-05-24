@@ -3,7 +3,7 @@
 Name: boost
 Summary: The Boost C++ Libraries
 Version: 1.32.0
-Release: 5
+Release: 6
 License: Boost Software License
 URL: http://www.boost.org/
 Group: System Environment/Libraries
@@ -16,6 +16,7 @@ Obsoletes: boost-python <= 1.30.2
 Patch0: boost-base.patch
 Patch1: boost-gcc-tools.patch
 Patch2: boost-thread.patch
+Patch3: boost-config-compiler-gcc.patch
 
 %description
 Boost provides free peer-reviewed portable C++ source libraries.  The
@@ -43,6 +44,7 @@ rm -rf $RPM_BUILD_ROOT
 %patch0 -p0
 %patch1 -p0
 %patch2 -p0
+%patch3 -p0
 
 %build
 #build bjam
@@ -91,15 +93,20 @@ rm -rf $RPM_BUILD_ROOT
 
 %files 
 %defattr(-, root, root)
-%{_libdir}/*.so.*
-%{_libdir}/*.so
+%{_libdir}/*.so.%{version}
 
 %files devel
 %defattr(-, root, root)
 %{_includedir}/boost
 %{_libdir}/*.a
+%{_libdir}/*.so
 
 %changelog
+* Tue May 24 2005 Benjamin Kosnik <bkoz@redhat.com> 1.32.0-6
+- (#153093: boost warns that gcc 4.0.0 is an unknown compiler)
+- (#152205: development .so symlinks should be in -devel subpackage)
+- (#154783: linker .so symlinks missing from boost-devel package)
+
 * Fri Mar 18 2005 Benjamin Kosnik <bkoz@redhat.com> 1.32.0-5
 - Revert boost-base.patch to old behavior.
 - Use SONAMEVERSION instead of dllversion.
