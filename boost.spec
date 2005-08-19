@@ -1,9 +1,9 @@
-%define tarball_name boost_1_32_0
+%define tarball_name boost_1_33_0
 
 Name: boost
 Summary: The Boost C++ Libraries
-Version: 1.32.0
-Release: 6
+Version: 1.33.0
+Release: 1
 License: Boost Software License
 URL: http://www.boost.org/
 Group: System Environment/Libraries
@@ -51,7 +51,8 @@ rm -rf $RPM_BUILD_ROOT
 (cd tools/build/jam_src && ./build.sh)
 #build boost with bjam
 BJAM=`find tools/build/jam_src/ -name bjam -a -type f`
-PYTHON_VERSION=`python -V 2>&1 |sed 's,.* \([0-9]\.[0-9]\)\(\.[0-9]\)\?.*,\1,'`
+#PYTHON_VERSION=`python -V 2>&1 |sed 's,.* \([0-9]\.[0-9]\)\(\.[0-9]\)\?.*,\1,'`
+PYTHON_VERSION=$(python -c 'import sys; print sys.version[:3]')
 PYTHON_FLAGS="-sPYTHON_ROOT=/usr -sPYTHON_VERSION=$PYTHON_VERSION"
 #$BJAM $PYTHON_FLAGS "-sTOOLS=gcc" "-sBUILD=release <dllversion>1" stage 
 $BJAM $PYTHON_FLAGS "-sTOOLS=gcc" "-sBUILD=release" stage 
@@ -102,6 +103,10 @@ rm -rf $RPM_BUILD_ROOT
 %{_libdir}/*.so
 
 %changelog
+* Fri Aug 12 2005 Benjamin Kosnik <bkoz@redhat.com> 1.33.0-1
+- Update to boost-1.33.0
+- Simplified PYTHON_VERSION by Philipp Thomas <pth@suse.de>
+
 * Tue May 24 2005 Benjamin Kosnik <bkoz@redhat.com> 1.32.0-6
 - (#153093: boost warns that gcc 4.0.0 is an unknown compiler)
 - (#152205: development .so symlinks should be in -devel subpackage)
