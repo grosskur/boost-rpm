@@ -51,7 +51,6 @@ rm -rf $RPM_BUILD_ROOT
 (cd tools/build/jam_src && ./build.sh)
 #build boost with bjam
 BJAM=`find tools/build/jam_src/ -name bjam -a -type f`
-#PYTHON_VERSION=`python -V 2>&1 |sed 's,.* \([0-9]\.[0-9]\)\(\.[0-9]\)\?.*,\1,'`
 PYTHON_VERSION=$(python -c 'import sys; print sys.version[:3]')
 PYTHON_FLAGS="-sPYTHON_ROOT=/usr -sPYTHON_VERSION=$PYTHON_VERSION"
 #$BJAM $PYTHON_FLAGS "-sTOOLS=gcc" "-sBUILD=release <dllversion>1" stage 
