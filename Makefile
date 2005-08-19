@@ -1,15 +1,6 @@
-# Top level Makefile for module boost
-all : CVS/Root common-update
-	@cvs update
+# Makefile for source rpm: boost
+# $Id: Makefile,v 1.1 2004/09/09 03:35:58 cvsdist Exp $
+NAME := boost
+SPECFILE = $(firstword $(wildcard *.spec))
 
-common-update : common
-	@cd common && cvs update
-
-common : CVS/Root
-	@cvs checkout common
-
-CVS/Root :
-	@echo "ERROR: This does not look like a CVS checkout" && exit 1
-
-clean :
-	@find . -type f -name *~ -exec rm -fv {} \;
+include ../common/Makefile.common
