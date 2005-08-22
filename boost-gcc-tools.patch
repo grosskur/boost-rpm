@@ -1,29 +1,12 @@
 *** tools/build/v1/gcc-tools.jam.orig	2005-03-18 09:58:30.227128264 -0600
 --- tools/build/v1/gcc-tools.jam	2005-03-18 10:00:20.235025969 -0600
-*************** flags gcc LINKFLAGS <runtime-link>static
-*** 60,66 ****
-  flags gcc CFLAGS <debug-symbols>on : -g ;
-  flags gcc LINKFLAGS <debug-symbols>on : -g ;
-  flags gcc CFLAGS <optimization>off : -O0 ;
-! flags gcc CFLAGS <optimization>speed : -O3 ;
-  
-  # Other optimizations we might want for GCC
-  # -fforce-mem -fomit-frame-pointer
---- 60,66 ----
-  flags gcc CFLAGS <debug-symbols>on : -g ;
-  flags gcc LINKFLAGS <debug-symbols>on : -g ;
-  flags gcc CFLAGS <optimization>off : -O0 ;
-! flags gcc CFLAGS <optimization>speed : -O2 ;
-  
-  # Other optimizations we might want for GCC
-  # -fforce-mem -fomit-frame-pointer
 *************** flags gcc FINDLIBS <find-library> ;
 *** 352,357 ****
 --- 352,358 ----
   flags gcc DLLVERSION <dllversion> ;
   DLLVERSION = $(DLLVERSION[1]) ;
   DLLVERSION ?= $(BOOST_VERSION) ;
-+ SONAMEVERSION = 1 ;
++ SONAMEVERSION = 2 ;
   
   flags gcc TARGET_TYPE <target-type> ;
   

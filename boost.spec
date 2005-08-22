@@ -3,7 +3,7 @@
 Name: boost
 Summary: The Boost C++ Libraries
 Version: 1.33.0
-Release: 1
+Release: 2
 License: Boost Software License
 URL: http://www.boost.org/
 Group: System Environment/Libraries
@@ -103,7 +103,7 @@ rm -rf $RPM_BUILD_ROOT
 
 %changelog
 * Fri Aug 12 2005 Benjamin Kosnik <bkoz@redhat.com> 1.33.0-1
-- Update to boost-1.33.0
+- Update to boost-1.33.0, update SONAME to 2 due to ABI changes.
 - Simplified PYTHON_VERSION by Philipp Thomas <pth@suse.de>
 
 * Tue May 24 2005 Benjamin Kosnik <bkoz@redhat.com> 1.32.0-6
