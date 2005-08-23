@@ -3,7 +3,7 @@
 Name: boost
 Summary: The Boost C++ Libraries
 Version: 1.33.0
-Release: 2
+Release: 3
 License: Boost Software License
 URL: http://www.boost.org/
 Group: System Environment/Libraries
@@ -28,14 +28,24 @@ proposed for inclusion in the C++ Standards Committee's upcoming C++
 Standard Library Technical Report.)
 
 %package devel
-Summary: The Boost C++ Headers
+Summary: The Boost C++ headers and development libraries
 Group: System Environment/Libraries
 Requires: boost = %{version}-%{release}
 Obsoletes: boost-python-devel <= 1.30.2
 Provides: boost-python-devel = %{version}-%{release}
 
 %description devel
-Headers for the Boost C++ libraries
+Headers, static libraries, and shared object symlinks for the Boost
+C++ libraries
+
+%package doc
+Summary: The Boost C++ html docs
+Group: System Environment/Libraries
+Requires: boost = %{version}-%{release}
+Provides: boost-python-docs = %{version}-%{release}
+
+%description doc
+HTML documentation files for Boost C++ libraries
 
 %prep
 rm -rf $RPM_BUILD_ROOT
@@ -59,6 +69,8 @@ $BJAM $PYTHON_FLAGS "-sTOOLS=gcc" "-sBUILD=release" stage
 %install
 mkdir -p $RPM_BUILD_ROOT%{_libdir}
 mkdir -p $RPM_BUILD_ROOT%{_includedir}
+mkdir -p $RPM_BUILD_ROOT%{_docdir}
+mkdir -p $RPM_BUILD_ROOT%{_docdir}/boost-%{version}
 
 # install lib
 for i in `find stage -type f -name \*.a`; do
@@ -82,6 +94,16 @@ for i in `find boost -type f`; do
   install -m 644 $i $RPM_BUILD_ROOT%{_includedir}/$i
 done
 
+#install doc files
+cd doc/html; 
+for i in `find . -type d`; do
+  mkdir -p $RPM_BUILD_ROOT%{_docdir}/boost-%{version}/$i
+done
+for i in `find . -type f`; do
+  install -m 644 $i $RPM_BUILD_ROOT%{_docdir}/boost-%{version}/$i
+done
+cd ../..;
+
 %clean
 rm -rf $RPM_BUILD_ROOT 
 
@@ -101,7 +123,15 @@ rm -rf $RPM_BUILD_ROOT
 %{_libdir}/*.a
 %{_libdir}/*.so
 
+%files doc
+%defattr(-, root, root)
+%{_docdir}/boost-%{version}
+
 %changelog
+* Tue Aug 23 2005 Benjamin Kosnik <bkoz@redhat.com> 1.33.0-3
+- Create doc package again.
+- Parts of the above by Neal Becker <ndbecker2@gmail.com>.
+
 * Fri Aug 12 2005 Benjamin Kosnik <bkoz@redhat.com> 1.33.0-1
 - Update to boost-1.33.0, update SONAME to 2 due to ABI changes.
 - Simplified PYTHON_VERSION by Philipp Thomas <pth@suse.de>
