@@ -3,7 +3,7 @@
 Name: boost
 Summary: The Boost C++ Libraries
 Version: 1.33.0
-Release: 3
+Release: 4
 License: Boost Software License
 URL: http://www.boost.org/
 Group: System Environment/Libraries
@@ -11,6 +11,8 @@ Source: %{tarball_name}.tar.bz2
 BuildRoot: %{_tmppath}/boost-%{version}-root
 Prereq: /sbin/ldconfig
 BuildRequires: libstdc++-devel python 
+BuildRequires: bzip2-devel
+BuildRequires: zlib-devel
 Obsoletes: boost-doc <= 1.30.2
 Obsoletes: boost-python <= 1.30.2
 Patch0: boost-base.patch
@@ -128,6 +130,9 @@ rm -rf $RPM_BUILD_ROOT
 %{_docdir}/boost-%{version}
 
 %changelog
+* Tue Oct 11 2005 Nils Philippsen <nphilipp@redhat.com> 1.33.0-4
+- build require bzip2-devel and zlib-devel
+
 * Tue Aug 23 2005 Benjamin Kosnik <bkoz@redhat.com> 1.33.0-3
 - Create doc package again.
 - Parts of the above by Neal Becker <ndbecker2@gmail.com>.
