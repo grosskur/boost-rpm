@@ -1,0 +1,54 @@
+*** tools/regression/run_tests.sh.orig	2005-11-14 17:28:00.000000000 -0600
+--- tools/regression/run_tests.sh	2005-11-15 00:42:12.000000000 -0600
+***************
+*** 15,21 ****
+  # This can be either a non-exitent directory or an already complete Boost
+  # source tree.
+  #
+! boost_root="$HOME/CVSROOTs/Boost/boost_regression"
+  
+  #
+  # Wether to fetch the most current Boost code from CVS (yes/no):
+--- 15,21 ----
+  # This can be either a non-exitent directory or an already complete Boost
+  # source tree.
+  #
+! boost_root=`pwd`/../..
+  
+  #
+  # Wether to fetch the most current Boost code from CVS (yes/no):
+*************** for tool in $test_tools ; do
+*** 151,157 ****
+  #
+  echo running the $tool regression tests:
+  cd "$boost_root/status"
+! "$bjam" -sTOOLS=$tool --dump-tests test 2>&1 | tee regress.log
+  
+  #
+  # STEP 4:
+--- 151,157 ----
+  #
+  echo running the $tool regression tests:
+  cd "$boost_root/status"
+! "$bjam" -sTOOLS=$tool -sBUILD=release --dump-tests test 2>&1 | tee regress.log
+  
+  #
+  # STEP 4:
+*************** done
+*** 172,178 ****
+  #
+  uname=`uname`
+  echo generating html tables:
+! "$compiler_status" --comment "$comment_path" "$boost_root" cs-$uname.html cs-$uname-links.html
+  if test $? != 0 ; then
+      echo "Failed HTML result table generation."
+      exit 256
+--- 172,179 ----
+  #
+  uname=`uname`
+  echo generating html tables:
+! echo "$compiler_status $boost_root results.html results-links.html"
+! "$compiler_status" "$boost_root" results.html results-links.html
+  if test $? != 0 ; then
+      echo "Failed HTML result table generation."
+      exit 256

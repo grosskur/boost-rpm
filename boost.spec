@@ -1,9 +1,9 @@
-%define tarball_name boost_1_33_0
+%define tarball_name boost-1.33.1.20051114
 
 Name: boost
 Summary: The Boost C++ Libraries
-Version: 1.33.0
-Release: 4
+Version: 1.33.1
+Release: 1
 License: Boost Software License
 URL: http://www.boost.org/
 Group: System Environment/Libraries
@@ -19,15 +19,16 @@ Patch0: boost-base.patch
 Patch1: boost-gcc-tools.patch
 Patch2: boost-thread.patch
 Patch3: boost-config-compiler-gcc.patch
+Patch4: boost-runtests.patch
 
 %description
 Boost provides free peer-reviewed portable C++ source libraries.  The
 emphasis is on libraries which work well with the C++ Standard
-Library.  One goal is to establish "existing practice" and provide
-reference implementations so that the Boost libraries are suitable for
-eventual standardization. (Some of the libraries have already been
-proposed for inclusion in the C++ Standards Committee's upcoming C++
-Standard Library Technical Report.)
+Library, in the hopes of establishing "existing practice" for
+extensions and providing reference implementations so that the Boost
+libraries are suitable for eventual standardization. (Some of the
+libraries have already been proposed for inclusion in the C++
+Standards Committee's upcoming C++ Standard Library Technical Report.)
 
 %package devel
 Summary: The Boost C++ headers and development libraries
@@ -57,16 +58,35 @@ rm -rf $RPM_BUILD_ROOT
 %patch1 -p0
 %patch2 -p0
 %patch3 -p0
+%patch4 -p0
 
 %build
 #build bjam
 (cd tools/build/jam_src && ./build.sh)
+
 #build boost with bjam
 BJAM=`find tools/build/jam_src/ -name bjam -a -type f`
 PYTHON_VERSION=$(python -c 'import sys; print sys.version[:3]')
 PYTHON_FLAGS="-sPYTHON_ROOT=/usr -sPYTHON_VERSION=$PYTHON_VERSION"
 #$BJAM $PYTHON_FLAGS "-sTOOLS=gcc" "-sBUILD=release <dllversion>1" stage 
 $BJAM $PYTHON_FLAGS "-sTOOLS=gcc" "-sBUILD=release" stage 
+
+#run tests
+BOOST_ROOT=`pwd`;
+cd tools/regression;
+(cd ./build && $BOOST_ROOT/$BJAM)
+chmod +x ./run_tests.sh;
+./run_tests.sh;
+results1=$BOOST_ROOT/status/results.html
+results2=$BOOST_ROOT/status/results-links.html
+if [ -e $results1 ]; then
+  testdate=`date +%Y%m%d`;
+  testarch=`uname -m`;
+  mail -s "$testdate boost regression $testarch 1" bkoz@redhat.com < $results1;
+  mail -s "$testdate boost regression $testarch 2" bkoz@redhat.com < $results2;
+fi
+cd ../..;
+
 
 %install
 mkdir -p $RPM_BUILD_ROOT%{_libdir}
@@ -130,6 +150,10 @@ rm -rf $RPM_BUILD_ROOT
 %{_docdir}/boost-%{version}
 
 %changelog
+* Mon Nov 14 2005 Benjamin Kosnik <bkoz@redhat.com> 1.33.1-1
+- Update to boost-1.33.1 beta.
+- Run testsuite, gather results.
+
 * Tue Oct 11 2005 Nils Philippsen <nphilipp@redhat.com> 1.33.0-4
 - build require bzip2-devel and zlib-devel
 
