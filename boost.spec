@@ -75,15 +75,19 @@ $BJAM $PYTHON_FLAGS "-sTOOLS=gcc" "-sBUILD=release" stage
 BOOST_ROOT=`pwd`;
 cd tools/regression;
 (cd ./build && $BOOST_ROOT/$BJAM)
+echo "<p>" `uname -a` "</p>" > regression_comment.html;
+echo "" >>  regression_comment.html;
+echo "<p>" `g++ --version` "</p>" >> regression_comment.html;
 chmod +x ./run_tests.sh;
-./run_tests.sh;
+#./run_tests.sh;
 results1=$BOOST_ROOT/status/results.html
 results2=$BOOST_ROOT/status/results-links.html
-if [ -e $results1 ]; then
+if [ -f $results2 ] && [ -f $results2 ]; then
   testdate=`date +%Y%m%d`;
   testarch=`uname -m`;
-  mail -s "$testdate boost regression $testarch 1" bkoz@redhat.com < $results1;
-  mail -s "$testdate boost regression $testarch 2" bkoz@redhat.com < $results2;
+  email=bkoz@redhat.com
+  mail -s "$testdate boost regression $testarch 1" $email < $results1;
+  mail -s "$testdate boost regression $testarch 2" $email < $results2;
 fi
 cd ../..;
 

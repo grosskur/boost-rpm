@@ -1,5 +1,5 @@
 *** tools/regression/run_tests.sh.orig	2005-11-14 17:28:00.000000000 -0600
---- tools/regression/run_tests.sh	2005-11-15 00:42:12.000000000 -0600
+--- tools/regression/run_tests.sh	2005-11-16 18:57:09.000000000 -0600
 ***************
 *** 15,21 ****
   # This can be either a non-exitent directory or an already complete Boost
@@ -17,8 +17,27 @@
   
   #
   # Wether to fetch the most current Boost code from CVS (yes/no):
+*************** toolset=gcc
+*** 45,51 ****
+  # "comment_path" is the path to an html-file describing the test environment.
+  # The content of this file will be embedded in the status pages being produced.
+  #
+! comment_path="$boost_root/../regression_comment.html"
+  
+  
+  ### DEFAULTS ARE OK FOR THESE.
+--- 45,51 ----
+  # "comment_path" is the path to an html-file describing the test environment.
+  # The content of this file will be embedded in the status pages being produced.
+  #
+! comment_path="$boost_root/tools/regression/regression_comment.html"
+  
+  
+  ### DEFAULTS ARE OK FOR THESE.
 *************** for tool in $test_tools ; do
-*** 151,157 ****
+*** 149,157 ****
+  # STEP 3:
+  # run the regression tests:
   #
   echo running the $tool regression tests:
   cd "$boost_root/status"
@@ -26,29 +45,37 @@
   
   #
   # STEP 4:
---- 151,157 ----
+--- 149,159 ----
+  # STEP 3:
+  # run the regression tests:
   #
++ PYTHON_VERSION=$(python -c 'import sys; print sys.version[:3]')
++ PYTHON_FLAGS="-sPYTHON_ROOT=/usr -sPYTHON_VERSION=$PYTHON_VERSION"
   echo running the $tool regression tests:
   cd "$boost_root/status"
-! "$bjam" -sTOOLS=$tool -sBUILD=release --dump-tests test 2>&1 | tee regress.log
+! "$bjam" $PYTHON_FLAGS -sTOOLS=$tool --dump-tests test 2>&1 | tee regress.log
   
   #
   # STEP 4:
 *************** done
-*** 172,178 ****
+*** 170,178 ****
+  # STEP 6:
+  # create the html table:
   #
-  uname=`uname`
+- uname=`uname`
   echo generating html tables:
 ! "$compiler_status" --comment "$comment_path" "$boost_root" cs-$uname.html cs-$uname-links.html
   if test $? != 0 ; then
       echo "Failed HTML result table generation."
       exit 256
---- 172,179 ----
+--- 172,181 ----
+  # STEP 6:
+  # create the html table:
   #
-  uname=`uname`
   echo generating html tables:
-! echo "$compiler_status $boost_root results.html results-links.html"
-! "$compiler_status" "$boost_root" results.html results-links.html
+! echo ""
+! echo "$compiler_status --comment $comment_path $boost_root results.html results-links.html"
+! "$compiler_status" --comment "$comment_path" "$boost_root" results.html results-links.html
   if test $? != 0 ; then
       echo "Failed HTML result table generation."
       exit 256
