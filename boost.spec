@@ -3,7 +3,7 @@
 Name: boost
 Summary: The Boost C++ Libraries
 Version: 1.33.1
-Release: 1
+Release: 2
 License: Boost Software License
 URL: http://www.boost.org/
 Group: System Environment/Libraries
@@ -154,6 +154,9 @@ rm -rf $RPM_BUILD_ROOT
 %{_docdir}/boost-%{version}
 
 %changelog
+* Thu Dec 22 2005 Jesse Keating <jkeating@redhat.com> 1.33.1-2
+- rebuilt
+
 * Mon Nov 14 2005 Benjamin Kosnik <bkoz@redhat.com> 1.33.1-1
 - Update to boost-1.33.1 beta.
 - Run testsuite, gather results.
