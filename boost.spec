@@ -1,9 +1,9 @@
-%define tarball_name boost-1.33.1.20051114
+%define tarball_name boost_1_33_1
 
 Name: boost
 Summary: The Boost C++ Libraries
 Version: 1.33.1
-Release: 2
+Release: 3
 License: Boost Software License
 URL: http://www.boost.org/
 Group: System Environment/Libraries
@@ -11,6 +11,7 @@ Source: %{tarball_name}.tar.bz2
 BuildRoot: %{_tmppath}/boost-%{version}-root
 Prereq: /sbin/ldconfig
 BuildRequires: libstdc++-devel python 
+BuildRequires: bzip2-libs
 BuildRequires: bzip2-devel
 BuildRequires: zlib-devel
 Obsoletes: boost-doc <= 1.30.2
@@ -103,13 +104,14 @@ for i in `find stage -type f -name \*.a`; do
   NAME=`basename $i`;
   install -m 755 $i $RPM_BUILD_ROOT%{_libdir}/$NAME;
 done;
+for i in `find stage -type l -name \*.so`; do
+  NAME=`basename $i`;
+  cp $i $RPM_BUILD_ROOT%{_libdir}/$NAME;
+  mv $i $RPM_BUILD_ROOT%{_libdir}/$NAME.2;
+done;
 for i in `find stage -type f -name \*.so.*`; do
   NAME=`basename $i`;
   install -m 755 $i $RPM_BUILD_ROOT%{_libdir}/$NAME;
-done;
-for i in `find stage -type l -name \*.so`; do
-  NAME=`basename $i`;
-  mv $i $RPM_BUILD_ROOT%{_libdir}/$NAME;
 done;
 
 # install include files
@@ -142,6 +144,7 @@ rm -rf $RPM_BUILD_ROOT
 %files 
 %defattr(-, root, root)
 %{_libdir}/*.so.%{version}
+%{_libdir}/*.so.2
 
 %files devel
 %defattr(-, root, root)
@@ -154,6 +157,11 @@ rm -rf $RPM_BUILD_ROOT
 %{_docdir}/boost-%{version}
 
 %changelog
+* Wed Jan 04 2006 Benjamin Kosnik <bkoz@redhat.com> 1.33.1-3
+- Update to boost-1.33.1.
+- (#176485: Missing BuildRequires)
+- (#169271: /usr/lib/libboost*.so.? links missing in package)
+
 * Thu Dec 22 2005 Jesse Keating <jkeating@redhat.com> 1.33.1-2
 - rebuilt
 
