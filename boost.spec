@@ -3,7 +3,7 @@
 Name: boost
 Summary: The Boost C++ Libraries
 Version: 1.33.1
-Release: 3
+Release: 4
 License: Boost Software License
 URL: http://www.boost.org/
 Group: System Environment/Libraries
@@ -104,14 +104,16 @@ for i in `find stage -type f -name \*.a`; do
   NAME=`basename $i`;
   install -m 755 $i $RPM_BUILD_ROOT%{_libdir}/$NAME;
 done;
-for i in `find stage -type l -name \*.so`; do
-  NAME=`basename $i`;
-  cp $i $RPM_BUILD_ROOT%{_libdir}/$NAME;
-  mv $i $RPM_BUILD_ROOT%{_libdir}/$NAME.2;
-done;
 for i in `find stage -type f -name \*.so.*`; do
   NAME=`basename $i`;
   install -m 755 $i $RPM_BUILD_ROOT%{_libdir}/$NAME;
+done;
+for i in `find stage -type l -name \*.so`; do
+  NAME=`basename $i`;
+  SONAME=$NAME.2;
+  ln -s $NAME.* $SONAME;
+  mv $SONAME $RPM_BUILD_ROOT%{_libdir}/$SONAME;
+  mv $i $RPM_BUILD_ROOT%{_libdir}/$NAME;
 done;
 
 # install include files
@@ -157,6 +159,9 @@ rm -rf $RPM_BUILD_ROOT
 %{_docdir}/boost-%{version}
 
 %changelog
+* Thu Jan 05 2006 Benjamin Kosnik <bkoz@redhat.com> 1.33.1-4
+- Fix symbolic links.
+
 * Wed Jan 04 2006 Benjamin Kosnik <bkoz@redhat.com> 1.33.1-3
 - Update to boost-1.33.1.
 - (#176485: Missing BuildRequires)
