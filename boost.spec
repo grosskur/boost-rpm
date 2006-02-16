@@ -3,7 +3,7 @@
 Name: boost
 Summary: The Boost C++ Libraries
 Version: 1.33.1
-Release: 4.2
+Release: 5
 License: Boost Software License
 URL: http://www.boost.org/
 Group: System Environment/Libraries
@@ -111,7 +111,7 @@ done;
 for i in `find stage -type l -name \*.so`; do
   NAME=`basename $i`;
   SONAME=$NAME.2;
-  ln -s $NAME.* $SONAME;
+  ln -s $NAME.%{version} $SONAME;
   mv $SONAME $RPM_BUILD_ROOT%{_libdir}/$SONAME;
   mv $i $RPM_BUILD_ROOT%{_libdir}/$NAME;
 done;
@@ -159,6 +159,9 @@ rm -rf $RPM_BUILD_ROOT
 %{_docdir}/boost-%{version}
 
 %changelog
+* Thu Feb 16 2006 Florian La Roche <laroche@redhat.com> - 1.33.1-5
+- use the real version number to point to the shared libs
+
 * Fri Feb 10 2006 Jesse Keating <jkeating@redhat.com> - 1.33.1-4.2
 - bump again for double-long bug on ppc(64)
 
