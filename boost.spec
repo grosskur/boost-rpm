@@ -3,7 +3,7 @@
 Name: boost
 Summary: The Boost C++ Libraries
 Version: 1.33.1
-Release: 5
+Release: 6
 License: Boost Software License
 URL: http://www.boost.org/
 Group: System Environment/Libraries
@@ -14,6 +14,7 @@ BuildRequires: libstdc++-devel python
 BuildRequires: bzip2-libs
 BuildRequires: bzip2-devel
 BuildRequires: zlib-devel
+BuildRequires: python-devel
 Obsoletes: boost-doc <= 1.30.2
 Obsoletes: boost-python <= 1.30.2
 Patch0: boost-base.patch
@@ -159,6 +160,9 @@ rm -rf $RPM_BUILD_ROOT
 %{_docdir}/boost-%{version}
 
 %changelog
+* Tue May 16 2006 Karsten Hopp <karsten@redhat.de> 1.33.1-6
+- buildrequire python-devel for Python.h
+
 * Thu Feb 16 2006 Florian La Roche <laroche@redhat.com> - 1.33.1-5
 - use the real version number to point to the shared libs
 
