@@ -3,7 +3,7 @@
 Name: boost
 Summary: The Boost C++ Libraries
 Version: 1.33.1
-Release: 6
+Release: 6.1
 License: Boost Software License
 URL: http://www.boost.org/
 Group: System Environment/Libraries
@@ -160,6 +160,9 @@ rm -rf $RPM_BUILD_ROOT
 %{_docdir}/boost-%{version}
 
 %changelog
+* Wed Jul 12 2006 Jesse Keating <jkeating@redhat.com> - 1.33.1-6.1
+- rebuild
+
 * Tue May 16 2006 Karsten Hopp <karsten@redhat.de> 1.33.1-6
 - buildrequire python-devel for Python.h
 
