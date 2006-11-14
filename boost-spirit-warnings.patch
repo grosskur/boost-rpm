@@ -33,7 +33,7 @@
   
       template <typename T>
       inline bool
---- 17,28 ----
+--- 17,29 ----
       : len(-1), val() {}
   
       template <typename T>
@@ -46,49 +46,3 @@
   
       template <typename T>
       inline bool
-*** boost/spirit/core/scanner/scanner.hpp.orig	2006-11-13 11:57:51.000000000 +0100
---- boost/spirit/core/scanner/scanner.hpp	2006-11-13 12:00:06.000000000 +0100
-*************** namespace boost { namespace spirit
-*** 242,263 ****
-          bool
-          at_end() const
-          {
-!             typedef typename PoliciesT::iteration_policy_t iteration_policy_t;
-!             return iteration_policy_t::at_end(*this);
-          }
-  
-          value_t
-          operator*() const
-          {
-!             typedef typename PoliciesT::iteration_policy_t iteration_policy_t;
-!             return iteration_policy_t::filter(iteration_policy_t::get(*this));
-          }
-  
-          scanner const&
-          operator++() const
-          {
-!             typedef typename PoliciesT::iteration_policy_t iteration_policy_t;
-!             iteration_policy_t::advance(*this);
-              return *this;
-          }
-  
---- 242,260 ----
-          bool
-          at_end() const
-          {
-!             return PoliciesT::iteration_policy_t::at_end(*this);
-          }
-  
-          value_t
-          operator*() const
-          {
-!             return PoliciesT::iteration_policy_t::filter(iteration_policy_t::get(*this));
-          }
-  
-          scanner const&
-          operator++() const
-          {
-!             PoliciesT::iteration_policy_t::advance(*this);
-              return *this;
-          }
-  
