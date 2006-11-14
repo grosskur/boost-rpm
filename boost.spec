@@ -3,7 +3,7 @@
 Name: boost
 Summary: The Boost C++ Libraries
 Version: 1.33.1
-Release: 7
+Release: 8
 License: Boost Software License
 URL: http://www.boost.org/
 Group: System Environment/Libraries
@@ -172,6 +172,9 @@ rm -rf $RPM_BUILD_ROOT
 %{_docdir}/boost-%{version}
 
 %changelog
+* Tue Nov 14 2006 Benjamin Kosnik <bkoz@redhat.com> 1.33.1-8
+- (#205866: Revert scanner.hpp change.)
+
 * Mon Nov 13 2006 Benjamin Kosnik <bkoz@redhat.com> 1.33.1-7
 - (#205866: boost::spirit generates warnings with -Wshadow)
 - (#205863: serialization lib generates warnings)
