@@ -1,0 +1,94 @@
+*** boost/spirit/core/non_terminal/impl/rule.ipp.orig	2006-11-13 11:54:53.000000000 +0100
+--- boost/spirit/core/non_terminal/impl/rule.ipp	2006-11-13 11:55:31.000000000 +0100
+*************** namespace boost { namespace spirit {
+*** 224,230 ****
+          template <typename ParserT, typename ScannerT, typename AttrT>
+          struct concrete_parser : abstract_parser<ScannerT, AttrT>
+          {
+!             concrete_parser(ParserT const& p) : p(p) {}
+              virtual ~concrete_parser() {}
+  
+              virtual typename match_result<ScannerT, AttrT>::type
+--- 224,230 ----
+          template <typename ParserT, typename ScannerT, typename AttrT>
+          struct concrete_parser : abstract_parser<ScannerT, AttrT>
+          {
+!             concrete_parser(ParserT const& p_) : p(p_) {}
+              virtual ~concrete_parser() {}
+  
+              virtual typename match_result<ScannerT, AttrT>::type
+*** boost/spirit/core/impl/match.ipp.orig	2006-11-13 11:55:48.000000000 +0100
+--- boost/spirit/core/impl/match.ipp	2006-11-13 11:57:19.000000000 +0100
+*************** namespace boost { namespace spirit
+*** 17,28 ****
+      : len(-1), val() {}
+  
+      template <typename T>
+!     inline match<T>::match(std::size_t length)
+!     : len(length), val() {}
+  
+      template <typename T>
+!     inline match<T>::match(std::size_t length, ctor_param_t val_)
+!     : len(length), val(val_) {}
+  
+      template <typename T>
+      inline bool
+--- 17,28 ----
+      : len(-1), val() {}
+  
+      template <typename T>
+!     inline match<T>::match(std::size_t length_)
+!     : len(length_), val() {}
+  
+      template <typename T>
+!     inline match<T>::match(std::size_t length_, ctor_param_t val_)
+!     : len(length_), val(val_) {}
+  
+      template <typename T>
+      inline bool
+*** boost/spirit/core/scanner/scanner.hpp.orig	2006-11-13 11:57:51.000000000 +0100
+--- boost/spirit/core/scanner/scanner.hpp	2006-11-13 12:00:06.000000000 +0100
+*************** namespace boost { namespace spirit
+*** 242,263 ****
+          bool
+          at_end() const
+          {
+!             typedef typename PoliciesT::iteration_policy_t iteration_policy_t;
+!             return iteration_policy_t::at_end(*this);
+          }
+  
+          value_t
+          operator*() const
+          {
+!             typedef typename PoliciesT::iteration_policy_t iteration_policy_t;
+!             return iteration_policy_t::filter(iteration_policy_t::get(*this));
+          }
+  
+          scanner const&
+          operator++() const
+          {
+!             typedef typename PoliciesT::iteration_policy_t iteration_policy_t;
+!             iteration_policy_t::advance(*this);
+              return *this;
+          }
+  
+--- 242,260 ----
+          bool
+          at_end() const
+          {
+!             return PoliciesT::iteration_policy_t::at_end(*this);
+          }
+  
+          value_t
+          operator*() const
+          {
+!             return PoliciesT::iteration_policy_t::filter(iteration_policy_t::get(*this));
+          }
+  
+          scanner const&
+          operator++() const
+          {
+!             PoliciesT::iteration_policy_t::advance(*this);
+              return *this;
+          }
+  

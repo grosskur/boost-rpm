@@ -3,7 +3,7 @@
 Name: boost
 Summary: The Boost C++ Libraries
 Version: 1.33.1
-Release: 6.1
+Release: 7
 License: Boost Software License
 URL: http://www.boost.org/
 Group: System Environment/Libraries
@@ -13,8 +13,11 @@ Prereq: /sbin/ldconfig
 BuildRequires: libstdc++-devel python 
 BuildRequires: bzip2-libs
 BuildRequires: bzip2-devel
+BuildRequires: zlib
 BuildRequires: zlib-devel
 BuildRequires: python-devel
+BuildRequires: libicu
+BuildRequires: libicu-devel
 Obsoletes: boost-doc <= 1.30.2
 Obsoletes: boost-python <= 1.30.2
 Patch0: boost-base.patch
@@ -22,6 +25,9 @@ Patch1: boost-gcc-tools.patch
 Patch2: boost-thread.patch
 Patch3: boost-config-compiler-gcc.patch
 Patch4: boost-runtests.patch
+Patch5: boost-serialization-warnings.patch
+Patch6: boost-spirit-warnings.patch
+Patch7: boost-bind-gcc41.patch
 
 %description
 Boost provides free peer-reviewed portable C++ source libraries.  The
@@ -61,6 +67,9 @@ rm -rf $RPM_BUILD_ROOT
 %patch2 -p0
 %patch3 -p0
 %patch4 -p0
+%patch5 -p0
+%patch6 -p0
+%patch7 -p0
 
 %build
 #build bjam
@@ -68,10 +77,13 @@ rm -rf $RPM_BUILD_ROOT
 
 #build boost with bjam
 BJAM=`find tools/build/jam_src/ -name bjam -a -type f`
+#BUILD_FLAGS="-sTOOLS=gcc -sBUILD=release <dllversion>1"
+#BUILD_FLAGS="-sTOOLS=gcc -sBUILD=release"
+BUILD_FLAGS="-d2 -sTOOLS=gcc -sBUILD=release"
 PYTHON_VERSION=$(python -c 'import sys; print sys.version[:3]')
 PYTHON_FLAGS="-sPYTHON_ROOT=/usr -sPYTHON_VERSION=$PYTHON_VERSION"
-#$BJAM $PYTHON_FLAGS "-sTOOLS=gcc" "-sBUILD=release <dllversion>1" stage 
-$BJAM $PYTHON_FLAGS "-sTOOLS=gcc" "-sBUILD=release" stage 
+REGEX_FLAGS="-sHAVE_ICU=1"
+$BJAM $PYTHON_FLAGS $REGEX_FLAGS $BUILD_FLAGS stage 
 
 #run tests
 BOOST_ROOT=`pwd`;
@@ -160,6 +172,14 @@ rm -rf $RPM_BUILD_ROOT
 %{_docdir}/boost-%{version}
 
 %changelog
+* Mon Nov 13 2006 Benjamin Kosnik <bkoz@redhat.com> 1.33.1-7
+- (#205866: boost::spirit generates warnings with -Wshadow)
+- (#205863: serialization lib generates warnings)
+- (#204326: boost RPM missing dependencies)
+- (#193465: [SIGNAL/BIND] Regressions with GCC 4.1)
+- BUILD_FLAGS, add, to see actual compile line.
+- REGEX_FLAGS, add, to compile regex with ICU support.
+
 * Wed Jul 12 2006 Jesse Keating <jkeating@redhat.com> - 1.33.1-6.1
 - rebuild
 

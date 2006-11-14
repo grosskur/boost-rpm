@@ -1,0 +1,61 @@
+*** boost/serialization/nvp.hpp.orig	2006-11-13 12:18:36.000000000 +0100
+--- boost/serialization/nvp.hpp	2006-11-13 12:19:03.000000000 +0100
+*************** struct nvp : 
+*** 43,51 ****
+      public std::pair<const char *, T *>,
+      public wrapper_traits<nvp<T> >
+  {
+!     explicit nvp(const char * name, T & t) :
+          // note: redundant cast works around borland issue
+!         std::pair<const char *, T *>(name, (T*)(& t))
+      {}
+      nvp(const nvp & rhs) : 
+          // note: redundant cast works around borland issue
+--- 43,51 ----
+      public std::pair<const char *, T *>,
+      public wrapper_traits<nvp<T> >
+  {
+!     explicit nvp(const char * name_, T & t) :
+          // note: redundant cast works around borland issue
+!         std::pair<const char *, T *>(name_, (T*)(& t))
+      {}
+      nvp(const nvp & rhs) : 
+          // note: redundant cast works around borland issue
+*** boost/archive/detail/iserializer.hpp.orig	2006-11-13 12:25:02.000000000 +0100
+--- boost/archive/detail/iserializer.hpp	2006-11-13 12:25:43.000000000 +0100
+*************** public:
+*** 123,129 ****
+          return boost::serialization::implementation_level<T>::value 
+              >= boost::serialization::object_class_info;
+      }
+!     virtual bool tracking(const unsigned int flags) const {
+  //        if(0 != (flags & no_tracking))
+  //            return false;
+          return boost::serialization::tracking_level<T>::value 
+--- 123,129 ----
+          return boost::serialization::implementation_level<T>::value 
+              >= boost::serialization::object_class_info;
+      }
+!     virtual bool tracking(const unsigned int) const {
+  //        if(0 != (flags & no_tracking))
+  //            return false;
+          return boost::serialization::tracking_level<T>::value 
+*** boost/archive/detail/oserializer.hpp.orig	2006-11-13 12:25:06.000000000 +0100
+--- boost/archive/detail/oserializer.hpp	2006-11-13 12:25:57.000000000 +0100
+*************** public:
+*** 115,121 ****
+          return boost::serialization::implementation_level<T>::value 
+              >= boost::serialization::object_class_info;
+      }
+!     virtual bool tracking(const unsigned int flags) const {
+  //        if(0 != (flags &  no_tracking))
+  //            return false;
+          return boost::serialization::tracking_level<T>::value == boost::serialization::track_always
+--- 115,121 ----
+          return boost::serialization::implementation_level<T>::value 
+              >= boost::serialization::object_class_info;
+      }
+!     virtual bool tracking(const unsigned int) const {
+  //        if(0 != (flags &  no_tracking))
+  //            return false;
+          return boost::serialization::tracking_level<T>::value == boost::serialization::track_always
