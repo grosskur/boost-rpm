@@ -3,7 +3,7 @@
 Name: boost
 Summary: The Boost C++ Libraries
 Version: 1.33.1
-Release: 8
+Release: 9
 License: Boost Software License
 URL: http://www.boost.org/
 Group: System Environment/Libraries
@@ -28,6 +28,7 @@ Patch4: boost-runtests.patch
 Patch5: boost-serialization-warnings.patch
 Patch6: boost-spirit-warnings.patch
 Patch7: boost-bind-gcc41.patch
+Patch8: boost-cxxflags-debug.patch
 
 %description
 Boost provides free peer-reviewed portable C++ source libraries.  The
@@ -70,6 +71,7 @@ rm -rf $RPM_BUILD_ROOT
 %patch5 -p0
 %patch6 -p0
 %patch7 -p0
+%patch8 -p0
 
 %build
 #build bjam
@@ -172,6 +174,9 @@ rm -rf $RPM_BUILD_ROOT
 %{_docdir}/boost-%{version}
 
 %changelog
+* Wed Nov 15 2006 Benjamin Kosnik <bkoz@redhat.com> 1.33.1-9
+- (#154784: boost-debuginfo package is empty)
+
 * Tue Nov 14 2006 Benjamin Kosnik <bkoz@redhat.com> 1.33.1-8
 - (#205866: Revert scanner.hpp change.)
 

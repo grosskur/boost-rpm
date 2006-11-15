@@ -1,0 +1,53 @@
+*** tools/build/v1/gcc-tools.jam.orig	2005-11-19 20:21:16.000000000 +0100
+--- tools/build/v1/gcc-tools.jam	2006-11-15 11:27:47.000000000 +0100
+*************** flags gcc UNDEFS <undef> ;
+*** 338,344 ****
+  flags gcc HDRS <include> ;
+  flags gcc SYSHDRS <sysinclude> ;
+  flags gcc LINKFLAGS <linkflags> ;
+! flags gcc LINKFLAGS <debug-symbols>off : -s ;
+  flags gcc ARFLAGS <arflags> ;
+  
+  flags gcc STDHDRS : $(GCC_INCLUDE_DIRECTORY) ;
+--- 338,344 ----
+  flags gcc HDRS <include> ;
+  flags gcc SYSHDRS <sysinclude> ;
+  flags gcc LINKFLAGS <linkflags> ;
+! #flags gcc LINKFLAGS <debug-symbols>off : -s ;
+  flags gcc ARFLAGS <arflags> ;
+  
+  flags gcc STDHDRS : $(GCC_INCLUDE_DIRECTORY) ;
+*************** actions gcc-Link-action bind NEEDLIBS NE
+*** 478,484 ****
+      $(.SET_EXIT)
+      $(SHELL_SET)$(gSHELL_LIBPATH)=$(LINK_LIBPATH)$(gAPPEND_LD_LIBRARY_PATH)
+      $(SHELL_EXPORT)$(gSHELL_LIBPATH)
+!     "$(.GXX[1]:R=$(GCC_BIN_DIR))" $(.GXX[2-]) "$(DLL_LINK_FLAGS)" "$(IMPLIB_COMMAND)$(<[2])" $(LINKFLAGS) -o "$(<[1])$(OUTTAG)" -L"$(LIBPATH:T)" -L"$(STDLIBPATH:T)" "$(>)" "$(NEEDLIBS)" "$(NEEDLIBS)" "$(IMPLIB_FLAGS)$(NEEDIMPS)" -l$(FINDLIBS) $(LNOPT)$(RPATH_LINK). $(LNOPT)$(SONAME)$(<[1]:D=)$(SOTAG)
+      $(ACTION_1)$(LN)$(_)-fs$(_)"$(<[1]:D=)$(OUTTAG)"$(_)"$(<[1])"
+  }
+  
+--- 478,484 ----
+      $(.SET_EXIT)
+      $(SHELL_SET)$(gSHELL_LIBPATH)=$(LINK_LIBPATH)$(gAPPEND_LD_LIBRARY_PATH)
+      $(SHELL_EXPORT)$(gSHELL_LIBPATH)
+!     "$(.GXX[1]:R=$(GCC_BIN_DIR))" $(.GXX[2-]) -g "$(DLL_LINK_FLAGS)" "$(IMPLIB_COMMAND)$(<[2])" $(LINKFLAGS) -o "$(<[1])$(OUTTAG)" -L"$(LIBPATH:T)" -L"$(STDLIBPATH:T)" "$(>)" "$(NEEDLIBS)" "$(NEEDLIBS)" "$(IMPLIB_FLAGS)$(NEEDIMPS)" -l$(FINDLIBS) $(LNOPT)$(RPATH_LINK). $(LNOPT)$(SONAME)$(<[1]:D=)$(SOTAG)
+      $(ACTION_1)$(LN)$(_)-fs$(_)"$(<[1]:D=)$(OUTTAG)"$(_)"$(<[1])"
+  }
+  
+*************** rule C++-action
+*** 509,515 ****
+  actions gcc-C++-action
+  {
+      $(.SET_EXIT)
+!     "$(.GXX[1]:R=$(GCC_BIN_DIR))" $(.GXX[2-]) -c -Wall -ftemplate-depth-255 -U$(UNDEFS) -D$(DEFINES) $(CFLAGS) $(C++FLAGS) -I"$(HDRS)" -I$(_)"$(STDHDRS)" -I$(_)"$(SYSHDRS)" -o "$(<)" "$(>)"
+      "$(.OBJCOPY[1])"$(_)$(OBJCOPY_FLAGS)$(_)"$(<)"
+  }
+  
+--- 509,515 ----
+  actions gcc-C++-action
+  {
+      $(.SET_EXIT)
+!     "$(.GXX[1]:R=$(GCC_BIN_DIR))" $(.GXX[2-]) -c -g -Wall -ftemplate-depth-255 -U$(UNDEFS) -D$(DEFINES) $(CFLAGS) $(C++FLAGS) -I"$(HDRS)" -I$(_)"$(STDHDRS)" -I$(_)"$(SYSHDRS)" -o "$(<)" "$(>)"
+      "$(.OBJCOPY[1])"$(_)$(OBJCOPY_FLAGS)$(_)"$(<)"
+  }
+  
