@@ -1,9 +1,10 @@
+
 %define tarball_name boost_1_33_1
 
 Name: boost
 Summary: The Boost C++ Libraries
 Version: 1.33.1
-Release: 9
+Release: 10%{?dist}
 License: Boost Software License
 URL: http://www.boost.org/
 Group: System Environment/Libraries
@@ -87,7 +88,7 @@ PYTHON_FLAGS="-sPYTHON_ROOT=/usr -sPYTHON_VERSION=$PYTHON_VERSION"
 REGEX_FLAGS="-sHAVE_ICU=1"
 $BJAM $PYTHON_FLAGS $REGEX_FLAGS $BUILD_FLAGS stage 
 
-#run tests
+%check
 BOOST_ROOT=`pwd`;
 cd tools/regression;
 (cd ./build && $BOOST_ROOT/$BJAM)
@@ -95,6 +96,7 @@ echo "<p>" `uname -a` "</p>" > regression_comment.html;
 echo "" >>  regression_comment.html;
 echo "<p>" `g++ --version` "</p>" >> regression_comment.html;
 chmod +x ./run_tests.sh;
+#uncomment next line to run tests: warning, takes a long time
 #./run_tests.sh;
 results1=$BOOST_ROOT/status/results.html
 results2=$BOOST_ROOT/status/results-links.html
@@ -174,6 +176,10 @@ rm -rf $RPM_BUILD_ROOT
 %{_docdir}/boost-%{version}
 
 %changelog
+* Thu Nov 23 2006 Benjamin Kosnik <bkoz@redhat.com> 1.33.1-10
+- (#182414: boost: put tests in %check section) via Rex Dieter
+- Fix EVR with %{?dist} tag via Gianluca Sforna
+
 * Wed Nov 15 2006 Benjamin Kosnik <bkoz@redhat.com> 1.33.1-9
 - (#154784: boost-debuginfo package is empty)
 
