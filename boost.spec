@@ -1,26 +1,23 @@
-
-%define tarball_name boost_1_33_1
-
 Name: boost
 Summary: The Boost C++ Libraries
 Version: 1.33.1
-Release: 10%{?dist}
-License: Boost Software License
+Release: 11%{?dist}
+License: Boost Software License (GPL-Compatible, Free Software License)
 URL: http://www.boost.org/
 Group: System Environment/Libraries
-Source: %{tarball_name}.tar.bz2
-BuildRoot: %{_tmppath}/boost-%{version}-root
-Prereq: /sbin/ldconfig
-BuildRequires: libstdc++-devel python 
+Source: %{name}_1_33_1.tar.bz2
+#Source: http://downloads.sourceforge.net/boost/boost_1_33_1.tar.bz2
+Provides: boost-python = %{version}-%{release}
+BuildRoot: %(mktemp -ud %{_tmppath}/%{name}-%{version}-%{release}-XXXXXX)
+BuildRequires: libstdc++-devel
 BuildRequires: bzip2-libs
 BuildRequires: bzip2-devel
 BuildRequires: zlib
 BuildRequires: zlib-devel
+BuildRequires: python
 BuildRequires: python-devel
 BuildRequires: libicu
 BuildRequires: libicu-devel
-Obsoletes: boost-doc <= 1.30.2
-Obsoletes: boost-python <= 1.30.2
 Patch0: boost-base.patch
 Patch1: boost-gcc-tools.patch
 Patch2: boost-thread.patch
@@ -41,29 +38,35 @@ libraries have already been proposed for inclusion in the C++
 Standards Committee's upcoming C++ Standard Library Technical Report.)
 
 %package devel
-Summary: The Boost C++ headers and development libraries
-Group: System Environment/Libraries
+Summary: The Boost C++ headers and shared development libraries
+Group: Development/Libraries
 Requires: boost = %{version}-%{release}
-Obsoletes: boost-python-devel <= 1.30.2
 Provides: boost-python-devel = %{version}-%{release}
 
 %description devel
-Headers, static libraries, and shared object symlinks for the Boost
-C++ libraries
+Headers and shared object symlinks for the Boost C++ libraries.
+
+%package static
+Summary: The Boost C++ static development libraries
+Group: Development/Libraries
+Requires: boost = %{version}-%{release}
+Provides: boost-python-devel = %{version}-%{release}
+
+%description static
+Static libraries for the Boost C++ libraries.
 
 %package doc
 Summary: The Boost C++ html docs
-Group: System Environment/Libraries
-Requires: boost = %{version}-%{release}
+Group: Documentation
 Provides: boost-python-docs = %{version}-%{release}
 
 %description doc
-HTML documentation files for Boost C++ libraries
+HTML documentation files for Boost C++ libraries.
 
 %prep
-rm -rf $RPM_BUILD_ROOT
+rm -rf %{buildroot}
 
-%setup -n %{tarball_name} -q
+%setup -q -n %{name}_1_33_1
 %patch0 -p0
 %patch1 -p0
 %patch2 -p0
@@ -113,17 +116,16 @@ cd ../..;
 %install
 mkdir -p $RPM_BUILD_ROOT%{_libdir}
 mkdir -p $RPM_BUILD_ROOT%{_includedir}
-mkdir -p $RPM_BUILD_ROOT%{_docdir}
 mkdir -p $RPM_BUILD_ROOT%{_docdir}/boost-%{version}
 
 # install lib
 for i in `find stage -type f -name \*.a`; do
   NAME=`basename $i`;
-  install -m 755 $i $RPM_BUILD_ROOT%{_libdir}/$NAME;
+  install -p -m 0644 $i $RPM_BUILD_ROOT%{_libdir}/$NAME;
 done;
 for i in `find stage -type f -name \*.so.*`; do
   NAME=`basename $i`;
-  install -m 755 $i $RPM_BUILD_ROOT%{_libdir}/$NAME;
+  install -p -m 755 $i $RPM_BUILD_ROOT%{_libdir}/$NAME;
 done;
 for i in `find stage -type l -name \*.so`; do
   NAME=`basename $i`;
@@ -138,7 +140,7 @@ for i in `find boost -type d`; do
   mkdir -p $RPM_BUILD_ROOT%{_includedir}/$i
 done
 for i in `find boost -type f`; do
-  install -m 644 $i $RPM_BUILD_ROOT%{_includedir}/$i
+  install -p -m 644 $i $RPM_BUILD_ROOT%{_includedir}/$i
 done
 
 #install doc files
@@ -147,35 +149,57 @@ for i in `find . -type d`; do
   mkdir -p $RPM_BUILD_ROOT%{_docdir}/boost-%{version}/$i
 done
 for i in `find . -type f`; do
-  install -m 644 $i $RPM_BUILD_ROOT%{_docdir}/boost-%{version}/$i
+  install -p -m 644 $i $RPM_BUILD_ROOT%{_docdir}/boost-%{version}/$i
 done
 cd ../..;
 
 %clean
-rm -rf $RPM_BUILD_ROOT 
+rm -rf %{buildroot}
 
 %post 
 /sbin/ldconfig
 
-%postun 
+%postun
 /sbin/ldconfig
 
 %files 
-%defattr(-, root, root)
+%defattr(-, root, root, -)
 %{_libdir}/*.so.%{version}
 %{_libdir}/*.so.2
 
 %files devel
-%defattr(-, root, root)
+%defattr(-, root, root, -)
 %{_includedir}/boost
-%{_libdir}/*.a
 %{_libdir}/*.so
 
+%files static
+%defattr(-, root, root, -)
+%{_libdir}/*.a
+
 %files doc
-%defattr(-, root, root)
-%{_docdir}/boost-%{version}
+%defattr(-, root, root, -)
+%doc %{_docdir}/boost-%{version}
 
 %changelog
+* Mon Mar 26 2007 Benjamin Kosnik <bkoz@redhat.com> 1.33.1-11
+- (#233523: libboost_python needs rebuild against python 2.5)
+- (#225622: Merge Review: boost)
+  Source to http.
+  BuildRoot to preferred value.
+  PreReq to post/postun -p
+  Clarified BSL as GPL-Compatible, Free Software License.
+  Remove Obsoletes.
+  Add Provides boost-python.
+  Remove mkdir -p $RPM_BUILD_ROOT%{_docdir}
+  Added periods for decription text. 
+  Fix Group field.
+  Remove doc Requires boost.
+  Preserve timestamps on install.
+  Use %defattr(-, root, root, -)
+  Added static package for .a libs.
+  Install static libs with 0644 permissions.
+  Use %doc for doc files.
+
 * Thu Nov 23 2006 Benjamin Kosnik <bkoz@redhat.com> 1.33.1-10
 - (#182414: boost: put tests in %check section) via Rex Dieter
 - Fix EVR with %{?dist} tag via Gianluca Sforna
