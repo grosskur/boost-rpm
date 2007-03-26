@@ -1,7 +1,7 @@
 Name: boost
 Summary: The Boost C++ Libraries
 Version: 1.33.1
-Release: 11%{?dist}
+Release: 12%{?dist}
 License: Boost Software License (GPL-Compatible, Free Software License)
 URL: http://www.boost.org/
 Group: System Environment/Libraries
@@ -27,6 +27,7 @@ Patch5: boost-serialization-warnings.patch
 Patch6: boost-spirit-warnings.patch
 Patch7: boost-bind-gcc41.patch
 Patch8: boost-cxxflags-debug.patch
+Patch9: boost-python-vs-x86-64.patch
 
 %description
 Boost provides free peer-reviewed portable C++ source libraries.  The
@@ -76,6 +77,7 @@ rm -rf %{buildroot}
 %patch6 -p0
 %patch7 -p0
 %patch8 -p0
+%patch9 -p0
 
 %build
 #build bjam
@@ -181,8 +183,11 @@ rm -rf %{buildroot}
 %doc %{_docdir}/boost-%{version}
 
 %changelog
-* Mon Mar 26 2007 Benjamin Kosnik <bkoz@redhat.com> 1.33.1-11
+* Mon Mar 26 2007 Benjamin Kosnik <bkoz@redhat.com> 1.33.1-12
 - (#233523: libboost_python needs rebuild against python 2.5)
+  Use patch.
+
+* Mon Mar 26 2007 Benjamin Kosnik <bkoz@redhat.com> 1.33.1-11
 - (#225622: Merge Review: boost)
   Source to http.
   BuildRoot to preferred value.

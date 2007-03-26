@@ -1,0 +1,37 @@
+--- boost/python/detail/wrap_python.hpp	4 Nov 2005 21:38:29 -0000	1.22
++++ boost/python/detail/wrap_python.hpp	12 Apr 2006 15:55:11 -0000
+@@ -141,6 +141,12 @@
+ # include <Python.h>
+ #endif
+ 
++#if PY_VERSION_HEX < 0x02050000
++typedef int Py_ssize_t;
++#define PY_SSIZE_T_MIN INT_MIN
++#define PY_SSIZE_T_MAX INT_MAX
++#endif
++
+ #ifdef BOOST_PYTHON_ULONG_MAX_UNDEFINED
+ # undef ULONG_MAX
+ # undef BOOST_PYTHON_ULONG_MAX_UNDEFINED
+
+diff -u -r1.7 object_protocol.cpp
+--- libs/python/src/object_protocol.cpp	26 Jul 2004 00:32:11 -0000	1.7
++++ libs/python/src/object_protocol.cpp	12 Apr 2006 15:55:31 -0000
+@@ -106,7 +106,7 @@
+       PySequenceMethods *sq = tp->tp_as_sequence;
+ 
+       if (sq && sq->sq_slice && ISINT(v) && ISINT(w)) {
+-          int ilow = 0, ihigh = INT_MAX;
++          Py_ssize_t ilow = 0, ihigh = PY_SSIZE_T_MAX;
+           if (!_PyEval_SliceIndex(v, &ilow))
+               return NULL;
+           if (!_PyEval_SliceIndex(w, &ihigh))
+@@ -133,7 +133,7 @@
+       PySequenceMethods *sq = tp->tp_as_sequence;
+ 
+       if (sq && sq->sq_slice && ISINT(v) && ISINT(w)) {
+-          int ilow = 0, ihigh = INT_MAX;
++          Py_ssize_t ilow = 0, ihigh = PY_SSIZE_T_MAX;
+           if (!_PyEval_SliceIndex(v, &ilow))
+               return -1;
+           if (!_PyEval_SliceIndex(w, &ihigh))
