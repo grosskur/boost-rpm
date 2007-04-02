@@ -1,7 +1,7 @@
 Name: boost
 Summary: The Boost C++ Libraries
 Version: 1.33.1
-Release: 12%{?dist}
+Release: 13%{?dist}
 License: Boost Software License (GPL-Compatible, Free Software License)
 URL: http://www.boost.org/
 Group: System Environment/Libraries
@@ -47,13 +47,13 @@ Provides: boost-python-devel = %{version}-%{release}
 %description devel
 Headers and shared object symlinks for the Boost C++ libraries.
 
-%package static
+%package devel-static
 Summary: The Boost C++ static development libraries
 Group: Development/Libraries
 Requires: boost = %{version}-%{release}
 Provides: boost-python-devel = %{version}-%{release}
 
-%description static
+%description devel-static
 Static libraries for the Boost C++ libraries.
 
 %package doc
@@ -174,7 +174,7 @@ rm -rf %{buildroot}
 %{_includedir}/boost
 %{_libdir}/*.so
 
-%files static
+%files devel-static
 %defattr(-, root, root, -)
 %{_libdir}/*.a
 
@@ -183,6 +183,10 @@ rm -rf %{buildroot}
 %doc %{_docdir}/boost-%{version}
 
 %changelog
+* Mon Apr 02 2007 Benjamin Kosnik <bkoz@redhat.com> 1.33.1-13
+- (#225622: Merge Review: boost)
+  Change static to devel-static.
+
 * Mon Mar 26 2007 Benjamin Kosnik <bkoz@redhat.com> 1.33.1-12
 - (#233523: libboost_python needs rebuild against python 2.5)
   Use patch.
