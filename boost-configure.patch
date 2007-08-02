@@ -1,0 +1,38 @@
+*** configure.orig	2007-01-16 01:39:00.000000000 +0100
+--- configure	2007-01-19 03:53:08.000000000 +0100
+***************
+*** 9,15 ****
+  
+  BJAM=""
+  TOOLSET=""
+! BJAM_CONFIG=""
+  BUILD=""
+  PREFIX=/usr/local
+  EPREFIX=
+--- 9,15 ----
+  
+  BJAM=""
+  TOOLSET=""
+! BJAM_CONFIG="-d2 --layout=system variant=release debug-symbols=on"
+  BUILD=""
+  PREFIX=/usr/local
+  EPREFIX=
+*************** INCLUDEDIR=$INCLUDEDIR
+*** 325,332 ****
+  LIBS=$LIBS
+  
+  all: .dummy
+! 	@echo "\$(BJAM) \$(BJAM_CONFIG) --user-config=user-config.jam \$(LIBS)"
+! 	@\$(BJAM) \$(BJAM_CONFIG) --user-config=user-config.jam \$(LIBS) || \\
+  	echo "Not all Boost libraries built properly."
+  
+  clean: .dummy
+--- 325,332 ----
+  LIBS=$LIBS
+  
+  all: .dummy
+! 	@echo "\$(BJAM) \$(BJAM_CONFIG) --user-config=user-config.jam \$(LIBS) stage"
+! 	@\$(BJAM) \$(BJAM_CONFIG) --user-config=user-config.jam \$(LIBS) stage || \\
+  	echo "Not all Boost libraries built properly."
+  
+  clean: .dummy

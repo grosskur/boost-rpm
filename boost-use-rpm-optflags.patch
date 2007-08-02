@@ -1,0 +1,19 @@
+*** tools/build/v2/tools/gcc.jam.orig	2007-08-01 01:17:16.000000000 -0500
+--- tools/build/v2/tools/gcc.jam	2007-08-01 01:17:46.000000000 -0500
+*************** flags gcc.compile PCH_FILE <pch>on : <pc
+*** 268,274 ****
+  
+  # Declare flags and action for compilation
+  flags gcc.compile OPTIONS <optimization>off : -O0 ;
+! flags gcc.compile OPTIONS <optimization>speed : -O3 ;
+  flags gcc.compile OPTIONS <optimization>space : -Os ;
+  
+  flags gcc.compile OPTIONS <inlining>off : -fno-inline ;
+--- 268,274 ----
+  
+  # Declare flags and action for compilation
+  flags gcc.compile OPTIONS <optimization>off : -O0 ;
+! flags gcc.compile OPTIONS <optimization>speed : "$RPM_OPT_FLAGS" ;
+  flags gcc.compile OPTIONS <optimization>space : -Os ;
+  
+  flags gcc.compile OPTIONS <inlining>off : -fno-inline ;

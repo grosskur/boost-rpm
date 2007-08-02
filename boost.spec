@@ -1,13 +1,16 @@
 Name: boost
 Summary: The Boost C++ Libraries
-Version: 1.33.1
-Release: 13%{?dist}
+Version: 1.34.1
+Release: 1%{?dist}
 License: Boost Software License (GPL-Compatible, Free Software License)
 URL: http://www.boost.org/
 Group: System Environment/Libraries
-Source: %{name}_1_33_1.tar.bz2
-#Source: http://downloads.sourceforge.net/boost/boost_1_33_1.tar.bz2
+#Source: %{name}_1_34_1.tar.bz2
+Source: http://downloads.sourceforge.net/boost/boost_1_34_1.tar.bz2
+Obsoletes: boost-doc <= 1.30.2
+Obsoletes: boost-python <= 1.30.2
 Provides: boost-python = %{version}-%{release}
+Provides: boost-doc = %{version}-%{release}
 BuildRoot: %(mktemp -ud %{_tmppath}/%{name}-%{version}-%{release}-XXXXXX)
 BuildRequires: libstdc++-devel
 BuildRequires: bzip2-libs
@@ -18,16 +21,10 @@ BuildRequires: python
 BuildRequires: python-devel
 BuildRequires: libicu
 BuildRequires: libicu-devel
-Patch0: boost-base.patch
-Patch1: boost-gcc-tools.patch
-Patch2: boost-thread.patch
-Patch3: boost-config-compiler-gcc.patch
-Patch4: boost-runtests.patch
-Patch5: boost-serialization-warnings.patch
-Patch6: boost-spirit-warnings.patch
-Patch7: boost-bind-gcc41.patch
-Patch8: boost-cxxflags-debug.patch
-Patch9: boost-python-vs-x86-64.patch
+Patch0: boost-configure.patch
+Patch1: boost-gcc-soname.patch
+Patch2: boost-use-rpm-optflags.patch
+Patch3: boost-run-tests.patch
 
 %description
 Boost provides free peer-reviewed portable C++ source libraries.  The
@@ -67,55 +64,69 @@ HTML documentation files for Boost C++ libraries.
 %prep
 rm -rf %{buildroot}
 
-%setup -q -n %{name}_1_33_1
+%setup -q -n %{name}_1_34_1
 %patch0 -p0
 %patch1 -p0
 %patch2 -p0
 %patch3 -p0
-%patch4 -p0
-%patch5 -p0
-%patch6 -p0
-%patch7 -p0
-%patch8 -p0
-%patch9 -p0
 
 %build
-#build bjam
-(cd tools/build/jam_src && ./build.sh)
+BOOST_ROOT=`pwd`
+staged_dir=stage
+export BOOST_ROOT
 
-#build boost with bjam
-BJAM=`find tools/build/jam_src/ -name bjam -a -type f`
-#BUILD_FLAGS="-sTOOLS=gcc -sBUILD=release <dllversion>1"
-#BUILD_FLAGS="-sTOOLS=gcc -sBUILD=release"
-BUILD_FLAGS="-d2 -sTOOLS=gcc -sBUILD=release"
+# build make tools, ie bjam, necessary for building libs, docs, and testing
+(cd tools/jam/src && ./build.sh)
+BJAM=`find tools/jam/src/ -name bjam -a -type f`
+
+#BUILD_FLAGS="--with-toolset=gcc --prefix=$RPM_BUILD_ROOT%{_prefix}"
+BUILD_FLAGS="--with-toolset=gcc"
 PYTHON_VERSION=$(python -c 'import sys; print sys.version[:3]')
-PYTHON_FLAGS="-sPYTHON_ROOT=/usr -sPYTHON_VERSION=$PYTHON_VERSION"
-REGEX_FLAGS="-sHAVE_ICU=1"
-$BJAM $PYTHON_FLAGS $REGEX_FLAGS $BUILD_FLAGS stage 
+PYTHON_FLAGS="--with-python-root=/usr --with-python-version=$PYTHON_VERSION"
+REGEX_FLAGS="--with-icu"
+./configure $BUILD_FLAGS $PYTHON_FLAGS $REGEX_FLAGS 
+make all
+
+# build docs, requires a network connection for docbook XSLT stylesheets
+#cd ./doc
+#chmod +x ../tools/boostbook/setup_boostbook.sh
+#../tools/boostbook/setup_boostbook.sh
+#$BOOST_ROOT/$BJAM --v2 -sICU_PATH=/usr --user-config=../user-config.jam html
+#cd ..
 
 %check
-BOOST_ROOT=`pwd`;
-cd tools/regression;
-(cd ./build && $BOOST_ROOT/$BJAM)
-echo "<p>" `uname -a` "</p>" > regression_comment.html;
-echo "" >>  regression_comment.html;
-echo "<p>" `g++ --version` "</p>" >> regression_comment.html;
-chmod +x ./run_tests.sh;
-#uncomment next line to run tests: warning, takes a long time
-#./run_tests.sh;
-results1=$BOOST_ROOT/status/results.html
-results2=$BOOST_ROOT/status/results-links.html
-if [ -f $results2 ] && [ -f $results2 ]; then
-  testdate=`date +%Y%m%d`;
-  testarch=`uname -m`;
-  email=bkoz@redhat.com
-  mail -s "$testdate boost regression $testarch 1" $email < $results1;
-  mail -s "$testdate boost regression $testarch 2" $email < $results2;
-fi
-cd ../..;
+# --with tests activates checking
+%define with_tests %{?_with_tests:1}%{!?_with_tests:0}
+%define without_tests %{!?_with_tests:1}%{?_with_tests:0}
 
+%if %{with_tests}
+echo "<p>" `uname -a` "</p>" > status/regression_comment.html
+echo "" >> status/regression_comment.html
+echo "<p>" `g++ --version` "</p>" >> status/regression_comment.html
+echo "" >> status/regression_comment.html
+
+chmod +x tools/regression/run_tests.sh
+./tools/regression/run_tests.sh
+
+results1=status/cs-`uname`.html
+results2=status/cs-`uname`-links.html
+email=benjamin.kosnik@gmail.com
+if [ -f $results1 ] && [ -f $results2 ]; then
+  echo "sending results starting"
+  testdate=`date +%Y%m%d`
+  testarch=`uname -m`
+  results=boost-results-$testdate-$testarch.tar.bz2
+  tar -cvf boost-results-$testdate-$testarch.tar $results1 $results2
+  bzip2 -f boost-results-$testdate-$testarch.tar 
+  echo | mutt -s "$testdate boost regression $testarch" -a $results $email 
+  echo "sending results finished"
+else
+  echo "error sending results"
+fi
+%endif
 
 %install
+rm -rf $RPM_BUILD_ROOT
 mkdir -p $RPM_BUILD_ROOT%{_libdir}
 mkdir -p $RPM_BUILD_ROOT%{_includedir}
 mkdir -p $RPM_BUILD_ROOT%{_docdir}/boost-%{version}
@@ -125,16 +136,20 @@ for i in `find stage -type f -name \*.a`; do
   NAME=`basename $i`;
   install -p -m 0644 $i $RPM_BUILD_ROOT%{_libdir}/$NAME;
 done;
-for i in `find stage -type f -name \*.so.*`; do
-  NAME=`basename $i`;
-  install -p -m 755 $i $RPM_BUILD_ROOT%{_libdir}/$NAME;
-done;
-for i in `find stage -type l -name \*.so`; do
-  NAME=`basename $i`;
-  SONAME=$NAME.2;
-  ln -s $NAME.%{version} $SONAME;
-  mv $SONAME $RPM_BUILD_ROOT%{_libdir}/$SONAME;
-  mv $i $RPM_BUILD_ROOT%{_libdir}/$NAME;
+for i in `find stage -type f -name \*.so`; do
+  NAME=$i;
+  SONAME=$i.2;
+  VNAME=$i.%{version};
+  base=`basename $i`;
+  NAMEbase=$base;
+  SONAMEbase=$base.2;
+  VNAMEbase=$base.%{version};
+  mv $i $VNAME;
+  ln -s $VNAMEbase $SONAME;
+  ln -s $VNAMEbase $NAME;
+  install -p -m 755 $VNAME $RPM_BUILD_ROOT%{_libdir}/$VNAMEbase;
+  mv $SONAME $RPM_BUILD_ROOT%{_libdir}/$SONAMEbase;
+  mv $NAME $RPM_BUILD_ROOT%{_libdir}/$NAMEbase;
 done;
 
 # install include files
@@ -155,14 +170,15 @@ for i in `find . -type f`; do
 done
 cd ../..;
 
+# remove scripts used to generate include files 
+find $RPM_BUILD_ROOT%{_includedir}/ \( -name '*.pl' -o -name '*.sh' \) -exec rm {} \;
+
 %clean
-rm -rf %{buildroot}
+rm -rf $RPM_BUILD_ROOT
 
-%post 
-/sbin/ldconfig
+%post -p /sbin/ldconfig
 
-%postun
-/sbin/ldconfig
+%postun -p /sbin/ldconfig
 
 %files 
 %defattr(-, root, root, -)
@@ -183,6 +199,16 @@ rm -rf %{buildroot}
 %doc %{_docdir}/boost-%{version}
 
 %changelog
+* Tue Jul 31 2007 Benjamin Kosnik <bkoz@redhat.com> 1.34.1-1
+- Update to boost_1_34_1.
+- Source via http.
+- Philipp Thomas <pth.suse.de> fix for RPM_OPT_FLAGS
+- Philipp Thomas <pth.suse.de> fix for .so sym links.
+- (#225622) Patrice Dumas review comments. 
+
+* Tue Jun 26 2007 Benjamin Kosnik <bkoz@redhat.com> 1.34.1.rc1-0.1
+- Update to boost_1_34_1_RC1.
+
 * Mon Apr 02 2007 Benjamin Kosnik <bkoz@redhat.com> 1.33.1-13
 - (#225622: Merge Review: boost)
   Change static to devel-static.
@@ -208,6 +234,12 @@ rm -rf %{buildroot}
   Added static package for .a libs.
   Install static libs with 0644 permissions.
   Use %doc for doc files.
+
+* Mon Jan 22 2007 Benjamin Kosnik <bkoz@redhat.com> 1.34.0-0.5
+- Update to boost.RC_1_34_0 snapshot as of 2007-01-19.
+- Modify build procedures for boost build v2.
+- Add *-mt variants for libraries, or at least variants that use
+  threads (regex and thread).
 
 * Thu Nov 23 2006 Benjamin Kosnik <bkoz@redhat.com> 1.33.1-10
 - (#182414: boost: put tests in %check section) via Rex Dieter
