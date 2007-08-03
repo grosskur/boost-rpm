@@ -14,7 +14,7 @@
   
       HAVE_SONAME   = "" ;
 !     SONAME_OPTION = -soname ;
-!     SONAME_VERSION = 2 ;
+!     SONAME_VERSION = 3 ;
   }
   
   

@@ -1,7 +1,7 @@
 Name: boost
 Summary: The Boost C++ Libraries
 Version: 1.34.1
-Release: 1%{?dist}
+Release: 2%{?dist}
 License: Boost Software License (GPL-Compatible, Free Software License)
 URL: http://www.boost.org/
 Group: System Environment/Libraries
@@ -138,11 +138,11 @@ for i in `find stage -type f -name \*.a`; do
 done;
 for i in `find stage -type f -name \*.so`; do
   NAME=$i;
-  SONAME=$i.2;
+  SONAME=$i.3;
   VNAME=$i.%{version};
   base=`basename $i`;
   NAMEbase=$base;
-  SONAMEbase=$base.2;
+  SONAMEbase=$base.3;
   VNAMEbase=$base.%{version};
   mv $i $VNAME;
   ln -s $VNAMEbase $SONAME;
@@ -183,7 +183,7 @@ rm -rf $RPM_BUILD_ROOT
 %files 
 %defattr(-, root, root, -)
 %{_libdir}/*.so.%{version}
-%{_libdir}/*.so.2
+%{_libdir}/*.so.3
 
 %files devel
 %defattr(-, root, root, -)
@@ -199,6 +199,9 @@ rm -rf $RPM_BUILD_ROOT
 %doc %{_docdir}/boost-%{version}
 
 %changelog
+* Thu Aug 02 2007 Benjamin Kosnik <bkoz@redhat.com> 1.34.1-2
+- SONAME to 3.
+
 * Tue Jul 31 2007 Benjamin Kosnik <bkoz@redhat.com> 1.34.1-1
 - Update to boost_1_34_1.
 - Source via http.
