@@ -1,7 +1,7 @@
 Name: boost
 Summary: The Boost C++ Libraries
 Version: 1.34.1
-Release: 2%{?dist}
+Release: 3%{?dist}
 License: Boost Software License (GPL-Compatible, Free Software License)
 URL: http://www.boost.org/
 Group: System Environment/Libraries
@@ -199,6 +199,9 @@ rm -rf $RPM_BUILD_ROOT
 %doc %{_docdir}/boost-%{version}
 
 %changelog
+* Wed Aug 08 2007 Benjamin Kosnik <bkoz@redhat.com> 1.34.1-3
+- Rebuild for icu 3.8 bump.
+
 * Thu Aug 02 2007 Benjamin Kosnik <bkoz@redhat.com> 1.34.1-2
 - SONAME to 3.
 
