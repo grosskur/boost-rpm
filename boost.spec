@@ -1,7 +1,7 @@
 Name: boost
 Summary: The Boost C++ Libraries
 Version: 1.34.1
-Release: 5%{?dist}
+Release: 6%{?dist}
 License: Boost Software License (GPL-Compatible, Free Software License)
 URL: http://www.boost.org/
 Group: System Environment/Libraries
@@ -25,6 +25,7 @@ Patch0: boost-configure.patch
 Patch1: boost-gcc-soname.patch
 Patch2: boost-use-rpm-optflags.patch
 Patch3: boost-run-tests.patch
+Patch4: boost-regex.patch
 
 %description
 Boost provides free peer-reviewed portable C++ source libraries.  The
@@ -69,6 +70,7 @@ rm -rf %{buildroot}
 %patch1 -p0
 %patch2 -p0
 %patch3 -p0
+%patch4 -p0
 
 %build
 BOOST_ROOT=`pwd`
@@ -199,6 +201,9 @@ rm -rf $RPM_BUILD_ROOT
 %doc %{_docdir}/boost-%{version}
 
 %changelog
+* Mon Jan 14 2008 Benjamin Kosnik <bkoz@redhat.com> 1.34.1-6
+- Fixes for boost.regex (rev 42674).
+
 * Wed Sep 19 2007 Benjamin Kosnik <bkoz@redhat.com> 1.34.1-5
 - (#283771: Linking against boost libraries fails).
 
