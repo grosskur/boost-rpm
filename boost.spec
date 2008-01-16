@@ -1,7 +1,7 @@
 Name: boost
 Summary: The Boost C++ Libraries
 Version: 1.34.1
-Release: 6%{?dist}
+Release: 7%{?dist}
 License: Boost Software License (GPL-Compatible, Free Software License)
 URL: http://www.boost.org/
 Group: System Environment/Libraries
@@ -201,7 +201,7 @@ rm -rf $RPM_BUILD_ROOT
 %doc %{_docdir}/boost-%{version}
 
 %changelog
-* Mon Jan 14 2008 Benjamin Kosnik <bkoz@redhat.com> 1.34.1-6
+* Mon Jan 14 2008 Benjamin Kosnik <bkoz@redhat.com> 1.34.1-7
 - Fixes for boost.regex (rev 42674).
 
 * Wed Sep 19 2007 Benjamin Kosnik <bkoz@redhat.com> 1.34.1-5
