@@ -138,3 +138,15 @@ diff -urp boost_1_34_1/boost/archive/polymorphic_iarchive.hpp boost_1_34_1.pm/bo
  // determine if its necessary to handle (u)int64_t specifically
  // i.e. that its not a synonym for (unsigned) long
  // if there is no 64 bit int or if its the same as a long
+diff -urp boost_1_34_1/boost/archive/polymorphic_iarchive.hpp boost_1_34_1.pm/boost/archive/polymorphic_iarchive.hpp
+--- boost_1_34_1/boost/archive/polymorphic_oarchive.hpp	2005-12-11 07:12:51.000000000 +0100
++++ boost_1_34_1.pm/boost/archive/polymorphic_oarchive.hpp	2008-02-06 18:42:07.000000000 +0100
+@@ -33,6 +33,8 @@ namespace std{
+ #include <boost/archive/detail/interface_iarchive.hpp>
+ #include <boost/serialization/nvp.hpp>
+ 
++#include <limits.h>
++
+ // determine if its necessary to handle (u)int64_t specifically
+ // i.e. that its not a synonym for (unsigned) long
+ // if there is no 64 bit int or if its the same as a long
