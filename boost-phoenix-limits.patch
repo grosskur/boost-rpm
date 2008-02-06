@@ -1,0 +1,12 @@
+diff -urp boost_1_34_1/boost/spirit/phoenix/operators.hpp boost_1_34_1.pm/boost/spirit/phoenix/operators.hpp
+--- boost_1_34_1/boost/spirit/phoenix/operators.hpp	2006-08-25 18:27:30.000000000 +0200
++++ boost_1_34_1.pm/boost/spirit/phoenix/operators.hpp	2008-02-06 16:29:32.000000000 +0100
+@@ -24,6 +24,7 @@
+ #include <boost/spirit/phoenix/composite.hpp>
+ #include <boost/config.hpp>
+ #include <boost/mpl/if.hpp>
++#include <limits.h>
+ 
+ ///////////////////////////////////////////////////////////////////////////////
+ namespace phoenix {
+Only in boost_1_34_1.pm/boost/spirit/phoenix: operators.hpp~
