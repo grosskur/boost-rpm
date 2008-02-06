@@ -1,7 +1,7 @@
 Name: boost
 Summary: The Boost C++ Libraries
 Version: 1.34.1
-Release: 8%{?dist}
+Release: 9%{?dist}
 License: Boost Software License (GPL-Compatible, Free Software License)
 URL: http://www.boost.org/
 Group: System Environment/Libraries
@@ -26,7 +26,7 @@ Patch1: boost-gcc-soname.patch
 Patch2: boost-use-rpm-optflags.patch
 Patch3: boost-run-tests.patch
 Patch4: boost-regex.patch
-Patch5: boost-phoenix-limits.patch
+Patch5: boost-gcc43.patch
 
 %description
 Boost provides free peer-reviewed portable C++ source libraries.  The
@@ -203,8 +203,8 @@ rm -rf $RPM_BUILD_ROOT
 %doc %{_docdir}/boost-%{version}
 
 %changelog
-* Wed Feb  6 2008 Petr Machata <pmachata@redhat.com> - 1.34.1-8
-- Add an include to boost/spirit/phoenix/operators.hpp
+* Wed Feb  6 2008 Petr Machata <pmachata@redhat.com> - 1.34.1-9
+- Fixes for GCC 4.3
 - Resolves: #431609
 
 * Mon Jan 14 2008 Benjamin Kosnik <bkoz@redhat.com> 1.34.1-7
@@ -248,15 +248,15 @@ rm -rf $RPM_BUILD_ROOT
   Clarified BSL as GPL-Compatible, Free Software License.
   Remove Obsoletes.
   Add Provides boost-python.
-  Remove mkdir -p $RPM_BUILD_ROOT%{_docdir}
+  Remove mkdir -p $RPM_BUILD_ROOT%%{_docdir}
   Added periods for decription text. 
   Fix Group field.
   Remove doc Requires boost.
   Preserve timestamps on install.
-  Use %defattr(-, root, root, -)
+  Use %%defattr(-, root, root, -)
   Added static package for .a libs.
   Install static libs with 0644 permissions.
-  Use %doc for doc files.
+  Use %%doc for doc files.
 
 * Mon Jan 22 2007 Benjamin Kosnik <bkoz@redhat.com> 1.34.0-0.5
 - Update to boost.RC_1_34_0 snapshot as of 2007-01-19.
@@ -265,8 +265,8 @@ rm -rf $RPM_BUILD_ROOT
   threads (regex and thread).
 
 * Thu Nov 23 2006 Benjamin Kosnik <bkoz@redhat.com> 1.33.1-10
-- (#182414: boost: put tests in %check section) via Rex Dieter
-- Fix EVR with %{?dist} tag via Gianluca Sforna
+- (#182414: boost: put tests in %%check section) via Rex Dieter
+- Fix EVR with %%{?dist} tag via Gianluca Sforna
 
 * Wed Nov 15 2006 Benjamin Kosnik <bkoz@redhat.com> 1.33.1-9
 - (#154784: boost-debuginfo package is empty)
