@@ -150,3 +150,15 @@ diff -urp boost_1_34_1/boost/archive/polymorphic_iarchive.hpp boost_1_34_1.pm/bo
  // determine if its necessary to handle (u)int64_t specifically
  // i.e. that its not a synonym for (unsigned) long
  // if there is no 64 bit int or if its the same as a long
+diff -urp boost_1_34_1/boost/date_time/date_facet.hpp boost_1_34_1-pm/boost/date_time/date_facet.hpp
+--- boost_1_34_1/boost/date_time/date_facet.hpp	2005-09-05 23:10:50.000000000 +0200
++++ boost_1_34_1-pm/boost/date_time/date_facet.hpp	2008-02-13 16:07:59.000000000 +0100
+@@ -429,7 +429,7 @@ namespace boost { namespace date_time {
+     typedef std::basic_string<CharT> string_type;
+     typedef CharT                    char_type;
+     typedef boost::date_time::period_parser<date_type, CharT>  period_parser_type;
+-    typedef special_values_parser<date_type,CharT> special_values_parser_type; 
++    typedef boost::date_time::special_values_parser<date_type,CharT> special_values_parser_type; 
+     typedef std::vector<std::basic_string<CharT> > input_collection_type;
+     typedef format_date_parser<date_type, CharT> format_date_parser_type;
+     // date_generators stuff goes here
