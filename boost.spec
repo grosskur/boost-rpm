@@ -1,25 +1,21 @@
 Name: boost
 Summary: The Boost C++ Libraries
 Version: 1.34.1
-Release: 12%{?dist}
+Release: 13%{?dist}
 License: Boost Software License (GPL-Compatible, Free Software License)
 URL: http://www.boost.org/
 Group: System Environment/Libraries
-#Source: %{name}_1_34_1.tar.bz2
 Source: http://downloads.sourceforge.net/boost/boost_1_34_1.tar.bz2
 Obsoletes: boost-doc <= 1.30.2
 Obsoletes: boost-python <= 1.30.2
 Provides: boost-python = %{version}-%{release}
 Provides: boost-doc = %{version}-%{release}
-BuildRoot: %(mktemp -ud %{_tmppath}/%{name}-%{version}-%{release}-XXXXXX)
+BuildRoot: %{_tmppath}/%{name}-%{version}-%{release}-root-%(%{__id_u} -n)
 BuildRequires: libstdc++-devel
 BuildRequires: bzip2-libs
 BuildRequires: bzip2-devel
-BuildRequires: zlib
 BuildRequires: zlib-devel
-BuildRequires: python
 BuildRequires: python-devel
-BuildRequires: libicu
 BuildRequires: libicu-devel
 Patch0: boost-configure.patch
 Patch1: boost-gcc-soname.patch
@@ -49,8 +45,7 @@ Headers and shared object symlinks for the Boost C++ libraries.
 %package devel-static
 Summary: The Boost C++ static development libraries
 Group: Development/Libraries
-Requires: boost = %{version}-%{release}
-Provides: boost-python-devel = %{version}-%{release}
+Requires: boost-devel = %{version}-%{release}
 
 %description devel-static
 Static libraries for the Boost C++ libraries.
@@ -64,8 +59,6 @@ Provides: boost-python-docs = %{version}-%{release}
 HTML documentation files for Boost C++ libraries.
 
 %prep
-rm -rf %{buildroot}
-
 %setup -q -n %{name}_1_34_1
 %patch0 -p0
 %patch1 -p0
@@ -99,11 +92,7 @@ make all
 #cd ..
 
 %check
-# --with tests activates checking
-%define with_tests %{?_with_tests:1}%{!?_with_tests:0}
-%define without_tests %{!?_with_tests:1}%{?_with_tests:0}
-
-%if %{with_tests}
+%if %{with tests}
 echo "<p>" `uname -a` "</p>" > status/regression_comment.html
 echo "" >> status/regression_comment.html
 echo "<p>" `g++ --version` "</p>" >> status/regression_comment.html
@@ -133,7 +122,7 @@ fi
 rm -rf $RPM_BUILD_ROOT
 mkdir -p $RPM_BUILD_ROOT%{_libdir}
 mkdir -p $RPM_BUILD_ROOT%{_includedir}
-mkdir -p $RPM_BUILD_ROOT%{_docdir}/boost-%{version}
+mkdir -p $RPM_BUILD_ROOT%{_docdir}/%{name}-%{version}
 
 # install lib
 for i in `find stage -type f -name \*.a`; do
@@ -157,24 +146,26 @@ for i in `find stage -type f -name \*.so`; do
 done;
 
 # install include files
-for i in `find boost -type d`; do
-  mkdir -p $RPM_BUILD_ROOT%{_includedir}/$i
-done
-for i in `find boost -type f`; do
-  install -p -m 644 $i $RPM_BUILD_ROOT%{_includedir}/$i
+find %{name} -type d | while read a; do
+  mkdir -p $RPM_BUILD_ROOT%{_includedir}/$a
+  find $a -mindepth 1 -maxdepth 1 -type f \
+    | xargs -r install -m 644 -p -t $RPM_BUILD_ROOT%{_includedir}/$a
 done
 
-#install doc files
-cd doc/html; 
-for i in `find . -type d`; do
-  mkdir -p $RPM_BUILD_ROOT%{_docdir}/boost-%{version}/$i
+# install doc files
+DOCPATH=$RPM_BUILD_ROOT%{_docdir}/%{name}-%{version}/
+find libs doc -type f \( -name \*.htm -o -name \*.html \) \
+    | sed -n '/\//{s,/[^/]*$,,;p}' \
+    | sort -u > tmp-doc-directories
+sed "s:^:$DOCPATH:" tmp-doc-directories | xargs -r mkdir -p
+cat tmp-doc-directories | while read a; do
+    find $a -mindepth 1 -maxdepth 1 -name \*.htm\* \
+	 | xargs install -m 644 -p -t $DOCPATH$a
 done
-for i in `find . -type f`; do
-  install -p -m 644 $i $RPM_BUILD_ROOT%{_docdir}/boost-%{version}/$i
-done
-cd ../..;
+rm tmp-doc-directories
+install -p -m 644 -t $DOCPATH LICENSE_1_0.txt index.htm
 
-# remove scripts used to generate include files 
+# remove scripts used to generate include files
 find $RPM_BUILD_ROOT%{_includedir}/ \( -name '*.pl' -o -name '*.sh' \) -exec rm {} \;
 
 %clean
@@ -184,7 +175,7 @@ rm -rf $RPM_BUILD_ROOT
 
 %postun -p /sbin/ldconfig
 
-%files 
+%files
 %defattr(-, root, root, -)
 %{_libdir}/*.so.%{version}
 %{_libdir}/*.so.3
@@ -200,9 +191,15 @@ rm -rf $RPM_BUILD_ROOT
 
 %files doc
 %defattr(-, root, root, -)
-%doc %{_docdir}/boost-%{version}
+%doc %{_docdir}/%{name}-%{version}
 
 %changelog
+* Wed Mar 26 2008 Petr Machata <pmachata@redhat.com> - 1.34.1-13
+- Install library doc files
+- Revamp %%install phase to speed up overall build time
+- Some cleanups per merge review
+- Resolves: #437032
+
 * Thu Feb 14 2008 Petr Machata <pmachata@redhat.com> - 1.34.1-12
 - Fix "changes meaning of keywords" in boost python
 - Resolves: #432694
