@@ -1,7 +1,9 @@
+%bcond_with tests
+
 Name: boost
 Summary: The Boost C++ Libraries
 Version: 1.34.1
-Release: 13%{?dist}
+Release: 14%{?dist}
 License: Boost Software License (GPL-Compatible, Free Software License)
 URL: http://www.boost.org/
 Group: System Environment/Libraries
@@ -42,13 +44,15 @@ Provides: boost-python-devel = %{version}-%{release}
 %description devel
 Headers and shared object symlinks for the Boost C++ libraries.
 
-%package devel-static
+%package static
 Summary: The Boost C++ static development libraries
 Group: Development/Libraries
 Requires: boost-devel = %{version}-%{release}
+Obsoletes: boost-devel-static < 1.34.1-14
+Provides: boost-devel-static = %{version}-%{release}
 
-%description devel-static
-Static libraries for the Boost C++ libraries.
+%description static
+Static Boost C++ libraries.
 
 %package doc
 Summary: The Boost C++ html docs
@@ -154,7 +158,7 @@ done
 
 # install doc files
 DOCPATH=$RPM_BUILD_ROOT%{_docdir}/%{name}-%{version}/
-find libs doc -type f \( -name \*.htm -o -name \*.html \) \
+find libs doc more -type f \( -name \*.htm -o -name \*.html \) \
     | sed -n '/\//{s,/[^/]*$,,;p}' \
     | sort -u > tmp-doc-directories
 sed "s:^:$DOCPATH:" tmp-doc-directories | xargs -r mkdir -p
@@ -185,7 +189,7 @@ rm -rf $RPM_BUILD_ROOT
 %{_includedir}/boost
 %{_libdir}/*.so
 
-%files devel-static
+%files static
 %defattr(-, root, root, -)
 %{_libdir}/*.a
 
@@ -194,6 +198,10 @@ rm -rf $RPM_BUILD_ROOT
 %doc %{_docdir}/%{name}-%{version}
 
 %changelog
+* Thu Mar 27 2008 Petr Machata <pmachata@redhat.com> - 1.34.1-14
+- Change devel-static back to static.
+- Related: #225622
+
 * Wed Mar 26 2008 Petr Machata <pmachata@redhat.com> - 1.34.1-13
 - Install library doc files
 - Revamp %%install phase to speed up overall build time
