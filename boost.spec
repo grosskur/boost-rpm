@@ -3,8 +3,8 @@
 Name: boost
 Summary: The Boost C++ Libraries
 Version: 1.34.1
-Release: 14%{?dist}
-License: Boost Software License (GPL-Compatible, Free Software License)
+Release: 15%{?dist}
+License: Boost
 URL: http://www.boost.org/
 Group: System Environment/Libraries
 Source: http://downloads.sourceforge.net/boost/boost_1_34_1.tar.bz2
@@ -198,6 +198,9 @@ rm -rf $RPM_BUILD_ROOT
 %doc %{_docdir}/%{name}-%{version}
 
 %changelog
+* Thu May 29 2008 Tom "spot" Callaway <tcallawa@redhat.com> - 1.34.1-15
+- fix license tag
+
 * Thu Mar 27 2008 Petr Machata <pmachata@redhat.com> - 1.34.1-14
 - Change devel-static back to static.
 - Related: #225622
