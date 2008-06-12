@@ -3,7 +3,7 @@
 Name: boost
 Summary: The Boost C++ Libraries
 Version: 1.34.1
-Release: 15%{?dist}
+Release: 16%{?dist}
 License: Boost
 URL: http://www.boost.org/
 Group: System Environment/Libraries
@@ -198,6 +198,10 @@ rm -rf $RPM_BUILD_ROOT
 %doc %{_docdir}/%{name}-%{version}
 
 %changelog
+* Thu Jun 12 2008 Petr Machata <pmachata@redhat.com> - 1.34.1-16
+- Fix "changes meaning of keywords" in boost date_time
+- Related: #450718
+
 * Thu May 29 2008 Tom "spot" Callaway <tcallawa@redhat.com> - 1.34.1-15
 - fix license tag
 
