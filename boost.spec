@@ -1,13 +1,18 @@
 %bcond_with tests
+%define sonamever 4
 
 Name: boost
 Summary: The Boost C++ Libraries
-Version: 1.34.1
-Release: 16%{?dist}
+Version: 1.36.0
+Release: 0.1.beta1%{?dist}
 License: Boost
 URL: http://www.boost.org/
 Group: System Environment/Libraries
-Source: http://downloads.sourceforge.net/boost/boost_1_34_1.tar.bz2
+# boost_1_36_0_beta1.tar.bz2 comes from svn checkout:
+#  svn co http://svn.boost.org/svn/boost/tags/release/Boost_1_36_0_beta1 \
+#    boost_1_36_0_beta1 -r 47919
+Source: boost_1_36_0_beta1.tar.bz2
+Source2: boost-gcc-soname.patch
 Obsoletes: boost-doc <= 1.30.2
 Obsoletes: boost-python <= 1.30.2
 Provides: boost-python = %{version}-%{release}
@@ -20,10 +25,8 @@ BuildRequires: zlib-devel
 BuildRequires: python-devel
 BuildRequires: libicu-devel
 Patch0: boost-configure.patch
-Patch1: boost-gcc-soname.patch
 Patch2: boost-use-rpm-optflags.patch
 Patch3: boost-run-tests.patch
-Patch4: boost-regex.patch
 Patch5: boost-gcc43.patch
 
 %description
@@ -63,12 +66,11 @@ Provides: boost-python-docs = %{version}-%{release}
 HTML documentation files for Boost C++ libraries.
 
 %prep
-%setup -q -n %{name}_1_34_1
+%setup -q -n %{name}_1_36_0_beta1
 %patch0 -p0
-%patch1 -p0
-%patch2 -p0
+sed 's/!!!SONAME!!!/%{sonamever}/' %{SOURCE2} | %{__patch} -p1
+%patch2 -p1
 %patch3 -p0
-%patch4 -p0
 %patch5 -p1
 
 %build
@@ -135,11 +137,11 @@ for i in `find stage -type f -name \*.a`; do
 done;
 for i in `find stage -type f -name \*.so`; do
   NAME=$i;
-  SONAME=$i.3;
+  SONAME=$i.%{sonamever};
   VNAME=$i.%{version};
   base=`basename $i`;
   NAMEbase=$base;
-  SONAMEbase=$base.3;
+  SONAMEbase=$base.%{sonamever};
   VNAMEbase=$base.%{version};
   mv $i $VNAME;
   ln -s $VNAMEbase $SONAME;
@@ -182,7 +184,7 @@ rm -rf $RPM_BUILD_ROOT
 %files
 %defattr(-, root, root, -)
 %{_libdir}/*.so.%{version}
-%{_libdir}/*.so.3
+%{_libdir}/*.so.%{sonamever}
 
 %files devel
 %defattr(-, root, root, -)
@@ -198,6 +200,12 @@ rm -rf $RPM_BUILD_ROOT
 %doc %{_docdir}/%{name}-%{version}
 
 %changelog
+* Mon Aug 11 2008 Petr Machata <pmachata@redhat.com> - 1.36.0-0.1.beta1
+- Rebase to 1.36.0.beta1
+  - Drop boost-regex.patch and portions of boost-gcc43.patch, port the rest
+  - Automate SONAME tracking and bump SONAME to 4
+  - Adjust boost-configure.patch to include threading=single,multi explicitly
+
 * Thu Jun 12 2008 Petr Machata <pmachata@redhat.com> - 1.34.1-16
 - Fix "changes meaning of keywords" in boost date_time
 - Related: #450718

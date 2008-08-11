@@ -13,7 +13,7 @@
   
   BJAM=""
   TOOLSET=""
-! BJAM_CONFIG="-d2 --layout=system variant=release debug-symbols=on"
+! BJAM_CONFIG="-d2 --layout=system variant=release threading=single,multi debug-symbols=on"
   BUILD=""
   PREFIX=/usr/local
   EPREFIX=
