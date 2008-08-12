@@ -1,21 +1,37 @@
---- boost_1_36_0_beta1/tools/build/v2/tools/gcc.jam.orig	2008-08-11 13:15:13.000000000 +0200
-+++ boost_1_36_0_beta1/tools/build/v2/tools/gcc.jam	2008-08-11 15:21:05.000000000 +0200
-@@ -336,7 +336,8 @@
-     # OSF does have an option called -soname but it doesn't seem to work as
-     # expected, therefore it has been disabled.
-     HAVE_SONAME   = "" ;
--    SONAME_OPTION = -h ;
-+    SONAME_OPTION = -soname ;
-+    SONAME_VERSION = !!!SONAME!!! ;
- }
- 
- 
-@@ -726,7 +727,7 @@
- # Differ from 'link' above only by -shared.
- actions link.dll bind LIBRARIES
- {
--    "$(CONFIG_COMMAND)" -L"$(LINKPATH)" -Wl,$(RPATH_OPTION:E=-R)$(SPACE)-Wl,"$(RPATH)" "$(.IMPLIB-COMMAND)$(<[1])" -o "$(<[-1])" $(HAVE_SONAME)-Wl,$(SONAME_OPTION)$(SPACE)-Wl,$(<[-1]:D=) -shared $(START-GROUP) "$(>)" "$(LIBRARIES)" $(FINDLIBS-ST-PFX) -l$(FINDLIBS-ST) $(FINDLIBS-SA-PFX) -l$(FINDLIBS-SA) $(END-GROUP) $(OPTIONS) $(USER_OPTIONS)
-+    "$(CONFIG_COMMAND)" -L"$(LINKPATH)" -Wl,$(RPATH_OPTION:E=-R)$(SPACE)-Wl,"$(RPATH)" "$(.IMPLIB-COMMAND)$(<[1])" -o "$(<[-1])" $(HAVE_SONAME)-Wl,$(SONAME_OPTION)$(SPACE)-Wl,$(<[-1]:D=).$(SONAME_VERSION) -shared $(START-GROUP) "$(>)" "$(LIBRARIES)" $(FINDLIBS-ST-PFX) -l$(FINDLIBS-ST) $(FINDLIBS-SA-PFX) -l$(FINDLIBS-SA) $(END-GROUP) $(OPTIONS) $(USER_OPTIONS)
- }
- 
- # Set up threading support. It's somewhat contrived, so perform it at the end,
+*** tools/build/v2/tools/gcc.jam.orig	2007-05-03 08:09:04.000000000 +0200
+--- tools/build/v2/tools/gcc.jam	2007-06-26 20:37:44.000000000 +0200
+*************** if [ os.name ] != NT && [ os.name ] != O
+*** 316,322 ****
+      # expected, therefore it has been disabled.
+  
+      HAVE_SONAME   = "" ;
+!     SONAME_OPTION = -h ;
+  }
+  
+  
+--- 316,323 ----
+      # expected, therefore it has been disabled.
+  
+      HAVE_SONAME   = "" ;
+!     SONAME_OPTION = -soname ;
+!     SONAME_VERSION = 3 ;
+  }
+  
+  
+*************** rule link.dll ( targets * : sources * : 
+*** 631,637 ****
+  # Differ from 'link' above only by -shared.
+  actions link.dll bind LIBRARIES
+  {
+!     "$(CONFIG_COMMAND)" -L"$(LINKPATH)" -Wl,$(RPATH_OPTION:E=-R)$(SPACE)-Wl,"$(RPATH)" "$(.IMPLIB-COMMAND)$(<[1])" -o "$(<[-1])" $(HAVE_SONAME)-Wl,$(SONAME_OPTION)$(SPACE)-Wl,$(<[-1]:D=) -shared $(START-GROUP) "$(>)" "$(LIBRARIES)" -l$(FINDLIBS-ST) -l$(FINDLIBS-SA) $(END-GROUP) $(OPTIONS) $(USER_OPTIONS)
+  }
+  
+  # Set up threading support. It's somewhat contrived, so perform it at the end,
+--- 632,638 ----
+  # Differ from 'link' above only by -shared.
+  actions link.dll bind LIBRARIES
+  {
+!     "$(CONFIG_COMMAND)" -L"$(LINKPATH)" -Wl,$(RPATH_OPTION:E=-R)$(SPACE)-Wl,"$(RPATH)" "$(.IMPLIB-COMMAND)$(<[1])" -o "$(<[-1])" $(HAVE_SONAME)-Wl,$(SONAME_OPTION)$(SPACE)-Wl,$(<[-1]:D=).$(SONAME_VERSION) -shared $(START-GROUP) "$(>)" "$(LIBRARIES)" -l$(FINDLIBS-ST) -l$(FINDLIBS-SA) $(END-GROUP) $(OPTIONS) $(USER_OPTIONS)
+  }
+  
+  # Set up threading support. It's somewhat contrived, so perform it at the end,

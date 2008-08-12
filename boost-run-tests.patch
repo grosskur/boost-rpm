@@ -1,5 +1,5 @@
-*** tools/regression/src/run_tests.sh.orig	2007-07-31 19:44:25.000000000 -0500
---- tools/regression/src/run_tests.sh	2007-08-01 12:17:25.000000000 -0500
+*** tools/regression/run_tests.sh.orig	2007-07-31 19:44:25.000000000 -0500
+--- tools/regression/run_tests.sh	2007-08-01 12:17:25.000000000 -0500
 ***************
 *** 15,21 ****
   # This can be either a non-exitent directory or an already complete Boost
