@@ -1,13 +1,14 @@
 %bcond_with tests
+%define sonamever 4
 
 Name: boost
 Summary: The Boost C++ Libraries
-Version: 1.34.1
-Release: 17%{?dist}
+Version: 1.37.0
+Release: 1%{?dist}
 License: Boost
 URL: http://www.boost.org/
 Group: System Environment/Libraries
-Source: http://downloads.sourceforge.net/boost/boost_1_34_1.tar.bz2
+Source: boost_1_37_0.tar.bz2
 Obsoletes: boost-doc <= 1.30.2
 Obsoletes: boost-python <= 1.30.2
 Provides: boost-python = %{version}-%{release}
@@ -19,12 +20,12 @@ BuildRequires: bzip2-devel
 BuildRequires: zlib-devel
 BuildRequires: python-devel
 BuildRequires: libicu-devel
+BuildRequires: chrpath
 Patch0: boost-configure.patch
-Patch1: boost-gcc-soname.patch
-Patch2: boost-use-rpm-optflags.patch
-Patch3: boost-run-tests.patch
-Patch4: boost-regex.patch
-Patch5: boost-gcc43.patch
+Patch1: boost-use-rpm-optflags.patch
+Patch2: boost-run-tests.patch
+Patch3: boost-gcc43.patch
+Patch4: boost-gcc-soname.patch
 
 %description
 Boost provides free peer-reviewed portable C++ source libraries.  The
@@ -63,13 +64,12 @@ Provides: boost-python-docs = %{version}-%{release}
 HTML documentation files for Boost C++ libraries.
 
 %prep
-%setup -q -n %{name}_1_34_1
-%patch0 -p0
+%setup -q -n %{name}_1_37_0
+%patch0 -p0 
 %patch1 -p0
 %patch2 -p0
-%patch3 -p0
-%patch4 -p0
-%patch5 -p1
+%patch3 -p1
+sed 's/!!!SONAME!!!/%{sonamever}/' %{PATCH4} | %{__patch} -p1
 
 %build
 BOOST_ROOT=`pwd`
@@ -80,7 +80,6 @@ export BOOST_ROOT
 (cd tools/jam/src && ./build.sh)
 BJAM=`find tools/jam/src/ -name bjam -a -type f`
 
-#BUILD_FLAGS="--with-toolset=gcc --prefix=$RPM_BUILD_ROOT%{_prefix}"
 BUILD_FLAGS="--with-toolset=gcc"
 PYTHON_VERSION=$(python -c 'import sys; print sys.version[:3]')
 PYTHON_FLAGS="--with-python-root=/usr --with-python-version=$PYTHON_VERSION"
@@ -135,16 +134,21 @@ for i in `find stage -type f -name \*.a`; do
 done;
 for i in `find stage -type f -name \*.so`; do
   NAME=$i;
-  SONAME=$i.3;
+  SONAME=$i.%{sonamever};
   VNAME=$i.%{version};
   base=`basename $i`;
   NAMEbase=$base;
-  SONAMEbase=$base.3;
+  SONAMEbase=$base.%{sonamever};
   VNAMEbase=$base.%{version};
   mv $i $VNAME;
+
+  # remove rpath
+  chrpath --delete $VNAME;
+
   ln -s $VNAMEbase $SONAME;
   ln -s $VNAMEbase $NAME;
-  install -p -m 755 $VNAME $RPM_BUILD_ROOT%{_libdir}/$VNAMEbase;
+  install -p -m 755 $VNAME $RPM_BUILD_ROOT%{_libdir}/$VNAMEbase; 
+
   mv $SONAME $RPM_BUILD_ROOT%{_libdir}/$SONAMEbase;
   mv $NAME $RPM_BUILD_ROOT%{_libdir}/$NAMEbase;
 done;
@@ -153,7 +157,7 @@ done;
 find %{name} -type d | while read a; do
   mkdir -p $RPM_BUILD_ROOT%{_includedir}/$a
   find $a -mindepth 1 -maxdepth 1 -type f \
-    | xargs -r install -m 644 -p -t $RPM_BUILD_ROOT%{_includedir}/$a
+  | xargs -r install -m 644 -p -t $RPM_BUILD_ROOT%{_includedir}/$a
 done
 
 # install doc files
@@ -164,7 +168,7 @@ find libs doc more -type f \( -name \*.htm -o -name \*.html \) \
 sed "s:^:$DOCPATH:" tmp-doc-directories | xargs -r mkdir -p
 cat tmp-doc-directories | while read a; do
     find $a -mindepth 1 -maxdepth 1 -name \*.htm\* \
-	 | xargs install -m 644 -p -t $DOCPATH$a
+    | xargs install -m 644 -p -t $DOCPATH$a
 done
 rm tmp-doc-directories
 install -p -m 644 -t $DOCPATH LICENSE_1_0.txt index.htm
@@ -182,7 +186,7 @@ rm -rf $RPM_BUILD_ROOT
 %files
 %defattr(-, root, root, -)
 %{_libdir}/*.so.%{version}
-%{_libdir}/*.so.3
+%{_libdir}/*.so.%{sonamever}
 
 %files devel
 %defattr(-, root, root, -)
@@ -198,9 +202,26 @@ rm -rf $RPM_BUILD_ROOT
 %doc %{_docdir}/%{name}-%{version}
 
 %changelog
+* Tue Dec 16 2008 Benjamin Kosnik <bkoz@redhat.com> - 1.37.0-1
+- Fix rpmlint rpath errors.
+- Fix rpmlint warnings on tabs and spaces.
+- Bump SONAME to 4
+
+* Tue Nov 17 2008 Benjamin Kosnik <bkoz@redhat.com> - 1.37.0-0.1
+- Rebase to 1.37.0.
+
+* Tue Oct 21 2008 Benjamin Kosnik <bkoz@redhat.com> - 1.36.0-1
+- Rebase to 1.36.0.
+
 * Mon Oct  6 2008 Petr Machata <pmachata@redhat.com> - 1.34.1-17
 - Fix gcc43 patch to apply cleanly under --fuzz=0
 - Resolves: #465003
+
+* Mon Aug 11 2008 Petr Machata <pmachata@redhat.com> - 1.36.0-0.1.beta1
+- Rebase to 1.36.0.beta1
+  - Drop boost-regex.patch and portions of boost-gcc43.patch, port the rest
+  - Automate SONAME tracking and bump SONAME to 4
+  - Adjust boost-configure.patch to include threading=single,multi explicitly
 
 * Thu Jun 12 2008 Petr Machata <pmachata@redhat.com> - 1.34.1-16
 - Fix "changes meaning of keywords" in boost date_time
