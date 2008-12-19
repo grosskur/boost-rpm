@@ -4,7 +4,7 @@
 Name: boost
 Summary: The Boost C++ Libraries
 Version: 1.37.0
-Release: 1%{?dist}
+Release: 2%{?dist}
 License: Boost
 URL: http://www.boost.org/
 Group: System Environment/Libraries
@@ -26,6 +26,7 @@ Patch1: boost-use-rpm-optflags.patch
 Patch2: boost-run-tests.patch
 Patch3: boost-gcc43.patch
 Patch4: boost-gcc-soname.patch
+Patch5: boost-function_template.patch
 
 %description
 Boost provides free peer-reviewed portable C++ source libraries.  The
@@ -70,6 +71,7 @@ HTML documentation files for Boost C++ libraries.
 %patch2 -p0
 %patch3 -p1
 sed 's/!!!SONAME!!!/%{sonamever}/' %{PATCH4} | %{__patch} -p1
+%patch5 -p0
 
 %build
 BOOST_ROOT=`pwd`
@@ -202,6 +204,10 @@ rm -rf $RPM_BUILD_ROOT
 %doc %{_docdir}/%{name}-%{version}
 
 %changelog
+* Fri Dec 19 2008 Petr Machata <pmachata@redhat.com> - 1.37.0-2
+- Apply a function_template patch from Caolan McNamara
+- Resolves: #477131
+
 * Tue Dec 16 2008 Benjamin Kosnik <bkoz@redhat.com> - 1.37.0-1
 - Fix rpmlint rpath errors.
 - Fix rpmlint warnings on tabs and spaces.
