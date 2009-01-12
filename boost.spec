@@ -4,7 +4,7 @@
 Name: boost
 Summary: The Boost C++ Libraries
 Version: 1.37.0
-Release: 2%{?dist}
+Release: 3%{?dist}
 License: Boost
 URL: http://www.boost.org/
 Group: System Environment/Libraries
@@ -27,6 +27,7 @@ Patch2: boost-run-tests.patch
 Patch3: boost-gcc43.patch
 Patch4: boost-gcc-soname.patch
 Patch5: boost-function_template.patch
+Patch6: boost-unneccessary_iostreams.patch
 
 %description
 Boost provides free peer-reviewed portable C++ source libraries.  The
@@ -66,12 +67,13 @@ HTML documentation files for Boost C++ libraries.
 
 %prep
 %setup -q -n %{name}_1_37_0
-%patch0 -p0 
+%patch0 -p0
 %patch1 -p0
 %patch2 -p0
 %patch3 -p1
-sed 's/!!!SONAME!!!/%{sonamever}/' %{PATCH4} | %{__patch} -p1
+sed 's/!!!SONAME!!!/%{sonamever}/' %{PATCH4} | %{__patch} -p1 --fuzz=0
 %patch5 -p0
+%patch6 -p0
 
 %build
 BOOST_ROOT=`pwd`
@@ -204,6 +206,12 @@ rm -rf $RPM_BUILD_ROOT
 %doc %{_docdir}/%{name}-%{version}
 
 %changelog
+* Mon Jan 12 2009 Petr Machata <pmachata@redhat.com> - 1.37.0-3
+- Apply a unneccessary_iostreams patch from Caolan McNamara
+- Fix soname patch so that it applies with fuzz=0.  Use fuzz=0 option
+  in spec file just like ordinary patches do.
+- Resolves: #479409
+
 * Fri Dec 19 2008 Petr Machata <pmachata@redhat.com> - 1.37.0-2
 - Apply a function_template patch from Caolan McNamara
 - Resolves: #477131
