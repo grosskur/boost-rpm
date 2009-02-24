@@ -4,7 +4,7 @@
 Name: boost
 Summary: The Boost C++ Libraries
 Version: 1.37.0
-Release: 3%{?dist}
+Release: 4%{?dist}
 License: Boost
 URL: http://www.boost.org/
 Group: System Environment/Libraries
@@ -206,6 +206,9 @@ rm -rf $RPM_BUILD_ROOT
 %doc %{_docdir}/%{name}-%{version}
 
 %changelog
+* Mon Feb 23 2009 Fedora Release Engineering <rel-eng@lists.fedoraproject.org> - 1.37.0-4
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_11_Mass_Rebuild
+
 * Mon Jan 12 2009 Petr Machata <pmachata@redhat.com> - 1.37.0-3
 - Apply a unneccessary_iostreams patch from Caolan McNamara
 - Fix soname patch so that it applies with fuzz=0.  Use fuzz=0 option
