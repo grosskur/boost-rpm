@@ -4,7 +4,7 @@
 Name: boost
 Summary: The Boost C++ Libraries
 Version: 1.37.0
-Release: 5%{?dist}
+Release: 6%{?dist}
 License: Boost
 URL: http://www.boost.org/
 Group: System Environment/Libraries
@@ -76,8 +76,7 @@ HTML documentation files for Boost C++ libraries.
 sed 's/!!!SONAME!!!/%{sonamever}/' %{PATCH4} | %{__patch} -p1 --fuzz=0
 %patch5 -p0
 %patch6 -p0
-%patch7 -p1
-#sed 's/!!!SMP_FLAGS!!!/%{?_smp_mflags}/' %{PATCH7} | %{__patch} -p1 --fuzz=0
+sed 's/!!!SMP_FLAGS!!!/%{?_smp_mflags}/' %{PATCH7} | %{__patch} -p1 --fuzz=0
 %patch8 -p1
 
 %build
@@ -211,7 +210,7 @@ rm -rf $RPM_BUILD_ROOT
 %doc %{_docdir}/%{name}-%{version}
 
 %changelog
-* Mon Mar 23 2009 Petr Machata <pmachata@redhat.com> - 1.37.0-5
+* Mon Mar 23 2009 Petr Machata <pmachata@redhat.com> - 1.37.0-6
 - Apply a SMP patch from Stefan Ring
 - Apply a workaround for "cannot appear in a constant-expression" in
   dynamic_bitset library.
