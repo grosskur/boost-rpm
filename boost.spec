@@ -4,7 +4,7 @@
 Name: boost
 Summary: The Boost C++ Libraries
 Version: 1.37.0
-Release: 6%{?dist}
+Release: 7%{?dist}
 License: Boost
 URL: http://www.boost.org/
 Group: System Environment/Libraries
@@ -210,6 +210,9 @@ rm -rf $RPM_BUILD_ROOT
 %doc %{_docdir}/%{name}-%{version}
 
 %changelog
+* Mon May 04 2009 Benjamin Kosnik <bkoz@redhat.com> - 1.37.0-7
+- Rebuild for libicu bump.
+
 * Mon Mar 23 2009 Petr Machata <pmachata@redhat.com> - 1.37.0-6
 - Apply a SMP patch from Stefan Ring
 - Apply a workaround for "cannot appear in a constant-expression" in
