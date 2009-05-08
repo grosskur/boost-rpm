@@ -1,18 +1,30 @@
-%bcond_with tests
-%define sonamever 4
-
 Name: boost
 Summary: The Boost C++ Libraries
-Version: 1.37.0
-Release: 7%{?dist}
+Version: 1.39.0
+Release: 1%{?dist}
 License: Boost
 URL: http://www.boost.org/
 Group: System Environment/Libraries
-Source: boost_1_37_0.tar.bz2
+Source: boost_1_39_0.tar.bz2
 Obsoletes: boost-doc <= 1.30.2
 Obsoletes: boost-python <= 1.30.2
-Provides: boost-python = %{version}-%{release}
 Provides: boost-doc = %{version}-%{release}
+
+# boost is an "umbrella" package that pulls in all other boost components
+Requires: boost-date-time = %{version}-%{release}
+Requires: boost-filesystem = %{version}-%{release}
+Requires: boost-graph = %{version}-%{release}
+Requires: boost-iostreams = %{version}-%{release}
+Requires: boost-math = %{version}-%{release}
+Requires: boost-test = %{version}-%{release}
+Requires: boost-program-options = %{version}-%{release}
+Requires: boost-python = %{version}-%{release}
+Requires: boost-regex = %{version}-%{release}
+Requires: boost-serialization = %{version}-%{release}
+Requires: boost-signals = %{version}-%{release}
+Requires: boost-system = %{version}-%{release}
+Requires: boost-wave = %{version}-%{release}
+
 BuildRoot: %{_tmppath}/%{name}-%{version}-%{release}-root-%(%{__id_u} -n)
 BuildRequires: libstdc++-devel
 BuildRequires: bzip2-libs
@@ -21,15 +33,16 @@ BuildRequires: zlib-devel
 BuildRequires: python-devel
 BuildRequires: libicu-devel
 BuildRequires: chrpath
-Patch0: boost-configure.patch
+Patch0: boost-version-override.patch
 Patch1: boost-use-rpm-optflags.patch
 Patch2: boost-run-tests.patch
-Patch3: boost-gcc43.patch
-Patch4: boost-gcc-soname.patch
-Patch5: boost-function_template.patch
-Patch6: boost-unneccessary_iostreams.patch
-Patch7: boost-1_37_0-smp.patch
-Patch8: boost-bitset.patch
+Patch3: boost-soname.patch
+Patch4: boost-unneccessary_iostreams.patch
+Patch5: boost-bitset.patch
+
+%bcond_with tests
+%bcond_with docs_generated
+%define sonamever 5
 
 %description
 Boost provides free peer-reviewed portable C++ source libraries.  The
@@ -39,6 +52,127 @@ extensions and providing reference implementations so that the Boost
 libraries are suitable for eventual standardization. (Some of the
 libraries have already been proposed for inclusion in the C++
 Standards Committee's upcoming C++ Standard Library Technical Report.)
+
+%package date-time
+Summary: Runtime component of boost date-time library
+Group: System Environment/Libraries
+
+%description date-time
+
+Runtime support for Boost Date Time, set of date-time libraries based
+on generic programming concepts.
+
+%package filesystem
+Summary: Runtime component of boost filesystem library
+Group: System Environment/Libraries
+
+%description filesystem
+
+Runtime support for the Boost Filesystem Library, which provides
+portable facilities to query and manipulate paths, files, and
+directories.
+
+%package graph
+Summary: Runtime component of boost graph library
+Group: System Environment/Libraries
+
+%description graph
+
+Runtime support for the BGL graph library.  BGL interface and graph
+components are generic, in the same sense as the the Standard Template
+Library (STL).
+
+%package iostreams
+Summary: Runtime component of boost iostreams library
+Group: System Environment/Libraries
+
+%description iostreams
+
+Runtime support for Boost.IOStreams, a framework for defining streams,
+stream buffers and i/o filters.
+
+%package math
+Summary: Runtime component of boost math library
+Group: System Environment/Libraries
+
+%description math
+
+Runtime support Boost.Math, a library of math and numeric tools.
+
+%package test
+Summary: Runtime component of boost test library
+Group: System Environment/Libraries
+
+%description test
+
+Runtime support for simple program testing, full unit testing, and for
+program execution monitoring.
+
+%package program-options
+Summary:  Runtime component of boost program_options library
+Group: System Environment/Libraries
+
+%description program-options
+
+Runtime support of boost program options library, which allows program
+developers to obtain (name, value) pairs from the user, via
+conventional methods such as command line and config file.
+
+%package python
+Summary: Runtime component of boost python library
+Group: System Environment/Libraries
+
+%description python
+
+The Boost Python Library is a framework for interfacing Python and
+C++. It allows you to quickly and seamlessly expose C++ classes
+functions and objects to Python, and vice-versa, using no special
+tools -- just your C++ compiler.  This package contains runtime
+support for Boost Python Library.
+
+%package regex
+Summary: Runtime component of boost regular expression library
+Group: System Environment/Libraries
+
+%description regex
+
+Runtime support for boost regular expression library.
+
+%package serialization
+Summary: Runtime component of boost serialization library
+Group: System Environment/Libraries
+
+%description serialization
+
+Runtime support for serialization for persistence and marshalling.
+
+%package signals
+Summary: Runtime component of boost signals and slots library
+Group: System Environment/Libraries
+
+%description signals
+
+Runtime support for managed signals & slots callback implementation.
+
+%package system
+Summary: Runtime component of boost system support library
+Group: System Environment/Libraries
+
+%description system
+
+Runtime component of Boost operating system support library, including
+the diagnostics support that will be part of the C++0x standard
+library.
+
+%package wave
+Summary: Runtime component of boost C99/C++ preprocessing library
+Group: System Environment/Libraries
+
+%description wave
+
+Runtime support for the Boost.Wave library, a Standards conformant,
+and highly configurable implementation of the mandated C99/C++
+preprocessor functionality.
 
 %package devel
 Summary: The Boost C++ headers and shared development libraries
@@ -68,39 +202,41 @@ Provides: boost-python-docs = %{version}-%{release}
 HTML documentation files for Boost C++ libraries.
 
 %prep
-%setup -q -n %{name}_1_37_0
+%setup -q -n %{name}_1_39_0
 %patch0 -p0
-%patch1 -p0
+sed 's/_FEDORA_OPT_FLAGS/%{optflags}/' %{PATCH1} | %{__patch} -p0 --fuzz=0
 %patch2 -p0
-%patch3 -p1
-sed 's/!!!SONAME!!!/%{sonamever}/' %{PATCH4} | %{__patch} -p1 --fuzz=0
+sed 's/_FEDORA_SONAME/%{sonamever}/' %{PATCH3} | %{__patch} -p0 --fuzz=0
+%patch4 -p0
 %patch5 -p0
-%patch6 -p0
-sed 's/!!!SMP_FLAGS!!!/%{?_smp_mflags}/' %{PATCH7} | %{__patch} -p1 --fuzz=0
-%patch8 -p1
 
 %build
 BOOST_ROOT=`pwd`
-staged_dir=stage
 export BOOST_ROOT
 
 # build make tools, ie bjam, necessary for building libs, docs, and testing
 (cd tools/jam/src && ./build.sh)
 BJAM=`find tools/jam/src/ -name bjam -a -type f`
 
-BUILD_FLAGS="--with-toolset=gcc"
+CONFIGURE_FLAGS="--with-toolset=gcc"
 PYTHON_VERSION=$(python -c 'import sys; print sys.version[:3]')
 PYTHON_FLAGS="--with-python-root=/usr --with-python-version=$PYTHON_VERSION"
 REGEX_FLAGS="--with-icu"
-./configure $BUILD_FLAGS $PYTHON_FLAGS $REGEX_FLAGS 
-make all
+./bootstrap.sh $CONFIGURE_FLAGS $PYTHON_FLAGS $REGEX_FLAGS 
+
+BUILD_VARIANTS="variant=release threading=single,multi debug-symbols=on"
+BUILD_FLAGS="-d2 --layout=system $BUILD_VARIANTS"
+$BJAM $BUILD_FLAGS %{?_smp_mflags} stage 
 
 # build docs, requires a network connection for docbook XSLT stylesheets
-#cd ./doc
-#chmod +x ../tools/boostbook/setup_boostbook.sh
-#../tools/boostbook/setup_boostbook.sh
-#$BOOST_ROOT/$BJAM --v2 -sICU_PATH=/usr --user-config=../user-config.jam html
-#cd ..
+%if %{with docs_generated}
+cd ./doc
+chmod +x ../tools/boostbook/setup_boostbook.sh
+../tools/boostbook/setup_boostbook.sh
+USER_CFG=$BOOST_ROOT/tools/build/v2/user-config.jam
+$BOOST_ROOT/$BJAM --v2 -sICU_PATH=/usr --user-config=$USER_CFG html
+cd ..
+%endif
 
 %check
 %if %{with tests}
@@ -109,8 +245,11 @@ echo "" >> status/regression_comment.html
 echo "<p>" `g++ --version` "</p>" >> status/regression_comment.html
 echo "" >> status/regression_comment.html
 
-chmod +x tools/regression/run_tests.sh
-./tools/regression/run_tests.sh
+cd tools/regression/build
+#$BOOST_ROOT/$BJAM
+cd ../test
+#python ./test.py
+cd ../../..
 
 results1=status/cs-`uname`.html
 results2=status/cs-`uname`-links.html
@@ -196,6 +335,79 @@ rm -rf $RPM_BUILD_ROOT
 %{_libdir}/*.so.%{version}
 %{_libdir}/*.so.%{sonamever}
 
+%files date-time
+%defattr(-, root, root, -)
+%{_libdir}/libboost_date_time*.so.%{version}
+%{_libdir}/libboost_date_time*.so.%{sonamever}
+
+%files filesystem
+%defattr(-, root, root, -)
+%{_libdir}/libboost_filesystem*.so.%{version}
+%{_libdir}/libboost_filesystem*.so.%{sonamever}
+
+%files graph
+%defattr(-, root, root, -)
+%{_libdir}/libboost_graph*.so.%{version}
+%{_libdir}/libboost_graph*.so.%{sonamever}
+
+%files iostreams
+%defattr(-, root, root, -)
+%{_libdir}/libboost_iostreams*.so.%{version}
+%{_libdir}/libboost_iostreams*.so.%{sonamever}
+
+%files math
+%defattr(-, root, root, -)
+%{_libdir}/libboost_math*.so.%{version}
+%{_libdir}/libboost_math*.so.%{sonamever}
+
+%files test
+%defattr(-, root, root, -)
+%{_libdir}/libboost_prg_exec_monitor*.so.%{version}
+%{_libdir}/libboost_prg_exec_monitor*.so.%{sonamever}
+%{_libdir}/libboost_unit_test_framework*.so.%{version}
+%{_libdir}/libboost_unit_test_framework*.so.%{sonamever}
+
+%files program-options
+%defattr(-, root, root, -)
+%{_libdir}/libboost_program_options*.so.%{version}
+%{_libdir}/libboost_program_options*.so.%{sonamever}
+
+%files python
+%defattr(-, root, root, -)
+%{_libdir}/libboost_python*.so.%{version}
+%{_libdir}/libboost_python*.so.%{sonamever}
+
+%files regex
+%defattr(-, root, root, -)
+%{_libdir}/libboost_regex*.so.%{version}
+%{_libdir}/libboost_regex*.so.%{sonamever}
+
+%files serialization
+%defattr(-, root, root, -)
+%{_libdir}/libboost_serialization*.so.%{version}
+%{_libdir}/libboost_serialization*.so.%{sonamever}
+%{_libdir}/libboost_wserialization*.so.%{version}
+%{_libdir}/libboost_wserialization*.so.%{sonamever}
+
+%files signals
+%defattr(-, root, root, -)
+%{_libdir}/libboost_signals*.so.%{version}
+%{_libdir}/libboost_signals*.so.%{sonamever}
+
+%files system
+%defattr(-, root, root, -)
+%{_libdir}/libboost_system*.so.%{version}
+%{_libdir}/libboost_system*.so.%{sonamever}
+
+%files wave
+%defattr(-, root, root, -)
+%{_libdir}/libboost_wave*.so.%{version}
+%{_libdir}/libboost_wave*.so.%{sonamever}
+
+%files doc
+%defattr(-, root, root, -)
+%doc %{_docdir}/%{name}-%{version}
+
 %files devel
 %defattr(-, root, root, -)
 %{_includedir}/boost
@@ -205,11 +417,22 @@ rm -rf $RPM_BUILD_ROOT
 %defattr(-, root, root, -)
 %{_libdir}/*.a
 
-%files doc
-%defattr(-, root, root, -)
-%doc %{_docdir}/%{name}-%{version}
-
 %changelog
+* Thu May 07 2009 Benjamin Kosnik <bkoz@redhat.com> - 1.39.0-1
+- Update release.
+
+* Wed May 06 2009 Benjamin Kosnik <bkoz@redhat.com> - 1.39.0-0.3
+- Fixes for rpmlint.
+
+* Wed May 06 2009 Petr Machata <pmachata@redhat.com> - 1.39.0-0.2
+- Split up boost package to sub-packages per library
+- Resolves: #496188
+
+* Wed May 06 2009 Benjamin Kosnik <bkoz@redhat.com> - 1.39.0-0.1
+- Rebase to 1.39.0.
+- Add --with docs_generated.
+- #225622: Substitute optflags at prep time instead of RPM_OPT_FLAGS.
+
 * Mon May 04 2009 Benjamin Kosnik <bkoz@redhat.com> - 1.37.0-7
 - Rebuild for libicu bump.
 
