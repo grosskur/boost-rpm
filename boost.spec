@@ -1,7 +1,7 @@
 Name: boost
 Summary: The Boost C++ Libraries
 Version: 1.39.0
-Release: 1%{?dist}
+Release: 2%{?dist}
 License: Boost
 URL: http://www.boost.org/
 Group: System Environment/Libraries
@@ -39,6 +39,7 @@ Patch2: boost-run-tests.patch
 Patch3: boost-soname.patch
 Patch4: boost-unneccessary_iostreams.patch
 Patch5: boost-bitset.patch
+Patch6: boost-function_template.patch
 
 %bcond_with tests
 %bcond_with docs_generated
@@ -209,6 +210,7 @@ sed 's/_FEDORA_OPT_FLAGS/%{optflags}/' %{PATCH1} | %{__patch} -p0 --fuzz=0
 sed 's/_FEDORA_SONAME/%{sonamever}/' %{PATCH3} | %{__patch} -p0 --fuzz=0
 %patch4 -p0
 %patch5 -p0
+%patch6 -p0
 
 %build
 BOOST_ROOT=`pwd`
@@ -418,6 +420,10 @@ rm -rf $RPM_BUILD_ROOT
 %{_libdir}/*.a
 
 %changelog
+* Mon May 11 2009 Benjamin Kosnik <bkoz@redhat.com> - 1.39.0-2
+- Apply patch from Caolan McNamara 
+- Resolves: #500030 function_template bug is back... 
+
 * Thu May 07 2009 Benjamin Kosnik <bkoz@redhat.com> - 1.39.0-1
 - Update release.
 

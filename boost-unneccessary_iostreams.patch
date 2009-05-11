@@ -1,4 +1,4 @@
-diff -ru boost_1_37_0.orig/boost/spirit/home/classic/iterator/multi_pass.hpp boost_1_37_0/boost/spirit/home/classic/iterator/multi_pass.hpp
+diff -ru boost/spirit/home/classic/iterator/multi_pass.hpp boost/spirit/home/classic/iterator/multi_pass.hpp
 --- boost/spirit/home/classic/iterator/multi_pass.hpp	2009-01-09 10:38:36.000000000 +0000
 +++ boost/spirit/home/classic/iterator/multi_pass.hpp	2009-01-09 10:39:41.000000000 +0000
 @@ -12,7 +12,6 @@
