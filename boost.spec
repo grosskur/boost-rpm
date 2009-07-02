@@ -1,7 +1,7 @@
 Name: boost
 Summary: The Boost C++ Libraries
 Version: 1.39.0
-Release: 2%{?dist}
+Release: 3%{?dist}
 License: Boost
 URL: http://www.boost.org/
 Group: System Environment/Libraries
@@ -23,6 +23,7 @@ Requires: boost-regex = %{version}-%{release}
 Requires: boost-serialization = %{version}-%{release}
 Requires: boost-signals = %{version}-%{release}
 Requires: boost-system = %{version}-%{release}
+Requires: boost-thread = %{version}-%{release}
 Requires: boost-wave = %{version}-%{release}
 
 BuildRoot: %{_tmppath}/%{name}-%{version}-%{release}-root-%(%{__id_u} -n)
@@ -40,6 +41,7 @@ Patch3: boost-soname.patch
 Patch4: boost-unneccessary_iostreams.patch
 Patch5: boost-bitset.patch
 Patch6: boost-function_template.patch
+Patch7: boost-fs_gcc44.patch
 
 %bcond_with tests
 %bcond_with docs_generated
@@ -175,6 +177,17 @@ Runtime support for the Boost.Wave library, a Standards conformant,
 and highly configurable implementation of the mandated C99/C++
 preprocessor functionality.
 
+%package thread
+Summary: Runtime component of boost thread library
+Group: System Environment/Libraries
+
+%description thread
+
+Runtime component Boost.Thread library, which provides classes and
+functions for managing multiple threads of execution, and for
+synchronizing data between the threads or providing separate copies of
+data specific to individual threads.
+
 %package devel
 Summary: The Boost C++ headers and shared development libraries
 Group: Development/Libraries
@@ -211,6 +224,7 @@ sed 's/_FEDORA_SONAME/%{sonamever}/' %{PATCH3} | %{__patch} -p0 --fuzz=0
 %patch4 -p0
 %patch5 -p0
 %patch6 -p0
+%patch7 -p0
 
 %build
 BOOST_ROOT=`pwd`
@@ -333,9 +347,6 @@ rm -rf $RPM_BUILD_ROOT
 %postun -p /sbin/ldconfig
 
 %files
-%defattr(-, root, root, -)
-%{_libdir}/*.so.%{version}
-%{_libdir}/*.so.%{sonamever}
 
 %files date-time
 %defattr(-, root, root, -)
@@ -401,6 +412,11 @@ rm -rf $RPM_BUILD_ROOT
 %{_libdir}/libboost_system*.so.%{version}
 %{_libdir}/libboost_system*.so.%{sonamever}
 
+%files thread
+%defattr(-, root, root, -)
+%{_libdir}/libboost_thread*.so.%{version}
+%{_libdir}/libboost_thread*.so.%{sonamever}
+
 %files wave
 %defattr(-, root, root, -)
 %{_libdir}/libboost_wave*.so.%{version}
@@ -420,6 +436,13 @@ rm -rf $RPM_BUILD_ROOT
 %{_libdir}/*.a
 
 %changelog
+* Thu Jul  2 2009 Petr Machata <pmachata@redhat.com> - 1.39.0-3
+- Drop file list for main "boost" package, which was inadvertently left in.
+- Add thread sub-package to capture omitted boost_thread.
+- Add upstream patch to make boost_filesystem compatible with C++0x.
+- Resolves: #496188
+- Resolves: #509250
+
 * Mon May 11 2009 Benjamin Kosnik <bkoz@redhat.com> - 1.39.0-2
 - Apply patch from Caolan McNamara 
 - Resolves: #500030 function_template bug is back... 
