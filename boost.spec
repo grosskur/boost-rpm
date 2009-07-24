@@ -1,7 +1,7 @@
 Name: boost
 Summary: The Boost C++ Libraries
 Version: 1.39.0
-Release: 3%{?dist}
+Release: 4%{?dist}
 License: Boost
 URL: http://www.boost.org/
 Group: System Environment/Libraries
@@ -436,6 +436,9 @@ rm -rf $RPM_BUILD_ROOT
 %{_libdir}/*.a
 
 %changelog
+* Fri Jul 24 2009 Fedora Release Engineering <rel-eng@lists.fedoraproject.org> - 1.39.0-4
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_12_Mass_Rebuild
+
 * Thu Jul  2 2009 Petr Machata <pmachata@redhat.com> - 1.39.0-3
 - Drop file list for main "boost" package, which was inadvertently left in.
 - Add thread sub-package to capture omitted boost_thread.
