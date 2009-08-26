@@ -1,7 +1,7 @@
 Name: boost
 Summary: The Boost C++ Libraries
 Version: 1.39.0
-Release: 4%{?dist}
+Release: 5%{?dist}
 License: Boost
 URL: http://www.boost.org/
 Group: System Environment/Libraries
@@ -42,6 +42,7 @@ Patch4: boost-unneccessary_iostreams.patch
 Patch5: boost-bitset.patch
 Patch6: boost-function_template.patch
 Patch7: boost-fs_gcc44.patch
+Patch8: boost-openssl-1.0.patch
 
 %bcond_with tests
 %bcond_with docs_generated
@@ -225,6 +226,7 @@ sed 's/_FEDORA_SONAME/%{sonamever}/' %{PATCH3} | %{__patch} -p0 --fuzz=0
 %patch5 -p0
 %patch6 -p0
 %patch7 -p0
+%patch8 -p1
 
 %build
 BOOST_ROOT=`pwd`
@@ -436,6 +438,9 @@ rm -rf $RPM_BUILD_ROOT
 %{_libdir}/*.a
 
 %changelog
+* Wed Aug 26 2009 Tomas Mraz <tmraz@redhat.com> - 1.39.0-5
+- Make it to be usable with openssl-1.0
+
 * Fri Jul 24 2009 Fedora Release Engineering <rel-eng@lists.fedoraproject.org> - 1.39.0-4
 - Rebuilt for https://fedoraproject.org/wiki/Fedora_12_Mass_Rebuild
 

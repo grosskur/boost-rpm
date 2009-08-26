@@ -1,0 +1,15 @@
+diff -up boost_1_39_0/boost/asio/ssl/detail/openssl_context_service.hpp.ossl10 boost_1_39_0/boost/asio/ssl/detail/openssl_context_service.hpp
+--- boost_1_39_0/boost/asio/ssl/detail/openssl_context_service.hpp.ossl10	2008-08-09 03:59:54.000000000 +0200
++++ boost_1_39_0/boost/asio/ssl/detail/openssl_context_service.hpp	2009-08-26 11:26:25.000000000 +0200
+@@ -67,7 +67,11 @@ public:
+   // Create a new context implementation.
+   void create(impl_type& impl, context_base::method m)
+   {
++#if OPENSSL_VERSION_NUMBER >= 0x10000000L
++    const ::SSL_METHOD* ssl_method = 0;
++#else
+     ::SSL_METHOD* ssl_method = 0;
++#endif
+     switch (m)
+     {
+     case context_base::sslv2:
