@@ -1,7 +1,7 @@
 Name: boost
 Summary: The Boost C++ Libraries
 Version: 1.39.0
-Release: 5%{?dist}
+Release: 6%{?dist}
 License: Boost
 URL: http://www.boost.org/
 Group: System Environment/Libraries
@@ -438,6 +438,10 @@ rm -rf $RPM_BUILD_ROOT
 %{_libdir}/*.a
 
 %changelog
+* Tue Sep 08 2009 Karsten Hopp <karsten@redhat.com> 1.39.0-6
+- bump release and rebuild as the package was linked with an old libicu 
+  during the mass rebuild on s390x
+
 * Wed Aug 26 2009 Tomas Mraz <tmraz@redhat.com> - 1.39.0-5
 - Make it to be usable with openssl-1.0
 
