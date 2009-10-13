@@ -1,7 +1,12 @@
+%define disable_long_double 0
+%ifarch %{arm}
+%define disable_long_double 1
+%endif
+
 Name: boost
 Summary: The Boost C++ Libraries
 Version: 1.39.0
-Release: 6%{?dist}
+Release: 7%{?dist}
 License: Boost
 URL: http://www.boost.org/
 Group: System Environment/Libraries
@@ -244,7 +249,10 @@ REGEX_FLAGS="--with-icu"
 
 BUILD_VARIANTS="variant=release threading=single,multi debug-symbols=on"
 BUILD_FLAGS="-d2 --layout=system $BUILD_VARIANTS"
-$BJAM $BUILD_FLAGS %{?_smp_mflags} stage 
+%if %{disable_long_double}
+LONG_DOUBLE_FLAGS="--disable-long-double"
+%endif
+$BJAM $BUILD_FLAGS $LONG_DOUBLE_FLAGS %{?_smp_mflags} stage 
 
 # build docs, requires a network connection for docbook XSLT stylesheets
 %if %{with docs_generated}
@@ -438,6 +446,9 @@ rm -rf $RPM_BUILD_ROOT
 %{_libdir}/*.a
 
 %changelog
+* Sun Oct 11 2009 Jitesh Shah <jiteshs@marvell.com> 1.39.0-6.fa1
+- Disable long double support for ARM
+
 * Tue Sep 08 2009 Karsten Hopp <karsten@redhat.com> 1.39.0-6
 - bump release and rebuild as the package was linked with an old libicu 
   during the mass rebuild on s390x
