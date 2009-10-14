@@ -1,0 +1,204 @@
+Index: boost/gil/bit_aligned_pixel_reference.hpp
+===================================================================
+--- boost/gil/bit_aligned_pixel_reference.hpp	(revision 53049)
++++ boost/gil/bit_aligned_pixel_reference.hpp	(working copy)
+@@ -145,7 +145,7 @@
+ 
+     // Construct from another compatible pixel type
+     bit_aligned_pixel_reference(const bit_aligned_pixel_reference& p) : _bit_range(p._bit_range) {}
+-    template <typename BF, typename CR> bit_aligned_pixel_reference(packed_pixel<BF,CR,Layout>& p) : _bit_range(static_cast<data_ptr_t>(&at_c<0>(p)), at_c<0>(p).first_bit()) {
++    template <typename BF, typename CR> bit_aligned_pixel_reference(packed_pixel<BF,CR,Layout>& p) : _bit_range(static_cast<data_ptr_t>(&gil::at_c<0>(p)), gil::at_c<0>(p).first_bit()) {
+         check_compatible<packed_pixel<BF,CR,Layout> >();
+     }
+ 
+Index: boost/gil/color_base.hpp
+===================================================================
+--- boost/gil/color_base.hpp	(revision 53049)
++++ boost/gil/color_base.hpp	(working copy)
+@@ -155,15 +155,15 @@
+     homogeneous_color_base(Element v0, Element v1, Element v2) : _v0(v0), _v1(v1), _v2(v2) {}
+ 
+     template <typename E2, typename L2> homogeneous_color_base(const homogeneous_color_base<E2,L2,3>& c) : 
+-        _v0(at_c<mapping_transform<Layout,L2,0>::value>(c)), 
+-        _v1(at_c<mapping_transform<Layout,L2,1>::value>(c)), 
+-        _v2(at_c<mapping_transform<Layout,L2,2>::value>(c)) {}
++        _v0(gil::at_c<mapping_transform<Layout,L2,0>::value>(c)), 
++        _v1(gil::at_c<mapping_transform<Layout,L2,1>::value>(c)), 
++        _v2(gil::at_c<mapping_transform<Layout,L2,2>::value>(c)) {}
+ 
+     // Support for l-value reference proxy copy construction
+     template <typename E2, typename L2> homogeneous_color_base(      homogeneous_color_base<E2,L2,3>& c) : 
+-        _v0(at_c<mapping_transform<Layout,L2,0>::value>(c)), 
+-        _v1(at_c<mapping_transform<Layout,L2,1>::value>(c)), 
+-        _v2(at_c<mapping_transform<Layout,L2,2>::value>(c)) {}
++        _v0(gil::at_c<mapping_transform<Layout,L2,0>::value>(c)), 
++        _v1(gil::at_c<mapping_transform<Layout,L2,1>::value>(c)), 
++        _v2(gil::at_c<mapping_transform<Layout,L2,2>::value>(c)) {}
+ 
+     // Support for planar_pixel_iterator construction and dereferencing
+     template <typename P> homogeneous_color_base(P* p,bool) : 
+Index: boost/gil/color_base_algorithm.hpp
+===================================================================
+--- boost/gil/color_base_algorithm.hpp	(revision 53049)
++++ boost/gil/color_base_algorithm.hpp	(working copy)
+@@ -101,7 +101,7 @@
+ template <typename ColorBase, int K> struct kth_semantic_element_reference_type {
+     BOOST_STATIC_CONSTANT(int, semantic_index = (mpl::at_c<typename ColorBase::layout_t::channel_mapping_t,K>::type::value));
+     typedef typename kth_element_reference_type<ColorBase,semantic_index>::type type;
+-    static type       get(ColorBase& cb) { return at_c<semantic_index>(cb); }
++    static type       get(ColorBase& cb) { return gil::at_c<semantic_index>(cb); }
+ };
+ 
+ /// \brief Specifies the return type of the constant semantic_at_c<K>(color_base);
+@@ -109,7 +109,7 @@
+ template <typename ColorBase, int K> struct kth_semantic_element_const_reference_type {
+     BOOST_STATIC_CONSTANT(int, semantic_index = (mpl::at_c<typename ColorBase::layout_t::channel_mapping_t,K>::type::value));
+     typedef typename kth_element_const_reference_type<ColorBase,semantic_index>::type type;
+-    static type       get(const ColorBase& cb) { return at_c<semantic_index>(cb); }
++    static type       get(const ColorBase& cb) { return gil::at_c<semantic_index>(cb); }
+ };
+ 
+ /// \brief A mutable accessor to the K-th semantic element of a color base
+Index: boost/gil/image_view_factory.hpp
+===================================================================
+--- boost/gil/image_view_factory.hpp	(revision 53049)
++++ boost/gil/image_view_factory.hpp	(working copy)
+@@ -102,7 +102,7 @@
+     BOOST_STATIC_ASSERT((!is_planar<HomogeneousView>::value && view_is_basic<HomogeneousView>::value));
+     BOOST_STATIC_ASSERT((boost::is_pointer<typename HomogeneousView::x_iterator>::value));
+ 
+-    return &at_c<0>(view(0,0));
++    return &gil::at_c<0>(view(0,0));
+ }
+ 
+ /// \ingroup ImageViewConstructors
+@@ -430,7 +430,7 @@
+             typedef typename type::xy_locator                             locator_t;
+             typedef typename type::x_iterator                            x_iterator_t;
+             typedef typename iterator_adaptor_get_base<x_iterator_t>::type x_iterator_base_t;
+-            x_iterator_t sit(x_iterator_base_t(&at_c<K>(src(0,0))),src.pixels().pixel_size());
++            x_iterator_t sit(x_iterator_base_t(&gil::at_c<K>(src(0,0))),src.pixels().pixel_size());
+             return type(src.dimensions(),locator_t(sit, src.pixels().row_size()));
+         }
+     };
+@@ -444,7 +444,7 @@
+         typedef typename view_type<channel_t, gray_layout_t, false, false, view_is_mutable<View>::value>::type type;
+         static type make(const View& src) {
+             typedef typename type::x_iterator x_iterator_t;
+-            return interleaved_view(src.width(),src.height(),(x_iterator_t)&at_c<K>(src(0,0)), src.pixels().row_size());
++            return interleaved_view(src.width(),src.height(),(x_iterator_t)&gil::at_c<K>(src(0,0)), src.pixels().row_size());
+         }
+     };
+ 
+@@ -494,7 +494,7 @@
+         template <typename P> kth_channel_deref_fn(const kth_channel_deref_fn<K,P>&) {}
+ 
+         result_type operator()(argument_type srcP) const { 
+-            return result_type(at_c<K>(srcP)); 
++            return result_type(gil::at_c<K>(srcP));
+         }
+     };
+ 
+Index: boost/gil/packed_pixel.hpp
+===================================================================
+--- boost/gil/packed_pixel.hpp	(revision 53049)
++++ boost/gil/packed_pixel.hpp	(working copy)
+@@ -81,7 +81,7 @@
+     } 
+     packed_pixel(int chan0, int chan1, int chan2) : _bitfield(0) { 
+         BOOST_STATIC_ASSERT((num_channels<packed_pixel>::value==3)); 
+-        at_c<0>(*this)=chan0; at_c<1>(*this)=chan1; at_c<2>(*this)=chan2; 
++        gil::at_c<0>(*this)=chan0; gil::at_c<1>(*this)=chan1; gil::at_c<2>(*this)=chan2; 
+     } 
+     packed_pixel(int chan0, int chan1, int chan2, int chan3) : _bitfield(0) { 
+         BOOST_STATIC_ASSERT((num_channels<packed_pixel>::value==4)); 
+Index: boost/gil/pixel.hpp
+===================================================================
+--- boost/gil/pixel.hpp	(revision 53049)
++++ boost/gil/pixel.hpp	(working copy)
+@@ -143,11 +143,11 @@
+ 
+ private:
+     static void check_gray() {  BOOST_STATIC_ASSERT((is_same<typename Layout::color_space_t, gray_t>::value)); }
+-    template <typename Channel> void assign(const Channel& chan, mpl::false_)       { check_gray(); at_c<0>(*this)=chan; }
+-    template <typename Channel> bool equal (const Channel& chan, mpl::false_) const { check_gray(); return at_c<0>(*this)==chan; }
++    template <typename Channel> void assign(const Channel& chan, mpl::false_)       { check_gray(); gil::at_c<0>(*this)=chan; }
++    template <typename Channel> bool equal (const Channel& chan, mpl::false_) const { check_gray(); return gil::at_c<0>(*this)==chan; }
+ public:
+-    pixel&  operator= (channel_t chan)       { check_gray(); at_c<0>(*this)=chan; return *this; }
+-    bool    operator==(channel_t chan) const { check_gray(); return at_c<0>(*this)==chan; }
++    pixel&  operator= (channel_t chan)       { check_gray(); gil::at_c<0>(*this)=chan; return *this; }
++    bool    operator==(channel_t chan) const { check_gray(); return gil::at_c<0>(*this)==chan; }
+ };
+ 
+ /////////////////////////////
+Index: boost/gil/planar_pixel_iterator.hpp
+===================================================================
+--- boost/gil/planar_pixel_iterator.hpp	(revision 53049)
++++ boost/gil/planar_pixel_iterator.hpp	(working copy)
+@@ -109,8 +109,8 @@
+     reference operator->()                        const { return **this; }
+ 
+     // PERFORMANCE_CHECK: Remove?
+-    bool operator< (const planar_pixel_iterator& ptr)   const { return at_c<0>(*this)< at_c<0>(ptr); }
+-    bool operator!=(const planar_pixel_iterator& ptr)   const { return at_c<0>(*this)!=at_c<0>(ptr); }
++    bool operator< (const planar_pixel_iterator& ptr)   const { return gil::at_c<0>(*this)< gil::at_c<0>(ptr); }
++    bool operator!=(const planar_pixel_iterator& ptr)   const { return gil::at_c<0>(*this)!=gil::at_c<0>(ptr); }
+ private:
+     friend class boost::iterator_core_access;
+ 
+@@ -119,8 +119,8 @@
+     void advance(ptrdiff_t d)   { static_transform(*this,*this,std::bind2nd(detail::plus_asymmetric<ChannelPtr,ptrdiff_t>(),d)); }
+     reference dereference() const { return this->template deref<reference>(); }
+ 
+-    ptrdiff_t distance_to(const planar_pixel_iterator& it) const { return at_c<0>(it)-at_c<0>(*this); }
+-    bool equal(const planar_pixel_iterator& it) const { return at_c<0>(*this)==at_c<0>(it); }
++    ptrdiff_t distance_to(const planar_pixel_iterator& it) const { return gil::at_c<0>(it)-gil::at_c<0>(*this); }
++    bool equal(const planar_pixel_iterator& it) const { return gil::at_c<0>(*this)==gil::at_c<0>(it); }
+ };
+ 
+ namespace detail {
+Index: libs/gil/test/pixel.cpp
+===================================================================
+--- libs/gil/test/pixel.cpp	(revision 53049)
++++ libs/gil/test/pixel.cpp	(working copy)
+@@ -34,8 +34,9 @@
+ // Testing pixel references and values, pixel operations, color conversion
+ 
+ using namespace boost::gil;
+-using namespace std;
++using std::swap;
+ using namespace boost;
++
+ void error_if(bool condition);
+ 
+ struct increment { 
+@@ -63,8 +64,8 @@
+ 
+         // test homogeneous algorithms - fill, max, min
+         static const int num_chan = num_channels<typename C2::pixel_t>::value;
+-        static_fill(C2::_pixel, at_c<0>(C1::_pixel)+1);
+-        error_if(at_c<0>(C2::_pixel) != at_c<num_chan-1>(C2::_pixel));
++        static_fill(C2::_pixel, gil::at_c<0>(C1::_pixel)+1);
++        error_if(gil::at_c<0>(C2::_pixel) != gil::at_c<num_chan-1>(C2::_pixel));
+ 
+         C2::_pixel = C1::_pixel;
+         error_if(static_max(C2::_pixel) != static_max(C1::_pixel));
+@@ -107,7 +108,7 @@
+         error_if(C1::_pixel!=C2::_pixel);
+ 
+         static_generate(C2::_pixel, set_to_one());
+-        error_if(at_c<0>(C2::_pixel) != 1);
++        error_if(gil::at_c<0>(C2::_pixel) != 1);
+ 
+         // Test swap if both are mutable and if their value type is the same
+         // (We know the second one is mutable)
+@@ -313,7 +314,7 @@
+     bgr8_pixel_t bgr8(rgb8);
+     error_if(bgr8[0] == rgb8[0]);
+     error_if(dynamic_at_c(bgr8,0) == dynamic_at_c(rgb8,0));
+-    error_if(at_c<0>(bgr8) == at_c<0>(rgb8));
++    error_if(gil::at_c<0>(bgr8) == gil::at_c<0>(rgb8));
+     error_if(semantic_at_c<0>(bgr8) != semantic_at_c<0>(rgb8));
+     error_if(get_color(bgr8,blue_t()) != get_color(rgb8,blue_t()));
+ 

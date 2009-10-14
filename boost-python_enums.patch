@@ -1,0 +1,136 @@
+Index: /trunk/libs/python/test/enum.py
+===================================================================
+--- /trunk/libs/python/test/enum.py (revision 36256)
++++ /trunk/libs/python/test/enum.py (revision 53660)
+@@ -5,6 +5,6 @@
+ >>> from enum_ext import *
+ 
+->>> identity(color.red)
+-enum_ext.color.red
++>>> identity(color.red) # in case of duplicated enums it always take the last enum
++enum_ext.color.blood
+ 
+ >>> identity(color.green)
+@@ -14,6 +14,6 @@
+ enum_ext.color.blue
+ 
+->>> identity(color(1))
+-enum_ext.color.red
++>>> identity(color(1)) # in case of duplicated enums it always take the last enum
++enum_ext.color.blood
+ 
+ >>> identity(color(2))
+@@ -29,5 +29,5 @@
+ 
+ >>> identity(red)
+-enum_ext.color.red
++enum_ext.color.blood
+ 
+ >>> identity(green)
+@@ -43,8 +43,16 @@
+ >>> c = colorized()
+ >>> c.x
+-enum_ext.color.red
++enum_ext.color.blood
+ >>> c.x = green
+ >>> c.x
+ enum_ext.color.green
++>>> red == blood
++True
++>>> red == green
++False
++>>> hash(red) == hash(blood)
++True
++>>> hash(red) == hash(green)
++False
+ '''
+ 
+Index: /trunk/libs/python/test/enum.cpp
+===================================================================
+--- /trunk/libs/python/test/enum.cpp (revision 24614)
++++ /trunk/libs/python/test/enum.cpp (revision 53660)
+@@ -13,5 +13,5 @@
+ using namespace boost::python;
+ 
+-enum color { red = 1, green = 2, blue = 4 };
++enum color { red = 1, green = 2, blue = 4, blood = 1 };
+ 
+ #if BOOST_WORKAROUND(__MWERKS__, <= 0x2407)
+@@ -35,4 +35,5 @@
+         .value("green", green)
+         .value("blue", blue)
++        .value("blood", blood)
+         .export_values()
+         ;
+Index: /trunk/libs/python/src/object/enum.cpp
+===================================================================
+--- /trunk/libs/python/src/object/enum.cpp (revision 41521)
++++ /trunk/libs/python/src/object/enum.cpp (revision 53660)
+@@ -15,5 +15,5 @@
+ #include <structmember.h>
+ 
+-namespace boost { namespace python { namespace objects { 
++namespace boost { namespace python { namespace objects {
+ 
+ struct enum_object
+@@ -44,5 +44,5 @@
+             if (name == 0)
+                 return 0;
+-            
++
+             return PyString_FromFormat("%s.%s.%s", mod, self_->ob_type->tp_name, name);
+         }
+@@ -140,4 +140,5 @@
+       d["__slots__"] = tuple();
+       d["values"] = dict();
++      d["names"] = dict();
+ 
+       object module_name = module_prefix();
+@@ -146,7 +147,7 @@
+       if (doc)
+          d["__doc__"] = doc;
+-      
++
+       object result = (object(metatype))(name, make_tuple(base), d);
+-      
++
+       scope().attr(name) = result;
+ 
+@@ -168,5 +169,5 @@
+         = const_cast<converter::registration&>(
+             converter::registry::lookup(id));
+-            
++
+     converters.m_class_object = downcast<PyTypeObject>(this->ptr());
+     converter::registry::insert(to_python, id);
+@@ -187,21 +188,22 @@
+     dict d = extract<dict>(this->attr("values"))();
+     d[value] = x;
+-    
++
+     // Set the name field in the new enum instanec
+     enum_object* p = downcast<enum_object>(x.ptr());
+     Py_XDECREF(p->name);
+     p->name = incref(name.ptr());
++
++    dict names_dict = extract<dict>(this->attr("names"))();
++    names_dict[x.attr("name")] = x;
+ }
+ 
+ void enum_base::export_values()
+ {
+-    dict d = extract<dict>(this->attr("values"))();
+-    list values = d.values();
++    dict d = extract<dict>(this->attr("names"))();
++    list items = d.items();
+     scope current;
+-    
+-    for (unsigned i = 0, max = len(values); i < max; ++i)
+-    {
+-        api::setattr(current, object(values[i].attr("name")), values[i]);
+-    }
++
++    for (unsigned i = 0, max = len(items); i < max; ++i)
++        api::setattr(current, items[i][0], items[i][1]);
+  }
+ 

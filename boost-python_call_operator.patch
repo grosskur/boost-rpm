@@ -1,0 +1,160 @@
+Index: /trunk/boost/python/object_core.hpp
+===================================================================
+--- /trunk/boost/python/object_core.hpp (revision 45918)
++++ /trunk/boost/python/object_core.hpp (revision 47846)
+@@ -42,4 +42,10 @@
+ 
+ namespace boost { namespace python { 
++
++namespace detail
++{
++  class kwds_proxy; 
++  class args_proxy; 
++} 
+ 
+ namespace converter
+@@ -103,4 +109,9 @@
+ # define BOOST_PP_ITERATION_PARAMS_1 (3, (1, BOOST_PYTHON_MAX_ARITY, <boost/python/object_call.hpp>))
+ # include BOOST_PP_ITERATE()
++    
++      detail::args_proxy operator* () const; 
++      object operator()(detail::args_proxy const &args) const; 
++      object operator()(detail::args_proxy const &args, 
++                        detail::kwds_proxy const &kwds) const; 
+ 
+       // truth value testing
+@@ -417,4 +428,60 @@
+ //
+ 
++namespace detail 
++{
++
++class call_proxy 
++{ 
++public: 
++  call_proxy(object target) : m_target(target) {} 
++  operator object() const { return m_target;} 
++ 
++ private: 
++    object m_target; 
++}; 
++ 
++class kwds_proxy : public call_proxy 
++{ 
++public: 
++  kwds_proxy(object o = object()) : call_proxy(o) {} 
++}; 
++class args_proxy : public call_proxy 
++{ 
++public: 
++  args_proxy(object o) : call_proxy(o) {} 
++  kwds_proxy operator* () const { return kwds_proxy(*this);} 
++}; 
++} 
++ 
++template <typename U> 
++detail::args_proxy api::object_operators<U>::operator* () const 
++{ 
++  object_cref2 x = *static_cast<U const*>(this); 
++  return detail::args_proxy(x); 
++} 
++ 
++template <typename U> 
++object api::object_operators<U>::operator()(detail::args_proxy const &args) const 
++{ 
++  U const& self = *static_cast<U const*>(this); 
++  PyObject *result = PyObject_Call(get_managed_object(self, tag), 
++                                   args.operator object().ptr(), 
++                                   0); 
++  return object(detail::new_reference(result)); 
++ 
++} 
++ 
++template <typename U> 
++object api::object_operators<U>::operator()(detail::args_proxy const &args, 
++                                            detail::kwds_proxy const &kwds) const 
++{ 
++  U const& self = *static_cast<U const*>(this); 
++  PyObject *result = PyObject_Call(get_managed_object(self, tag), 
++                                   args.operator object().ptr(), 
++                                   kwds.operator object().ptr()); 
++  return object(detail::new_reference(result)); 
++ 
++}  
++
+ inline object::object()
+     : object_base(python::incref(Py_None))
+Index: /trunk/libs/python/test/object.cpp
+===================================================================
+--- /trunk/libs/python/test/object.cpp (revision 45918)
++++ /trunk/libs/python/test/object.cpp (revision 47846)
+@@ -187,4 +187,9 @@
+     return s.slice(2,-1).slice(1,-1)  == "lo, wor";
+ }
++
++object test_call(object c, object args, object kwds) 
++{ 
++    return c(*args, **kwds); 
++} 
+ 
+ bool check_binary_operators()
+@@ -378,4 +383,5 @@
+     def("test_not_item", test_not_item);
+ 
++    def("test_call", test_call);
+     def("check_binary_operators", check_binary_operators);
+     def("check_inplace", check_inplace);
+Index: /trunk/libs/python/test/object.py
+===================================================================
+--- /trunk/libs/python/test/object.py (revision 45918)
++++ /trunk/libs/python/test/object.py (revision 47846)
+@@ -135,5 +135,10 @@
+         Operators
+ 
+-        
++>>> def print_args(*args, **kwds): 
++...     print args, kwds 
++>>> test_call(print_args, (0, 1, 2, 3), {'a':'A'}) 
++(0, 1, 2, 3) {'a': 'A'}
++
++
+ >>> assert check_binary_operators()
+ 
+Index: /trunk/libs/python/doc/v2/object.html
+===================================================================
+--- /trunk/libs/python/doc/v2/object.html (revision 45918)
++++ /trunk/libs/python/doc/v2/object.html (revision 47846)
+@@ -656,4 +656,9 @@
+       object operator()(A0 const&amp;, A1 const&amp;,...An const&amp;) const;
+ 
++      detail::args_proxy operator* () const; 
++      object operator()(detail::args_proxy const &amp;args) const; 
++      object operator()(detail::args_proxy const &amp;args, 
++                        detail::kwds_proxy const &amp;kwds) const; 
++
+       // truth value testing
+       //
+@@ -705,4 +710,23 @@
+       a2,...aN)</dt>
+     </dl>
++
++<pre>
++object operator()(detail::args_proxy const &amp;args) const; 
++</pre>
++<dl class="function-semantics">
++  <dt><b>Effects:</b>
++  call object with arguments given by the tuple <varname>args</varname></dt>
++</dl>
++<pre>
++object operator()(detail::args_proxy const &amp;args, 
++                  detail::kwds_proxy const &amp;kwds) const; 
++</pre>
++<dl class="function-semantics">
++  <dt><b>Effects:</b>
++  call object with arguments given by the tuple <varname>args</varname>, and named
++  arguments given by the dictionary <varname>kwds</varname></dt>
++</dl>
++
++
+ <pre>
+ operator bool_type() const;
