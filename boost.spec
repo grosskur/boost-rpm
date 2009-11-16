@@ -6,11 +6,11 @@
 Name: boost
 Summary: The Boost C++ Libraries
 Version: 1.39.0
-Release: 9%{?dist}
+Release: 10%{?dist}
 License: Boost
 URL: http://www.boost.org/
 Group: System Environment/Libraries
-Source: boost_1_39_0.tar.bz2
+Source: http://downloads.sourceforge.net/project/boost/boost/1.39.0/boost_1_39_0.tar.bz2
 Obsoletes: boost-doc <= 1.30.2
 Obsoletes: boost-python <= 1.30.2
 Provides: boost-doc = %{version}-%{release}
@@ -40,19 +40,27 @@ BuildRequires: python-devel
 BuildRequires: libicu-devel
 BuildRequires: chrpath
 
+# Fedora-centric patch.
 Patch0: boost-version-override.patch
 Patch1: boost-use-rpm-optflags.patch
 Patch2: boost-run-tests.patch
 Patch3: boost-soname.patch
+
+# Upstream status unknown.
 Patch4: boost-unneccessary_iostreams.patch
 Patch5: boost-bitset.patch
 Patch6: boost-function_template.patch
 Patch7: boost-fs_gcc44.patch
 Patch8: boost-openssl-1.0.patch
+
+# These patches are taken from post-1.39.0 SVN (i.e. are all upstream
+# and will likely go away when we rebase).
 Patch9: boost-gil_gcc44.patch
 Patch10: boost-python_call_operator.patch
 Patch11: boost-python_enums.patch
 Patch12: boost-python_uint.patch
+
+Patch13: boost-python_translate_exception.patch # Not upstream
 
 %bcond_with tests
 %bcond_with docs_generated
@@ -241,6 +249,7 @@ sed 's/_FEDORA_SONAME/%{sonamever}/' %{PATCH3} | %{__patch} -p0 --fuzz=0
 %patch10 -p2
 %patch11 -p2
 %patch12 -p2
+%patch13 -p1
 
 %build
 BOOST_ROOT=`pwd`
@@ -455,6 +464,10 @@ rm -rf $RPM_BUILD_ROOT
 %{_libdir}/*.a
 
 %changelog
+* Mon Nov 16 2009 Petr Machata <pmachata@redhat.com> - 1.39.0-10
+- translate_exception.hpp misses a include
+- Related: #537612
+
 * Thu Oct 15 2009 Petr Machata <pmachata@redhat.com> - 1.39.0-9
 - Package index.html in the -doc subpackage
 - Resolves: #529030

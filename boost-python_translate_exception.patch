@@ -1,0 +1,13 @@
+diff -up /home/petr/fedora/boost/F-12/boost_1_39_0/boost/python/detail/translate_exception.hpp\~ /home/petr/fedora/boost/F-12/boost_1_39_0/boost/python/detail/translate_exception.hpp
+--- boost_1_39_0/boost/python/detail/translate_exception.hpp~	2004-08-20 13:10:24.000000000 +0200
++++ boost_1_39_0/boost/python/detail/translate_exception.hpp	2009-11-16 23:30:23.000000000 +0100
+@@ -9,6 +9,7 @@
+ 
+ # include <boost/call_traits.hpp>
+ # include <boost/type_traits/add_const.hpp>
++# include <boost/type_traits/add_reference.hpp>
+ 
+ # include <boost/function/function0.hpp>
+ 
+
+Diff finished.  Mon Nov 16 23:30:41 2009
