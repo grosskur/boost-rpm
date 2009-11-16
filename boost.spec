@@ -6,7 +6,7 @@
 Name: boost
 Summary: The Boost C++ Libraries
 Version: 1.39.0
-Release: 10%{?dist}
+Release: 11%{?dist}
 License: Boost
 URL: http://www.boost.org/
 Group: System Environment/Libraries
@@ -60,7 +60,8 @@ Patch10: boost-python_call_operator.patch
 Patch11: boost-python_enums.patch
 Patch12: boost-python_uint.patch
 
-Patch13: boost-python_translate_exception.patch # Not upstream
+# Not upstream
+Patch13: boost-python_translate_exception.patch
 
 %bcond_with tests
 %bcond_with docs_generated
@@ -464,6 +465,9 @@ rm -rf $RPM_BUILD_ROOT
 %{_libdir}/*.a
 
 %changelog
+* Mon Nov 16 2009 Petr Machata <pmachata@redhat.com> - 1.39.0-11
+- Move comment in Patch13 out of line
+
 * Mon Nov 16 2009 Petr Machata <pmachata@redhat.com> - 1.39.0-10
 - translate_exception.hpp misses a include
 - Related: #537612
