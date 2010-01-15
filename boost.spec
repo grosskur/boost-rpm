@@ -1,37 +1,43 @@
+# Support for documentation installation
+# As the %%doc macro erases the target directory, namely
+# $RPM_BUILD_ROOT%{_docdir}/%{name}-%{version}, manually installed
+# documentation must be saved into a temporary dedicated directory.
+%define boost_docdir __tmp_docdir
+
+# Support for long double
 %define disable_long_double 0
 %ifarch %{arm}
-%define disable_long_double 1
+  %define disable_long_double 1
 %endif
 
 Name: boost
-Summary: The Boost C++ Libraries
-Version: 1.39.0
-Release: 11%{?dist}
+Summary: The free peer-reviewed portable C++ source libraries
+Version: 1.41.0
+Release: 2%{?dist}
 License: Boost
-URL: http://www.boost.org/
+URL: http://sodium.resophonic.com/boost-cmake/%{version}.cmake0/
 Group: System Environment/Libraries
-Source: http://downloads.sourceforge.net/project/boost/boost/1.39.0/boost_1_39_0.tar.bz2
-Obsoletes: boost-doc <= 1.30.2
-Obsoletes: boost-python <= 1.30.2
-Provides: boost-doc = %{version}-%{release}
+%define full_version %{name}-%{version}.cmake0
+Source: %{full_version}.tar.bz2
 
 # boost is an "umbrella" package that pulls in all other boost components
 Requires: boost-date-time = %{version}-%{release}
 Requires: boost-filesystem = %{version}-%{release}
 Requires: boost-graph = %{version}-%{release}
 Requires: boost-iostreams = %{version}-%{release}
-Requires: boost-math = %{version}-%{release}
-Requires: boost-test = %{version}-%{release}
+Requires: boost-mpi = %{version}-%{release}
 Requires: boost-program-options = %{version}-%{release}
 Requires: boost-python = %{version}-%{release}
 Requires: boost-regex = %{version}-%{release}
 Requires: boost-serialization = %{version}-%{release}
 Requires: boost-signals = %{version}-%{release}
 Requires: boost-system = %{version}-%{release}
+Requires: boost-test = %{version}-%{release}
 Requires: boost-thread = %{version}-%{release}
 Requires: boost-wave = %{version}-%{release}
 
 BuildRoot: %{_tmppath}/%{name}-%{version}-%{release}-root-%(%{__id_u} -n)
+BuildRequires: cmake
 BuildRequires: libstdc++-devel
 BuildRequires: bzip2-libs
 BuildRequires: bzip2-devel
@@ -39,33 +45,13 @@ BuildRequires: zlib-devel
 BuildRequires: python-devel
 BuildRequires: libicu-devel
 BuildRequires: chrpath
+BuildRequires: mpich2-devel
 
-# Fedora-centric patch.
-Patch0: boost-version-override.patch
-Patch1: boost-use-rpm-optflags.patch
-Patch2: boost-run-tests.patch
-Patch3: boost-soname.patch
-
-# Upstream status unknown.
-Patch4: boost-unneccessary_iostreams.patch
-Patch5: boost-bitset.patch
-Patch6: boost-function_template.patch
-Patch7: boost-fs_gcc44.patch
-Patch8: boost-openssl-1.0.patch
-
-# These patches are taken from post-1.39.0 SVN (i.e. are all upstream
-# and will likely go away when we rebase).
-Patch9: boost-gil_gcc44.patch
-Patch10: boost-python_call_operator.patch
-Patch11: boost-python_enums.patch
-Patch12: boost-python_uint.patch
-
-# Not upstream
-Patch13: boost-python_translate_exception.patch
+Patch0: boost-graph-compile.patch
+Patch1: boost-cmake-soname.patch
 
 %bcond_with tests
 %bcond_with docs_generated
-%define sonamever 5
 
 %description
 Boost provides free peer-reviewed portable C++ source libraries.  The
@@ -115,21 +101,24 @@ Runtime support for Boost.IOStreams, a framework for defining streams,
 stream buffers and i/o filters.
 
 %package math
-Summary: Runtime component of boost math library
+Summary: Stub that used to contain boost math library
 Group: System Environment/Libraries
 
 %description math
 
-Runtime support Boost.Math, a library of math and numeric tools.
+This package is a stub that used to contain runtime component of boost
+math library.  Now that boost math library is header-only, this
+package is empty.  It's kept around only so that during yum-assisted
+update, old libraries from boost-math package aren't left around.
 
-%package test
-Summary: Runtime component of boost test library
+%package mpi
+Summary: Runtime component of boost mpi library
 Group: System Environment/Libraries
 
-%description test
+%description mpi
 
-Runtime support for simple program testing, full unit testing, and for
-program execution monitoring.
+Runtime support for Boost MPI, library providing a clean C++ API over
+the OpenMPI implementation of MPI.
 
 %package program-options
 Summary:  Runtime component of boost program_options library
@@ -187,15 +176,14 @@ Runtime component of Boost operating system support library, including
 the diagnostics support that will be part of the C++0x standard
 library.
 
-%package wave
-Summary: Runtime component of boost C99/C++ preprocessing library
+%package test
+Summary: Runtime component of boost test library
 Group: System Environment/Libraries
 
-%description wave
+%description test
 
-Runtime support for the Boost.Wave library, a Standards conformant,
-and highly configurable implementation of the mandated C99/C++
-preprocessor functionality.
+Runtime support for simple program testing, full unit testing, and for
+program execution monitoring.
 
 %package thread
 Summary: Runtime component of boost thread library
@@ -207,6 +195,16 @@ Runtime component Boost.Thread library, which provides classes and
 functions for managing multiple threads of execution, and for
 synchronizing data between the threads or providing separate copies of
 data specific to individual threads.
+
+%package wave
+Summary: Runtime component of boost C99/C++ preprocessing library
+Group: System Environment/Libraries
+
+%description wave
+
+Runtime support for the Boost.Wave library, a Standards conformant,
+and highly configurable implementation of the mandated C99/C++
+preprocessor functionality.
 
 %package devel
 Summary: The Boost C++ headers and shared development libraries
@@ -228,243 +226,286 @@ Provides: boost-devel-static = %{version}-%{release}
 Static Boost C++ libraries.
 
 %package doc
-Summary: The Boost C++ html docs
+Summary: HTML documentation for the Boost C++ libraries
 Group: Documentation
+%if 0%{?fedora} >= 10
+BuildArch: noarch
+%endif
 Provides: boost-python-docs = %{version}-%{release}
 
 %description doc
-HTML documentation files for Boost C++ libraries.
+This package contains the documentation in the HTML format of the Boost C++
+libraries. The documentation provides the same content as that on the Boost
+web page (http://www.boost.org/doc/libs/1_40_0).
 
 %prep
-%setup -q -n %{name}_1_39_0
+%setup -q -n %{full_version}
 %patch0 -p0
-sed 's/_FEDORA_OPT_FLAGS/%{optflags}/' %{PATCH1} | %{__patch} -p0 --fuzz=0
-%patch2 -p0
-sed 's/_FEDORA_SONAME/%{sonamever}/' %{PATCH3} | %{__patch} -p0 --fuzz=0
-%patch4 -p0
-%patch5 -p0
-%patch6 -p0
-%patch7 -p0
-%patch8 -p1
-%patch9 -p0
-%patch10 -p2
-%patch11 -p2
-%patch12 -p2
-%patch13 -p1
+#%patch1 -p0
 
 %build
-BOOST_ROOT=`pwd`
-export BOOST_ROOT
+%{__mkdir_p} build
+cd build
 
-# build make tools, ie bjam, necessary for building libs, docs, and testing
-(cd tools/jam/src && ./build.sh)
-BJAM=`find tools/jam/src/ -name bjam -a -type f`
-
-CONFIGURE_FLAGS="--with-toolset=gcc"
-PYTHON_VERSION=$(python -c 'import sys; print sys.version[:3]')
-PYTHON_FLAGS="--with-python-root=/usr --with-python-version=$PYTHON_VERSION"
-REGEX_FLAGS="--with-icu"
-./bootstrap.sh $CONFIGURE_FLAGS $PYTHON_FLAGS $REGEX_FLAGS 
-
-BUILD_VARIANTS="variant=release threading=single,multi debug-symbols=on"
-BUILD_FLAGS="-d2 --layout=system $BUILD_VARIANTS"
-%if %{disable_long_double}
-LONG_DOUBLE_FLAGS="--disable-long-double"
+# Support for building tests.
+%define boost_testflags -DBUILD_TESTS="NONE"
+%if %{with tests}
+  %define boost_testflags -DBUILD_TESTS="ALL"
 %endif
-$BJAM $BUILD_FLAGS $LONG_DOUBLE_FLAGS %{?_smp_mflags} stage 
 
-# build docs, requires a network connection for docbook XSLT stylesheets
-%if %{with docs_generated}
-cd ./doc
-chmod +x ../tools/boostbook/setup_boostbook.sh
-../tools/boostbook/setup_boostbook.sh
-USER_CFG=$BOOST_ROOT/tools/build/v2/user-config.jam
-$BOOST_ROOT/$BJAM --v2 -sICU_PATH=/usr --user-config=$USER_CFG html
-cd ..
-%endif
+%cmake -DCMAKE_BUILD_TYPE=RelWithDebInfo %{boost_testflags} \
+       -DENABLE_SINGLE_THREADED=YES -DINSTALL_VERSIONED=OFF .. 
+make VERBOSE=1 %{?_smp_mflags}
+cd %{_builddir}/%{full_version}
 
 %check
 %if %{with tests}
-echo "<p>" `uname -a` "</p>" > status/regression_comment.html
-echo "" >> status/regression_comment.html
-echo "<p>" `g++ --version` "</p>" >> status/regression_comment.html
-echo "" >> status/regression_comment.html
+cd build
 
-cd tools/regression/build
-#$BOOST_ROOT/$BJAM
-cd ../test
-#python ./test.py
-cd ../../..
-
-results1=status/cs-`uname`.html
-results2=status/cs-`uname`-links.html
-email=benjamin.kosnik@gmail.com
-if [ -f $results1 ] && [ -f $results2 ]; then
-  echo "sending results starting"
+# Standard test with CMake, depends on installed boost-test.
+ctest --verbose --output-log testing.log
+if [ -f testing.log ]; then
+  echo "" >> testing.log
+  echo `date` >> testing.log
+  echo "" >> testing.log
+  echo `uname -a` >> testing.log
+  echo "" >> testing.log
+  echo `g++ --version` >> testing.log
+  echo "" >> testing.log
   testdate=`date +%Y%m%d`
   testarch=`uname -m`
-  results=boost-results-$testdate-$testarch.tar.bz2
-  tar -cvf boost-results-$testdate-$testarch.tar $results1 $results2
-  bzip2 -f boost-results-$testdate-$testarch.tar 
-  echo | mutt -s "$testdate boost regression $testarch" -a $results $email 
+  email=benjamin.kosnik@gmail.com
+  bzip2 -f testing.log
+  echo "sending results starting"
+  echo | mutt -s "$testdate boost test $testarch" -a testing.log.bz2 $email
   echo "sending results finished"
 else
-  echo "error sending results"
+  echo "error with results"
 fi
+cd %{_builddir}/%{full_version}
 %endif
 
 %install
-rm -rf $RPM_BUILD_ROOT
-mkdir -p $RPM_BUILD_ROOT%{_libdir}
-mkdir -p $RPM_BUILD_ROOT%{_includedir}
-mkdir -p $RPM_BUILD_ROOT%{_docdir}/%{name}-%{version}
+%{__rm} -rf $RPM_BUILD_ROOT
 
-# install lib
-for i in `find stage -type f -name \*.a`; do
-  NAME=`basename $i`;
-  install -p -m 0644 $i $RPM_BUILD_ROOT%{_libdir}/$NAME;
-done;
-for i in `find stage -type f -name \*.so`; do
-  NAME=$i;
-  SONAME=$i.%{sonamever};
-  VNAME=$i.%{version};
-  base=`basename $i`;
-  NAMEbase=$base;
-  SONAMEbase=$base.%{sonamever};
-  VNAMEbase=$base.%{version};
-  mv $i $VNAME;
+cd %{_builddir}/%{full_version}/build
+DESTDIR=$RPM_BUILD_ROOT make VERBOSE=1 install
 
-  # remove rpath
-  chrpath --delete $VNAME;
+# Suppress the wrongly generated mpi.so library
+# (it is temporary until upstream Boost-CMake fixes that)
+%{__rm} -f $RPM_BUILD_ROOT%{_libdir}/mpi.so
 
-  ln -s $VNAMEbase $SONAME;
-  ln -s $VNAMEbase $NAME;
-  install -p -m 755 $VNAME $RPM_BUILD_ROOT%{_libdir}/$VNAMEbase; 
+# Kill any debug library versions that may show up un-invited.
+%{__rm} -f $RPM_BUILD_ROOT%{_libdir}/*-d.*
 
-  mv $SONAME $RPM_BUILD_ROOT%{_libdir}/$SONAMEbase;
-  mv $NAME $RPM_BUILD_ROOT%{_libdir}/$NAMEbase;
-done;
+# Prepare the place to temporary store the generated documentation
+%{__rm} -rf %{boost_docdir} && %{__mkdir_p} %{boost_docdir}/html
 
-# install include files
-find %{name} -type d | while read a; do
-  mkdir -p $RPM_BUILD_ROOT%{_includedir}/$a
-  find $a -mindepth 1 -maxdepth 1 -type f \
-  | xargs -r install -m 644 -p -t $RPM_BUILD_ROOT%{_includedir}/$a
-done
-
-# install doc files
-DOCPATH=$RPM_BUILD_ROOT%{_docdir}/%{name}-%{version}/
+# Install documentation files (HTML pages) within the temporary place
+cd %{_builddir}/%{full_version}
+DOCPATH=%{boost_docdir}
 find libs doc more -type f \( -name \*.htm -o -name \*.html \) \
     | sed -n '/\//{s,/[^/]*$,,;p}' \
     | sort -u > tmp-doc-directories
-sed "s:^:$DOCPATH:" tmp-doc-directories | xargs -r mkdir -p
-cat tmp-doc-directories | while read a; do
-    find $a -mindepth 1 -maxdepth 1 -name \*.htm\* \
-    | xargs install -m 644 -p -t $DOCPATH$a
+sed "s:^:$DOCPATH/:" tmp-doc-directories \
+    | xargs --no-run-if-empty %{__install} -d
+cat tmp-doc-directories | while read tobeinstalleddocdir; do
+    find $tobeinstalleddocdir -mindepth 1 -maxdepth 1 -name \*.htm\* \
+    | xargs %{__install} -p -m 644 -t $DOCPATH/$tobeinstalleddocdir
 done
-rm tmp-doc-directories
-install -p -m 644 -t $DOCPATH LICENSE_1_0.txt index.htm index.html
+%{__rm} -f tmp-doc-directories
+%{__install} -p -m 644 -t $DOCPATH LICENSE_1_0.txt index.htm index.html
 
-# remove scripts used to generate include files
-find $RPM_BUILD_ROOT%{_includedir}/ \( -name '*.pl' -o -name '*.sh' \) -exec rm {} \;
+# Remove scripts used to generate include files
+find $RPM_BUILD_ROOT%{_includedir}/ \( -name '*.pl' -o -name '*.sh' \) -exec %{__rm} -f {} \;
+
+# Remove cmake configuration files used to build the Boost libraries
+find $RPM_BUILD_ROOT%{_libdir}/ -name '*.cmake' -exec %{__rm} -f {} \;
 
 %clean
-rm -rf $RPM_BUILD_ROOT
+%{__rm} -rf $RPM_BUILD_ROOT
 
-%post -p /sbin/ldconfig
+%post date-time -p /sbin/ldconfig
 
-%postun -p /sbin/ldconfig
+%postun date-time -p /sbin/ldconfig
+
+%post filesystem -p /sbin/ldconfig
+
+%postun filesystem -p /sbin/ldconfig
+
+%post graph -p /sbin/ldconfig
+
+%postun graph -p /sbin/ldconfig
+
+%post iostreams -p /sbin/ldconfig
+
+%postun iostreams -p /sbin/ldconfig
+
+%post mpi -p /sbin/ldconfig
+
+%postun mpi -p /sbin/ldconfig
+
+%post program-options -p /sbin/ldconfig
+
+%postun program-options -p /sbin/ldconfig
+
+%post python -p /sbin/ldconfig
+
+%postun python -p /sbin/ldconfig
+
+%post regex -p /sbin/ldconfig
+
+%postun regex -p /sbin/ldconfig
+
+%post serialization -p /sbin/ldconfig
+
+%postun serialization -p /sbin/ldconfig
+
+%post signals -p /sbin/ldconfig
+
+%postun signals -p /sbin/ldconfig
+
+%post system -p /sbin/ldconfig
+
+%postun system -p /sbin/ldconfig
+
+%post test -p /sbin/ldconfig
+
+%postun test -p /sbin/ldconfig
+
+%post thread -p /sbin/ldconfig
+
+%postun thread -p /sbin/ldconfig
+
+%post wave -p /sbin/ldconfig
+
+%postun wave -p /sbin/ldconfig
+
 
 %files
 
 %files date-time
 %defattr(-, root, root, -)
+%doc LICENSE_1_0.txt
 %{_libdir}/libboost_date_time*.so.%{version}
-%{_libdir}/libboost_date_time*.so.%{sonamever}
 
 %files filesystem
 %defattr(-, root, root, -)
+%doc LICENSE_1_0.txt
 %{_libdir}/libboost_filesystem*.so.%{version}
-%{_libdir}/libboost_filesystem*.so.%{sonamever}
 
 %files graph
 %defattr(-, root, root, -)
+%doc LICENSE_1_0.txt
 %{_libdir}/libboost_graph*.so.%{version}
-%{_libdir}/libboost_graph*.so.%{sonamever}
 
 %files iostreams
 %defattr(-, root, root, -)
+%doc LICENSE_1_0.txt
 %{_libdir}/libboost_iostreams*.so.%{version}
-%{_libdir}/libboost_iostreams*.so.%{sonamever}
 
 %files math
-%defattr(-, root, root, -)
-%{_libdir}/libboost_math*.so.%{version}
-%{_libdir}/libboost_math*.so.%{sonamever}
 
 %files test
 %defattr(-, root, root, -)
+%doc LICENSE_1_0.txt
 %{_libdir}/libboost_prg_exec_monitor*.so.%{version}
-%{_libdir}/libboost_prg_exec_monitor*.so.%{sonamever}
 %{_libdir}/libboost_unit_test_framework*.so.%{version}
-%{_libdir}/libboost_unit_test_framework*.so.%{sonamever}
 
 %files program-options
 %defattr(-, root, root, -)
+%doc LICENSE_1_0.txt
 %{_libdir}/libboost_program_options*.so.%{version}
-%{_libdir}/libboost_program_options*.so.%{sonamever}
 
 %files python
 %defattr(-, root, root, -)
+%doc LICENSE_1_0.txt
 %{_libdir}/libboost_python*.so.%{version}
-%{_libdir}/libboost_python*.so.%{sonamever}
 
 %files regex
 %defattr(-, root, root, -)
+%doc LICENSE_1_0.txt
 %{_libdir}/libboost_regex*.so.%{version}
-%{_libdir}/libboost_regex*.so.%{sonamever}
 
 %files serialization
 %defattr(-, root, root, -)
+%doc LICENSE_1_0.txt
 %{_libdir}/libboost_serialization*.so.%{version}
-%{_libdir}/libboost_serialization*.so.%{sonamever}
 %{_libdir}/libboost_wserialization*.so.%{version}
-%{_libdir}/libboost_wserialization*.so.%{sonamever}
 
 %files signals
 %defattr(-, root, root, -)
+%doc LICENSE_1_0.txt
 %{_libdir}/libboost_signals*.so.%{version}
-%{_libdir}/libboost_signals*.so.%{sonamever}
 
 %files system
 %defattr(-, root, root, -)
+%doc LICENSE_1_0.txt
 %{_libdir}/libboost_system*.so.%{version}
-%{_libdir}/libboost_system*.so.%{sonamever}
 
 %files thread
 %defattr(-, root, root, -)
+%doc LICENSE_1_0.txt
 %{_libdir}/libboost_thread*.so.%{version}
-%{_libdir}/libboost_thread*.so.%{sonamever}
 
 %files wave
 %defattr(-, root, root, -)
+%doc LICENSE_1_0.txt
 %{_libdir}/libboost_wave*.so.%{version}
-%{_libdir}/libboost_wave*.so.%{sonamever}
+
+%files mpi
+%defattr(-, root, root, -)
+%doc LICENSE_1_0.txt
+%{_libdir}/libboost_mpi*.so.%{version}
 
 %files doc
 %defattr(-, root, root, -)
-%doc %{_docdir}/%{name}-%{version}
+%doc %{boost_docdir}/*
 
 %files devel
 %defattr(-, root, root, -)
-%{_includedir}/boost
+%doc LICENSE_1_0.txt
+%{_includedir}/%{name}
 %{_libdir}/*.so
+%{_datadir}/%{name}-%{version}
+%{_datadir}/cmake/%{name}/BoostConfig*.cmake
 
 %files static
 %defattr(-, root, root, -)
+%doc LICENSE_1_0.txt
 %{_libdir}/*.a
 
 %changelog
+* Thu Jan 14 2010 Petr Machata <pmachata@redhat.com> - 1.41.0-2
+- Replace a boost-math subpackage with a stub
+- Drop _cmake_lib_suffix and CMAKE_INSTALL_PREFIX magic, the rpm macro
+  does that for us
+- Drop LICENSE from the umbrella package
+- Drop obsolete Obsoletes: boost-python and boost-doc <= 1.30.2
+
+* Tue Jan 12 2010 Benjamin Kosnik <bkoz@redhat.com> - 1.41.0-1
+- Don't package generated debug libs, even with 
+  (-DCMAKE_BUILD_TYPE=RelWithDebInfo | Release).
+- Update and include boost-cmake-soname.patch.
+- Uncomment ctest.
+- Fix up --with tests to run tests.
+
+* Sat Dec 19 2009 Denis Arnaud <denis.arnaud_fedora@m4x.org> - 1.41.0-0.7
+- Switched off the delivery into a versioned sub-directory
+
+* Thu Dec 17 2009 Denis Arnaud <denis.arnaud_fedora@m4x.org> - 1.41.0-0.6
+- Boost-CMake upstream integration
+
+* Wed Dec 16 2009 Benjamin Kosnik <bkoz@redhat.com> - 1.41.0-0.5
+- Rebase to 1.41.0
+- Set build type to RelWithDebInfo
+- Resolves: #533922
+
+* Mon Nov 16 2009 Denis Arnaud <denis.arnaud_fedora@m4x.org> - 1.40.0-1
+- Add support for the Boost.MPI sub-package
+- Build with CMake (https://svn.boost.org/trac/boost/wiki/CMake)
+- Resolves: #529563
+
 * Mon Nov 16 2009 Petr Machata <pmachata@redhat.com> - 1.39.0-11
 - Move comment in Patch13 out of line
 
@@ -486,7 +527,7 @@ rm -rf $RPM_BUILD_ROOT
 - Disable long double support for ARM
 
 * Tue Sep 08 2009 Karsten Hopp <karsten@redhat.com> 1.39.0-6
-- bump release and rebuild as the package was linked with an old libicu 
+- bump release and rebuild as the package was linked with an old libicu
   during the mass rebuild on s390x
 
 * Wed Aug 26 2009 Tomas Mraz <tmraz@redhat.com> - 1.39.0-5
@@ -503,8 +544,8 @@ rm -rf $RPM_BUILD_ROOT
 - Resolves: #509250
 
 * Mon May 11 2009 Benjamin Kosnik <bkoz@redhat.com> - 1.39.0-2
-- Apply patch from Caolan McNamara 
-- Resolves: #500030 function_template bug is back... 
+- Apply patch from Caolan McNamara
+- Resolves: #500030 function_template bug is back...
 
 * Thu May 07 2009 Benjamin Kosnik <bkoz@redhat.com> - 1.39.0-1
 - Update release.
@@ -613,7 +654,7 @@ rm -rf $RPM_BUILD_ROOT
 - Source via http.
 - Philipp Thomas <pth.suse.de> fix for RPM_OPT_FLAGS
 - Philipp Thomas <pth.suse.de> fix for .so sym links.
-- (#225622) Patrice Dumas review comments. 
+- (#225622) Patrice Dumas review comments.
 
 * Tue Jun 26 2007 Benjamin Kosnik <bkoz@redhat.com> 1.34.1.rc1-0.1
 - Update to boost_1_34_1_RC1.
@@ -635,7 +676,7 @@ rm -rf $RPM_BUILD_ROOT
   Remove Obsoletes.
   Add Provides boost-python.
   Remove mkdir -p $RPM_BUILD_ROOT%%{_docdir}
-  Added periods for decription text. 
+  Added periods for decription text.
   Fix Group field.
   Remove doc Requires boost.
   Preserve timestamps on install.
@@ -719,7 +760,7 @@ rm -rf $RPM_BUILD_ROOT
 - Use SONAMEVERSION instead of dllversion.
 
 * Wed Mar 16 2005 Benjamin Kosnik <bkoz@redhat.com> 1.32.0-4
-- (#142612: Compiling Boost 1.32.0 Failed in RHEL 3.0 on Itanium2) 
+- (#142612: Compiling Boost 1.32.0 Failed in RHEL 3.0 on Itanium2)
 - (#150069: libboost_python.so is missing)
 - (#141617: bad patch boost-base.patch)
 - (#122817: libboost_*.so symlinks missing)
@@ -750,14 +791,14 @@ rm -rf $RPM_BUILD_ROOT
 * Wed May 05 2004 Warren Togami <wtogami@redhat.com> 1.31.0-7
 - missing Obsoletes boost-python
 
-* Mon May 03 2004 Benjamin Kosnik <bkoz@redhat.com> 
+* Mon May 03 2004 Benjamin Kosnik <bkoz@redhat.com>
 - (#121630: gcc34 patch needed)
 
 * Wed Apr 21 2004 Warren Togami <wtogami@redhat.com>
 - #121415 FC2 BLOCKER: Obsoletes boost-python-devel, boost-doc
 - other cleanups
 
-* Tue Mar 30 2004 Benjamin Kosnik <bkoz@redhat.com> 
+* Tue Mar 30 2004 Benjamin Kosnik <bkoz@redhat.com>
 - Remove bjam dependency. (via Graydon).
 - Fix installed library names.
 - Fix SONAMEs in shared libraries.
