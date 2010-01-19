@@ -13,12 +13,24 @@
 Name: boost
 Summary: The free peer-reviewed portable C++ source libraries
 Version: 1.41.0
-Release: 2%{?dist}
+Release: 3%{?dist}
 License: Boost
 URL: http://sodium.resophonic.com/boost-cmake/%{version}.cmake0/
 Group: System Environment/Libraries
 %define full_version %{name}-%{version}.cmake0
 Source: %{full_version}.tar.bz2
+
+# From the version 13 of Fedora, the Boost libraries are delivered
+# with sonames equal to the Boost version (e.g., 1.41.0).  On older
+# versions of Fedora (e.g., Fedora 12), the Boost libraries are
+# delivered with another scheme for sonames (e.g., a soname of 5 for
+# Fedora 12).  If for some reason you wish to set the sonamever
+# yourself, you can do it here.
+%if 0%{?fedora} >= 13
+  %define sonamever %{version}
+%else
+  %define sonamever 5
+%endif
 
 # boost is an "umbrella" package that pulls in all other boost components
 Requires: boost-date-time = %{version}-%{release}
@@ -26,6 +38,7 @@ Requires: boost-filesystem = %{version}-%{release}
 Requires: boost-graph = %{version}-%{release}
 Requires: boost-iostreams = %{version}-%{release}
 Requires: boost-mpi = %{version}-%{release}
+Requires: boost-mpi-python = %{version}-%{release}
 Requires: boost-program-options = %{version}-%{release}
 Requires: boost-python = %{version}-%{release}
 Requires: boost-regex = %{version}-%{release}
@@ -47,8 +60,8 @@ BuildRequires: libicu-devel
 BuildRequires: chrpath
 BuildRequires: mpich2-devel
 
-Patch0: boost-graph-compile.patch
-Patch1: boost-cmake-soname.patch
+Patch0: boost-cmake-soname.patch
+Patch1: boost-graph-compile.patch
 
 %bcond_with tests
 %bcond_with docs_generated
@@ -117,8 +130,17 @@ Group: System Environment/Libraries
 
 %description mpi
 
-Runtime support for Boost MPI, library providing a clean C++ API over
-the OpenMPI implementation of MPI.
+Runtime support for Boost.MPI, library providing a clean C++ API over
+the MPICH2 implementation of MPI.
+
+%package mpi-python
+Summary: Python runtime component of boost mpi library
+Group: System Environment/Libraries
+
+%description mpi-python
+
+Python support for Boost.MPI, library providing a clean C++ API over
+the MPICH2 implementation of MPI.
 
 %package program-options
 Summary:  Runtime component of boost program_options library
@@ -128,7 +150,7 @@ Group: System Environment/Libraries
 
 Runtime support of boost program options library, which allows program
 developers to obtain (name, value) pairs from the user, via
-conventional methods such as command line and config file.
+conventional methods such as command line and configuration file.
 
 %package python
 Summary: Runtime component of boost python library
@@ -138,7 +160,7 @@ Group: System Environment/Libraries
 
 The Boost Python Library is a framework for interfacing Python and
 C++. It allows you to quickly and seamlessly expose C++ classes
-functions and objects to Python, and vice-versa, using no special
+functions and objects to Python, and vice versa, using no special
 tools -- just your C++ compiler.  This package contains runtime
 support for Boost Python Library.
 
@@ -156,7 +178,7 @@ Group: System Environment/Libraries
 
 %description serialization
 
-Runtime support for serialization for persistence and marshalling.
+Runtime support for serialization for persistence and marshaling.
 
 %package signals
 Summary: Runtime component of boost signals and slots library
@@ -240,8 +262,9 @@ web page (http://www.boost.org/doc/libs/1_40_0).
 
 %prep
 %setup -q -n %{full_version}
-%patch0 -p0
-#%patch1 -p0
+
+sed 's/_FEDORA_SONAME/%{sonamever}/' %{PATCH0} | %{__patch} -p0 --fuzz=0
+%patch1 -p0
 
 %build
 %{__mkdir_p} build
@@ -291,8 +314,10 @@ cd %{_builddir}/%{full_version}
 cd %{_builddir}/%{full_version}/build
 DESTDIR=$RPM_BUILD_ROOT make VERBOSE=1 install
 
-# Suppress the wrongly generated mpi.so library
-# (it is temporary until upstream Boost-CMake fixes that)
+# Suppress the mpi.so library, as it not currently properly generated (some
+# dependencies are missing. It is temporary until upstream Boost-CMake
+# fixes that (see http://lists.boost.org/boost-cmake/2009/12/0859.php for
+# more details)
 %{__rm} -f $RPM_BUILD_ROOT%{_libdir}/mpi.so
 
 # Kill any debug library versions that may show up un-invited.
@@ -345,6 +370,10 @@ find $RPM_BUILD_ROOT%{_libdir}/ -name '*.cmake' -exec %{__rm} -f {} \;
 
 %postun mpi -p /sbin/ldconfig
 
+%post mpi-python -p /sbin/ldconfig
+
+%postun mpi-python -p /sbin/ldconfig
+
 %post program-options -p /sbin/ldconfig
 
 %postun program-options -p /sbin/ldconfig
@@ -387,76 +416,82 @@ find $RPM_BUILD_ROOT%{_libdir}/ -name '*.cmake' -exec %{__rm} -f {} \;
 %files date-time
 %defattr(-, root, root, -)
 %doc LICENSE_1_0.txt
-%{_libdir}/libboost_date_time*.so.%{version}
+%{_libdir}/libboost_date_time*.so.%{sonamever}
 
 %files filesystem
 %defattr(-, root, root, -)
 %doc LICENSE_1_0.txt
-%{_libdir}/libboost_filesystem*.so.%{version}
+%{_libdir}/libboost_filesystem*.so.%{sonamever}
 
 %files graph
 %defattr(-, root, root, -)
 %doc LICENSE_1_0.txt
-%{_libdir}/libboost_graph*.so.%{version}
+%{_libdir}/libboost_graph*.so.%{sonamever}
 
 %files iostreams
 %defattr(-, root, root, -)
 %doc LICENSE_1_0.txt
-%{_libdir}/libboost_iostreams*.so.%{version}
+%{_libdir}/libboost_iostreams*.so.%{sonamever}
 
 %files math
 
 %files test
 %defattr(-, root, root, -)
 %doc LICENSE_1_0.txt
-%{_libdir}/libboost_prg_exec_monitor*.so.%{version}
-%{_libdir}/libboost_unit_test_framework*.so.%{version}
+%{_libdir}/libboost_prg_exec_monitor*.so.%{sonamever}
+%{_libdir}/libboost_unit_test_framework*.so.%{sonamever}
 
 %files program-options
 %defattr(-, root, root, -)
 %doc LICENSE_1_0.txt
-%{_libdir}/libboost_program_options*.so.%{version}
+%{_libdir}/libboost_program_options*.so.%{sonamever}
 
 %files python
 %defattr(-, root, root, -)
 %doc LICENSE_1_0.txt
-%{_libdir}/libboost_python*.so.%{version}
+%{_libdir}/libboost_python*.so.%{sonamever}
 
 %files regex
 %defattr(-, root, root, -)
 %doc LICENSE_1_0.txt
-%{_libdir}/libboost_regex*.so.%{version}
+%{_libdir}/libboost_regex*.so.%{sonamever}
 
 %files serialization
 %defattr(-, root, root, -)
 %doc LICENSE_1_0.txt
-%{_libdir}/libboost_serialization*.so.%{version}
-%{_libdir}/libboost_wserialization*.so.%{version}
+%{_libdir}/libboost_serialization*.so.%{sonamever}
+%{_libdir}/libboost_wserialization*.so.%{sonamever}
 
 %files signals
 %defattr(-, root, root, -)
 %doc LICENSE_1_0.txt
-%{_libdir}/libboost_signals*.so.%{version}
+%{_libdir}/libboost_signals*.so.%{sonamever}
 
 %files system
 %defattr(-, root, root, -)
 %doc LICENSE_1_0.txt
-%{_libdir}/libboost_system*.so.%{version}
+%{_libdir}/libboost_system*.so.%{sonamever}
 
 %files thread
 %defattr(-, root, root, -)
 %doc LICENSE_1_0.txt
-%{_libdir}/libboost_thread*.so.%{version}
+%{_libdir}/libboost_thread*.so.%{sonamever}
 
 %files wave
 %defattr(-, root, root, -)
 %doc LICENSE_1_0.txt
-%{_libdir}/libboost_wave*.so.%{version}
+%{_libdir}/libboost_wave*.so.%{sonamever}
 
 %files mpi
 %defattr(-, root, root, -)
 %doc LICENSE_1_0.txt
-%{_libdir}/libboost_mpi*.so.%{version}
+%{_libdir}/libboost_mpi.so.%{sonamever}
+%{_libdir}/libboost_mpi-mt.so.%{sonamever}
+
+%files mpi-python
+%defattr(-, root, root, -)
+%doc LICENSE_1_0.txt
+%{_libdir}/libboost_mpi_python*.so.%{sonamever}
 
 %files doc
 %defattr(-, root, root, -)
@@ -476,6 +511,16 @@ find $RPM_BUILD_ROOT%{_libdir}/ -name '*.cmake' -exec %{__rm} -f {} \;
 %{_libdir}/*.a
 
 %changelog
+* Tue Jan 19 2010 Petr Machata <pmachata@redhat.com> - 1.41.0-3
+- Generalize the soname selection
+
+* Mon Jan 18 2010 Denis Arnaud <denis.arnaud_fedora@m4x.org> - 1.41.0-2.2
+- Further split the Boost.MPI sub-package into boost-mpi and
+  boost-mpi-python
+- Changed the description of Boost.MPI according to the actual
+  dependency (MPICH2 rather than OpenMPI)
+- Added a few details on the generation of the mpi.so library
+
 * Thu Jan 14 2010 Petr Machata <pmachata@redhat.com> - 1.41.0-2
 - Replace a boost-math subpackage with a stub
 - Drop _cmake_lib_suffix and CMAKE_INSTALL_PREFIX magic, the rpm macro
