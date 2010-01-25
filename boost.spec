@@ -13,7 +13,7 @@
 Name: boost
 Summary: The free peer-reviewed portable C++ source libraries
 Version: 1.41.0
-Release: 3%{?dist}
+Release: 4%{?dist}
 License: Boost
 URL: http://sodium.resophonic.com/boost-cmake/%{version}.cmake0/
 Group: System Environment/Libraries
@@ -62,6 +62,7 @@ BuildRequires: mpich2-devel
 
 Patch0: boost-cmake-soname.patch
 Patch1: boost-graph-compile.patch
+Patch2: boost-1.41.0-mapnik.patch
 
 %bcond_with tests
 %bcond_with docs_generated
@@ -265,6 +266,7 @@ web page (http://www.boost.org/doc/libs/1_40_0).
 
 sed 's/_FEDORA_SONAME/%{sonamever}/' %{PATCH0} | %{__patch} -p0 --fuzz=0
 %patch1 -p0
+%patch2 -p0
 
 %build
 %{__mkdir_p} build
@@ -511,6 +513,10 @@ find $RPM_BUILD_ROOT%{_libdir}/ -name '*.cmake' -exec %{__rm} -f {} \;
 %{_libdir}/*.a
 
 %changelog
+* Mon Jan 25 2010 Petr Machata <pmachata@redhat.com> - 1.41.0-4
+- Add a patch to build mapnik
+- Resolves: #558383
+
 * Tue Jan 19 2010 Petr Machata <pmachata@redhat.com> - 1.41.0-3
 - Generalize the soname selection
 
