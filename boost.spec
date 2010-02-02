@@ -10,10 +10,14 @@
   %define disable_long_double 1
 %endif
 
+# Configuration of MPI backends
+%bcond_without mpich2
+%bcond_without openmpi
+
 Name: boost
 Summary: The free peer-reviewed portable C++ source libraries
 Version: 1.41.0
-Release: 4%{?dist}
+Release: 5%{?dist}
 License: Boost
 URL: http://sodium.resophonic.com/boost-cmake/%{version}.cmake0/
 Group: System Environment/Libraries
@@ -37,8 +41,6 @@ Requires: boost-date-time = %{version}-%{release}
 Requires: boost-filesystem = %{version}-%{release}
 Requires: boost-graph = %{version}-%{release}
 Requires: boost-iostreams = %{version}-%{release}
-Requires: boost-mpi = %{version}-%{release}
-Requires: boost-mpi-python = %{version}-%{release}
 Requires: boost-program-options = %{version}-%{release}
 Requires: boost-python = %{version}-%{release}
 Requires: boost-regex = %{version}-%{release}
@@ -49,6 +51,20 @@ Requires: boost-test = %{version}-%{release}
 Requires: boost-thread = %{version}-%{release}
 Requires: boost-wave = %{version}-%{release}
 
+# OpenMPI packages
+%if %{with openmpi}
+Requires: boost-openmpi = %{version}-%{release}
+Requires: boost-openmpi-python = %{version}-%{release}
+Requires: boost-graph-openmpi = %{version}-%{release}
+%endif
+
+# MPICH2 packages
+%if %{with mpich2}
+Requires: boost-mpich2 = %{version}-%{release}
+Requires: boost-mpich2-python = %{version}-%{release}
+Requires: boost-graph-mpich2 = %{version}-%{release}
+%endif
+
 BuildRoot: %{_tmppath}/%{name}-%{version}-%{release}-root-%(%{__id_u} -n)
 BuildRequires: cmake
 BuildRequires: libstdc++-devel
@@ -58,7 +74,6 @@ BuildRequires: zlib-devel
 BuildRequires: python-devel
 BuildRequires: libicu-devel
 BuildRequires: chrpath
-BuildRequires: mpich2-devel
 
 Patch0: boost-cmake-soname.patch
 Patch1: boost-graph-compile.patch
@@ -124,24 +139,6 @@ This package is a stub that used to contain runtime component of boost
 math library.  Now that boost math library is header-only, this
 package is empty.  It's kept around only so that during yum-assisted
 update, old libraries from boost-math package aren't left around.
-
-%package mpi
-Summary: Runtime component of boost mpi library
-Group: System Environment/Libraries
-
-%description mpi
-
-Runtime support for Boost.MPI, library providing a clean C++ API over
-the MPICH2 implementation of MPI.
-
-%package mpi-python
-Summary: Python runtime component of boost mpi library
-Group: System Environment/Libraries
-
-%description mpi-python
-
-Python support for Boost.MPI, library providing a clean C++ API over
-the MPICH2 implementation of MPI.
 
 %package program-options
 Summary:  Runtime component of boost program_options library
@@ -261,6 +258,103 @@ This package contains the documentation in the HTML format of the Boost C++
 libraries. The documentation provides the same content as that on the Boost
 web page (http://www.boost.org/doc/libs/1_40_0).
 
+
+%if %{with openmpi}
+
+%package openmpi
+Summary: Runtime component of Boost.MPI library
+Group: System Environment/Libraries
+Requires: openmpi
+BuildRequires: openmpi-devel
+
+%description openmpi
+
+Runtime support for Boost.MPI-OpenMPI, a library providing a clean C++
+API over the OpenMPI implementation of MPI.
+
+%package openmpi-devel
+Summary: Shared library symlinks for Boost.MPI
+Group: System Environment/Libraries
+Requires: boost-devel = %{version}-%{release}
+Requires: boost-openmpi = %{version}-%{release}
+
+%description openmpi-devel
+
+Devel package for Boost.MPI-OpenMPI, a library providing a clean C++
+API over the OpenMPI implementation of MPI.
+
+%package openmpi-python
+Summary: Python runtime component of Boost.MPI library
+Group: System Environment/Libraries
+Requires: boost-openmpi = %{version}-%{release}
+
+%description openmpi-python
+
+Python support for Boost.MPI-OpenMPI, a library providing a clean C++
+API over the OpenMPI implementation of MPI.
+
+%package graph-openmpi
+Summary: Runtime component of parallel boost graph library
+Group: System Environment/Libraries
+
+%description graph-openmpi
+
+Runtime support for the Parallel BGL graph library.  The interface and
+graph components are generic, in the same sense as the the Standard
+Template Library (STL).  This libraries in this package use OpenMPI
+backend to do the parallel work.
+
+%endif
+
+
+%if %{with mpich2}
+
+%package mpich2
+Summary: Runtime component of Boost.MPI library
+Group: System Environment/Libraries
+Requires: mpich2
+BuildRequires: mpich2-devel
+
+%description mpich2
+
+Runtime support for Boost.MPI-MPICH2, a library providing a clean C++
+API over the MPICH2 implementation of MPI.
+
+%package mpich2-devel
+Summary: Shared library symlinks for Boost.MPI
+Group: System Environment/Libraries
+Requires: boost-devel = %{version}-%{release}
+Requires: boost-mpich2 = %{version}-%{release}
+
+%description mpich2-devel
+
+Devel package for Boost.MPI-MPICH2, a library providing a clean C++
+API over the MPICH2 implementation of MPI.
+
+%package mpich2-python
+Summary: Python runtime component of Boost.MPI library
+Group: System Environment/Libraries
+Requires: boost-mpich2 = %{version}-%{release}
+
+%description mpich2-python
+
+Python support for Boost.MPI-MPICH2, a library providing a clean C++
+API over the MPICH2 implementation of MPI.
+
+%package graph-mpich2
+Summary: Runtime component of parallel boost graph library
+Group: System Environment/Libraries
+
+%description graph-mpich2
+
+Runtime support for the Parallel BGL graph library.  The interface and
+graph components are generic, in the same sense as the the Standard
+Template Library (STL).  This libraries in this package use MPICH2
+backend to do the parallel work.
+
+%endif
+
+
 %prep
 %setup -q -n %{full_version}
 
@@ -269,19 +363,54 @@ sed 's/_FEDORA_SONAME/%{sonamever}/' %{PATCH0} | %{__patch} -p0 --fuzz=0
 %patch2 -p0
 
 %build
-%{__mkdir_p} build
-cd build
-
 # Support for building tests.
 %define boost_testflags -DBUILD_TESTS="NONE"
 %if %{with tests}
   %define boost_testflags -DBUILD_TESTS="ALL"
 %endif
 
-%cmake -DCMAKE_BUILD_TYPE=RelWithDebInfo %{boost_testflags} \
-       -DENABLE_SINGLE_THREADED=YES -DINSTALL_VERSIONED=OFF .. 
-make VERBOSE=1 %{?_smp_mflags}
-cd %{_builddir}/%{full_version}
+( echo ============================= build serial ==================
+  mkdir serial
+  cd serial
+  %cmake -DCMAKE_BUILD_TYPE=RelWithDebInfo %{boost_testflags} \
+         -DENABLE_SINGLE_THREADED=YES -DINSTALL_VERSIONED=OFF \
+         -DWITH_MPI=OFF ..
+  make VERBOSE=1 %{?_smp_mflags}
+)
+
+# Build MPI parts of Boost with OpenMPI support
+%if %{with openmpi}
+%{_openmpi_load}
+# Work around the bug: https://bugzilla.redhat.com/show_bug.cgi?id=560224
+MPI_COMPILER=openmpi-%{_arch}
+export MPI_COMPILER
+( echo ============================= build $MPI_COMPILER ==================
+  mkdir $MPI_COMPILER
+  cd $MPI_COMPILER
+  %cmake -DCMAKE_BUILD_TYPE=RelWithDebInfo %{boost_testflags} \
+         -DENABLE_SINGLE_THREADED=YES -DINSTALL_VERSIONED=OFF \
+         -DBUILD_PROJECTS="serialization;python;mpi;graph_parallel" \
+         -DBOOST_LIB_INSTALL_DIR=$MPI_LIB ..
+  make VERBOSE=1 %{?_smp_mflags}
+)
+%{_openmpi_unload}
+%endif
+
+# Build MPI parts of Boost with MPICH2 support
+%if %{with mpich2}
+%{_mpich2_load}
+( echo ============================= build $MPI_COMPILER ==================
+  mkdir $MPI_COMPILER
+  cd $MPI_COMPILER
+  %cmake -DCMAKE_BUILD_TYPE=RelWithDebInfo %{boost_testflags} \
+         -DENABLE_SINGLE_THREADED=YES -DINSTALL_VERSIONED=OFF \
+         -DBUILD_PROJECTS="serialization;python;mpi;graph_parallel" \
+         -DBOOST_LIB_INSTALL_DIR=$MPI_LIB ..
+  make VERBOSE=1 %{?_smp_mflags}
+)
+%{_mpich2_unload}
+%endif
+
 
 %check
 %if %{with tests}
@@ -310,20 +439,59 @@ fi
 cd %{_builddir}/%{full_version}
 %endif
 
+
 %install
 %{__rm} -rf $RPM_BUILD_ROOT
 
-cd %{_builddir}/%{full_version}/build
-DESTDIR=$RPM_BUILD_ROOT make VERBOSE=1 install
+cd %{_builddir}/%{full_version}/
 
-# Suppress the mpi.so library, as it not currently properly generated (some
-# dependencies are missing. It is temporary until upstream Boost-CMake
-# fixes that (see http://lists.boost.org/boost-cmake/2009/12/0859.php for
-# more details)
-%{__rm} -f $RPM_BUILD_ROOT%{_libdir}/mpi.so
-
+%if %{with openmpi}
+%{_openmpi_load}
+# Work around the bug: https://bugzilla.redhat.com/show_bug.cgi?id=560224
+MPI_COMPILER=openmpi-%{_arch}
+export MPI_COMPILER
+echo ============================= install $MPI_COMPILER ==================
+DESTDIR=$RPM_BUILD_ROOT make -C $MPI_COMPILER VERBOSE=1 install
+# Remove parts of boost that we don't want installed in MPI directory.
+%{__rm} -f $RPM_BUILD_ROOT/$MPI_LIB/libboost_{python,{w,}serialization}*
+# Suppress the mpi.so python module, as it not currently properly
+# generated (some dependencies are missing. It is temporary until
+# upstream Boost-CMake fixes that (see
+# http://lists.boost.org/boost-cmake/2009/12/0859.php for more
+# details)
+%{__rm} -f $RPM_BUILD_ROOT/$MPI_LIB/mpi.so
 # Kill any debug library versions that may show up un-invited.
-%{__rm} -f $RPM_BUILD_ROOT%{_libdir}/*-d.*
+%{__rm} -f $RPM_BUILD_ROOT/$MPI_LIB/*-d.*
+# Remove cmake configuration files used to build the Boost libraries
+find $RPM_BUILD_ROOT/$MPI_LIB -name '*.cmake' -exec %{__rm} -f {} \;
+%{_openmpi_unload}
+%endif
+
+%if %{with mpich2}
+%{_mpich2_load}
+echo ============================= install $MPI_COMPILER ==================
+DESTDIR=$RPM_BUILD_ROOT make -C $MPI_COMPILER VERBOSE=1 install
+# Remove parts of boost that we don't want installed in MPI directory.
+%{__rm} -f $RPM_BUILD_ROOT/$MPI_LIB/libboost_{python,{w,}serialization}*
+# Suppress the mpi.so python module, as it not currently properly
+# generated (some dependencies are missing. It is temporary until
+# upstream Boost-CMake fixes that (see
+# http://lists.boost.org/boost-cmake/2009/12/0859.php for more
+# details)
+%{__rm} -f $RPM_BUILD_ROOT/$MPI_LIB/mpi.so
+# Kill any debug library versions that may show up un-invited.
+%{__rm} -f $RPM_BUILD_ROOT/$MPI_LIB/*-d.*
+# Remove cmake configuration files used to build the Boost libraries
+find $RPM_BUILD_ROOT/$MPI_LIB -name '*.cmake' -exec %{__rm} -f {} \;
+%{_mpich2_unload}
+%endif
+
+echo ============================= install serial ==================
+DESTDIR=$RPM_BUILD_ROOT make -C serial VERBOSE=1 install
+# Kill any debug library versions that may show up un-invited.
+%{__rm} -f $RPM_BUILD_ROOT/%{_libdir}/*-d.*
+# Remove cmake configuration files used to build the Boost libraries
+find $RPM_BUILD_ROOT/%{_libdir} -name '*.cmake' -exec %{__rm} -f {} \;
 
 # Prepare the place to temporary store the generated documentation
 %{__rm} -rf %{boost_docdir} && %{__mkdir_p} %{boost_docdir}/html
@@ -346,11 +514,13 @@ done
 # Remove scripts used to generate include files
 find $RPM_BUILD_ROOT%{_includedir}/ \( -name '*.pl' -o -name '*.sh' \) -exec %{__rm} -f {} \;
 
-# Remove cmake configuration files used to build the Boost libraries
-find $RPM_BUILD_ROOT%{_libdir}/ -name '*.cmake' -exec %{__rm} -f {} \;
-
 %clean
 %{__rm} -rf $RPM_BUILD_ROOT
+
+
+# MPI subpackages don't need the ldconfig magic.  They are hidden by
+# default, in MPI backend-specific directory, and only show to the
+# user after the relevant environment module has been loaded.
 
 %post date-time -p /sbin/ldconfig
 
@@ -367,14 +537,6 @@ find $RPM_BUILD_ROOT%{_libdir}/ -name '*.cmake' -exec %{__rm} -f {} \;
 %post iostreams -p /sbin/ldconfig
 
 %postun iostreams -p /sbin/ldconfig
-
-%post mpi -p /sbin/ldconfig
-
-%postun mpi -p /sbin/ldconfig
-
-%post mpi-python -p /sbin/ldconfig
-
-%postun mpi-python -p /sbin/ldconfig
 
 %post program-options -p /sbin/ldconfig
 
@@ -413,6 +575,7 @@ find $RPM_BUILD_ROOT%{_libdir}/ -name '*.cmake' -exec %{__rm} -f {} \;
 %postun wave -p /sbin/ldconfig
 
 
+
 %files
 
 %files date-time
@@ -428,7 +591,8 @@ find $RPM_BUILD_ROOT%{_libdir}/ -name '*.cmake' -exec %{__rm} -f {} \;
 %files graph
 %defattr(-, root, root, -)
 %doc LICENSE_1_0.txt
-%{_libdir}/libboost_graph*.so.%{sonamever}
+%{_libdir}/libboost_graph.so.%{sonamever}
+%{_libdir}/libboost_graph-mt.so.%{sonamever}
 
 %files iostreams
 %defattr(-, root, root, -)
@@ -484,17 +648,6 @@ find $RPM_BUILD_ROOT%{_libdir}/ -name '*.cmake' -exec %{__rm} -f {} \;
 %doc LICENSE_1_0.txt
 %{_libdir}/libboost_wave*.so.%{sonamever}
 
-%files mpi
-%defattr(-, root, root, -)
-%doc LICENSE_1_0.txt
-%{_libdir}/libboost_mpi.so.%{sonamever}
-%{_libdir}/libboost_mpi-mt.so.%{sonamever}
-
-%files mpi-python
-%defattr(-, root, root, -)
-%doc LICENSE_1_0.txt
-%{_libdir}/libboost_mpi_python*.so.%{sonamever}
-
 %files doc
 %defattr(-, root, root, -)
 %doc %{boost_docdir}/*
@@ -503,7 +656,7 @@ find $RPM_BUILD_ROOT%{_libdir}/ -name '*.cmake' -exec %{__rm} -f {} \;
 %defattr(-, root, root, -)
 %doc LICENSE_1_0.txt
 %{_includedir}/%{name}
-%{_libdir}/*.so
+%{_libdir}/libboost_*.so
 %{_datadir}/%{name}-%{version}
 %{_datadir}/cmake/%{name}/BoostConfig*.cmake
 
@@ -511,8 +664,76 @@ find $RPM_BUILD_ROOT%{_libdir}/ -name '*.cmake' -exec %{__rm} -f {} \;
 %defattr(-, root, root, -)
 %doc LICENSE_1_0.txt
 %{_libdir}/*.a
+%if %{with mpich2}
+%{_libdir}/mpich2/lib/*.a
+%endif
+%if %{with openmpi}
+%{_libdir}/openmpi/lib/*.a
+%endif
+
+# OpenMPI packages
+%if %{with openmpi}
+
+%files openmpi
+%defattr(-, root, root, -)
+%doc LICENSE_1_0.txt
+%{_libdir}/openmpi/lib/libboost_mpi.so.%{sonamever}
+%{_libdir}/openmpi/lib/libboost_mpi-mt.so.%{sonamever}
+
+%files openmpi-devel
+%defattr(-, root, root, -)
+%doc LICENSE_1_0.txt
+%{_libdir}/openmpi/lib/libboost_*.so
+
+%files openmpi-python
+%defattr(-, root, root, -)
+%doc LICENSE_1_0.txt
+%{_libdir}/openmpi/lib/libboost_mpi_python*.so.%{sonamever}
+
+%files graph-openmpi
+%defattr(-, root, root, -)
+%doc LICENSE_1_0.txt
+%{_libdir}/openmpi/lib/libboost_graph_parallel.so.%{sonamever}
+%{_libdir}/openmpi/lib/libboost_graph_parallel-mt.so.%{sonamever}
+
+%endif
+
+# MPICH2 packages
+%if %{with mpich2}
+
+%files mpich2
+%defattr(-, root, root, -)
+%doc LICENSE_1_0.txt
+%{_libdir}/mpich2/lib/libboost_mpi.so.%{sonamever}
+%{_libdir}/mpich2/lib/libboost_mpi-mt.so.%{sonamever}
+
+%files mpich2-devel
+%defattr(-, root, root, -)
+%doc LICENSE_1_0.txt
+%{_libdir}/mpich2/lib/libboost_*.so
+
+%files mpich2-python
+%defattr(-, root, root, -)
+%doc LICENSE_1_0.txt
+%{_libdir}/mpich2/lib/libboost_mpi_python*.so.%{sonamever}
+
+%files graph-mpich2
+%defattr(-, root, root, -)
+%doc LICENSE_1_0.txt
+%{_libdir}/mpich2/lib/libboost_graph_parallel.so.%{sonamever}
+%{_libdir}/mpich2/lib/libboost_graph_parallel-mt.so.%{sonamever}
+
+%endif
 
 %changelog
+* Mon Jan 30 2010 Denis Arnaud <denis.arnaud_fedora@m4x.org> - 1.41.0-5
+- Various fixes on the specification
+- Resolves: #559009
+
+* Tue Feb  2 2010 Petr Machata <pmachata@redhat.com> - 1.41.0-5
+- Introduce support for both OpenMPI and MPICH2
+- Resolves: #559009
+
 * Mon Jan 25 2010 Petr Machata <pmachata@redhat.com> - 1.41.0-4
 - Add a patch to build mapnik
 - Resolves: #558383
