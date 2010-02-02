@@ -17,7 +17,7 @@
 Name: boost
 Summary: The free peer-reviewed portable C++ source libraries
 Version: 1.41.0
-Release: 5%{?dist}
+Release: 6%{?dist}
 License: Boost
 URL: http://sodium.resophonic.com/boost-cmake/%{version}.cmake0/
 Group: System Environment/Libraries
@@ -36,7 +36,10 @@ Source: %{full_version}.tar.bz2
   %define sonamever 5
 %endif
 
-# boost is an "umbrella" package that pulls in all other boost components
+# boost is an "umbrella" package that pulls in all other boost
+# components, except for MPI sub-packages.  Those are "speacial", one
+# doesn't necessarily need them and the more typical scenario, I
+# think, will be that the developer wants to pick one MPI flavor.
 Requires: boost-date-time = %{version}-%{release}
 Requires: boost-filesystem = %{version}-%{release}
 Requires: boost-graph = %{version}-%{release}
@@ -50,20 +53,6 @@ Requires: boost-system = %{version}-%{release}
 Requires: boost-test = %{version}-%{release}
 Requires: boost-thread = %{version}-%{release}
 Requires: boost-wave = %{version}-%{release}
-
-# OpenMPI packages
-%if %{with openmpi}
-Requires: boost-openmpi = %{version}-%{release}
-Requires: boost-openmpi-python = %{version}-%{release}
-Requires: boost-graph-openmpi = %{version}-%{release}
-%endif
-
-# MPICH2 packages
-%if %{with mpich2}
-Requires: boost-mpich2 = %{version}-%{release}
-Requires: boost-mpich2-python = %{version}-%{release}
-Requires: boost-graph-mpich2 = %{version}-%{release}
-%endif
 
 BuildRoot: %{_tmppath}/%{name}-%{version}-%{release}-root-%(%{__id_u} -n)
 BuildRequires: cmake
@@ -277,6 +266,8 @@ Summary: Shared library symlinks for Boost.MPI
 Group: System Environment/Libraries
 Requires: boost-devel = %{version}-%{release}
 Requires: boost-openmpi = %{version}-%{release}
+Requires: boost-openmpi-python = %{version}-%{release}
+Requires: boost-graph-openmpi = %{version}-%{release}
 
 %description openmpi-devel
 
@@ -296,6 +287,7 @@ API over the OpenMPI implementation of MPI.
 %package graph-openmpi
 Summary: Runtime component of parallel boost graph library
 Group: System Environment/Libraries
+Requires: boost-openmpi = %{version}-%{release}
 
 %description graph-openmpi
 
@@ -325,6 +317,8 @@ Summary: Shared library symlinks for Boost.MPI
 Group: System Environment/Libraries
 Requires: boost-devel = %{version}-%{release}
 Requires: boost-mpich2 = %{version}-%{release}
+Requires: boost-mpich2-python = %{version}-%{release}
+Requires: boost-graph-mpich2 = %{version}-%{release}
 
 %description mpich2-devel
 
@@ -344,6 +338,7 @@ API over the MPICH2 implementation of MPI.
 %package graph-mpich2
 Summary: Runtime component of parallel boost graph library
 Group: System Environment/Libraries
+Requires: boost-mpich2 = %{version}-%{release}
 
 %description graph-mpich2
 
@@ -726,11 +721,19 @@ find $RPM_BUILD_ROOT%{_includedir}/ \( -name '*.pl' -o -name '*.sh' \) -exec %{_
 %endif
 
 %changelog
-* Mon Jan 30 2010 Denis Arnaud <denis.arnaud_fedora@m4x.org> - 1.41.0-5
+* Tue Feb  2 2010 Petr Machata <pmachata@redhat.com> - 1.41.0-6
+- More subpackage interdependency adjustments
+  - boost doesn't bring in the MPI stuff.  Instead, $MPI-devel does.
+    It needs to, so that the symlinks don't dangle.
+  - boost-graph-$MPI depends on boost-$MPI so that boost-mpich2
+    doesn't satisfy the SONAME dependency of boost-graph-openmpi.
+- Resolves: #559009
+
+* Mon Feb  1 2010 Denis Arnaud <denis.arnaud_fedora@m4x.org> - 1.41.0-5
 - Various fixes on the specification
 - Resolves: #559009
 
-* Tue Feb  2 2010 Petr Machata <pmachata@redhat.com> - 1.41.0-5
+* Fri Jan 29 2010 Petr Machata <pmachata@redhat.com> - 1.41.0-5
 - Introduce support for both OpenMPI and MPICH2
 - Resolves: #559009
 
