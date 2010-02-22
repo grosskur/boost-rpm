@@ -17,7 +17,7 @@
 Name: boost
 Summary: The free peer-reviewed portable C++ source libraries
 Version: 1.41.0
-Release: 6%{?dist}
+Release: 7%{?dist}
 License: Boost
 URL: http://sodium.resophonic.com/boost-cmake/%{version}.cmake0/
 Group: System Environment/Libraries
@@ -67,6 +67,7 @@ BuildRequires: chrpath
 Patch0: boost-cmake-soname.patch
 Patch1: boost-graph-compile.patch
 Patch2: boost-1.41.0-mapnik.patch
+Patch3: boost-1.41.0-shared_ptr_serialization.patch
 
 %bcond_with tests
 %bcond_with docs_generated
@@ -356,6 +357,7 @@ backend to do the parallel work.
 sed 's/_FEDORA_SONAME/%{sonamever}/' %{PATCH0} | %{__patch} -p0 --fuzz=0
 %patch1 -p0
 %patch2 -p0
+%patch3 -p1
 
 %build
 # Support for building tests.
@@ -721,6 +723,10 @@ find $RPM_BUILD_ROOT%{_includedir}/ \( -name '*.pl' -o -name '*.sh' \) -exec %{_
 %endif
 
 %changelog
+* Mon Feb 22 2010 Petr Machata <pmachata@redhat.com> - 1.41.0-7
+- Add a patch for serialization of shared pointers to non polymorphic
+  types
+
 * Tue Feb  2 2010 Petr Machata <pmachata@redhat.com> - 1.41.0-6
 - More subpackage interdependency adjustments
   - boost doesn't bring in the MPI stuff.  Instead, $MPI-devel does.
