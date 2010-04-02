@@ -17,7 +17,7 @@
 Name: boost
 Summary: The free peer-reviewed portable C++ source libraries
 Version: 1.41.0
-Release: 7%{?dist}
+Release: 8%{?dist}
 License: Boost
 URL: http://sodium.resophonic.com/boost-cmake/%{version}.cmake0/
 Group: System Environment/Libraries
@@ -723,6 +723,9 @@ find $RPM_BUILD_ROOT%{_includedir}/ \( -name '*.pl' -o -name '*.sh' \) -exec %{_
 %endif
 
 %changelog
+* Fri Apr 02 2010 Caolán McNamara <caolanm@redhat.com> - 1.41.0-8
+- rebuild for icu
+
 * Mon Feb 22 2010 Petr Machata <pmachata@redhat.com> - 1.41.0-7
 - Add a patch for serialization of shared pointers to non polymorphic
   types
