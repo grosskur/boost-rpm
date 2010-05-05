@@ -17,7 +17,7 @@
 Name: boost
 Summary: The free peer-reviewed portable C++ source libraries
 Version: 1.41.0
-Release: 8%{?dist}
+Release: 9%{?dist}
 License: Boost
 URL: http://sodium.resophonic.com/boost-cmake/%{version}.cmake0/
 Group: System Environment/Libraries
@@ -221,6 +221,9 @@ Summary: The Boost C++ headers and shared development libraries
 Group: Development/Libraries
 Requires: boost = %{version}-%{release}
 Provides: boost-python-devel = %{version}-%{release}
+# for %%_datadir/cmake ownership, can consider making cmake-filesystem
+# if this dep is a problem
+Requires: cmake
 
 %description devel
 Headers and shared object symlinks for the Boost C++ libraries.
@@ -655,6 +658,7 @@ find $RPM_BUILD_ROOT%{_includedir}/ \( -name '*.pl' -o -name '*.sh' \) -exec %{_
 %{_includedir}/%{name}
 %{_libdir}/libboost_*.so
 %{_datadir}/%{name}-%{version}
+%dir %{_datadir}/cmake/%{name}/
 %{_datadir}/cmake/%{name}/BoostConfig*.cmake
 
 %files static
@@ -723,6 +727,10 @@ find $RPM_BUILD_ROOT%{_includedir}/ \( -name '*.pl' -o -name '*.sh' \) -exec %{_
 %endif
 
 %changelog
+* Wed May 05 2010 Rex Dieter <rdieter@fedoraproject.org> - 1.41.0-9
+- -devel: own %%{_datadir}/cmake/%%{name}/
+- -devel: Requires: cmake (for %%{_datadir}/cmake ownership)
+
 * Fri Apr 02 2010 Caolán McNamara <caolanm@redhat.com> - 1.41.0-8
 - rebuild for icu
 
