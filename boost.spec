@@ -17,7 +17,7 @@
 Name: boost
 Summary: The free peer-reviewed portable C++ source libraries
 Version: 1.41.0
-Release: 9%{?dist}
+Release: 10%{?dist}
 License: Boost
 URL: http://sodium.resophonic.com/boost-cmake/%{version}.cmake0/
 Group: System Environment/Libraries
@@ -68,6 +68,7 @@ Patch0: boost-cmake-soname.patch
 Patch1: boost-graph-compile.patch
 Patch2: boost-1.41.0-mapnik.patch
 Patch3: boost-1.41.0-shared_ptr_serialization.patch
+Patch4: boost-1.41.0-iostreams-zlib.patch
 
 %bcond_with tests
 %bcond_with docs_generated
@@ -361,6 +362,7 @@ sed 's/_FEDORA_SONAME/%{sonamever}/' %{PATCH0} | %{__patch} -p0 --fuzz=0
 %patch1 -p0
 %patch2 -p0
 %patch3 -p1
+%patch4 -p2
 
 %build
 # Support for building tests.
@@ -727,6 +729,10 @@ find $RPM_BUILD_ROOT%{_includedir}/ \( -name '*.pl' -o -name '*.sh' \) -exec %{_
 %endif
 
 %changelog
+* Mon May 10 2010 Petr Machata <pmachata@redhat.com> - 1.41.0-10
+- Add an upstream patch that fixes computation of CRC in zlib streams.
+- Resolves: #590205
+
 * Wed May 05 2010 Rex Dieter <rdieter@fedoraproject.org> - 1.41.0-9
 - -devel: own %%{_datadir}/cmake/%%{name}/
 - -devel: Requires: cmake (for %%{_datadir}/cmake ownership)
