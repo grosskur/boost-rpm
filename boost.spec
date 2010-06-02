@@ -11,13 +11,15 @@
 %endif
 
 # Configuration of MPI backends
+%ifnarch s390 s390x
 %bcond_without mpich2
 %bcond_without openmpi
+%endif
 
 Name: boost
 Summary: The free peer-reviewed portable C++ source libraries
 Version: 1.41.0
-Release: 10%{?dist}
+Release: 11%{?dist}
 License: Boost
 URL: http://sodium.resophonic.com/boost-cmake/%{version}.cmake0/
 Group: System Environment/Libraries
@@ -729,6 +731,9 @@ find $RPM_BUILD_ROOT%{_includedir}/ \( -name '*.pl' -o -name '*.sh' \) -exec %{_
 %endif
 
 %changelog
+* Wed Jun  2 2010 Dan Horák <dan[at]danny.cz> - 1.41.0-11
+- don't build with mpich2/openmpi on s390/s390x
+
 * Mon May 10 2010 Petr Machata <pmachata@redhat.com> - 1.41.0-10
 - Add an upstream patch that fixes computation of CRC in zlib streams.
 - Resolves: #590205
