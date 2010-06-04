@@ -19,12 +19,12 @@
 Name: boost
 Summary: The free peer-reviewed portable C++ source libraries
 Version: 1.41.0
-Release: 11%{?dist}
+Release: 12%{?dist}
 License: Boost
 URL: http://sodium.resophonic.com/boost-cmake/%{version}.cmake0/
 Group: System Environment/Libraries
 %define full_version %{name}-%{version}.cmake0
-Source: %{full_version}.tar.bz2
+Source: %{url}/%{full_version}.tar.bz2
 
 # From the version 13 of Fedora, the Boost libraries are delivered
 # with sonames equal to the Boost version (e.g., 1.41.0).  On older
@@ -518,6 +518,14 @@ done
 # Remove scripts used to generate include files
 find $RPM_BUILD_ROOT%{_includedir}/ \( -name '*.pl' -o -name '*.sh' \) -exec %{__rm} -f {} \;
 
+# boost support of cmake needs some tuning.  For the time being, leave
+# the files out, and rely on cmake's FindBoost to DTRT, as it had been
+# doing in pre-cmake-boost times.  For further info, see:
+#   https://bugzilla.redhat.com/show_bug.cgi?id=597020
+%{__rm} -Rfv $RPM_BUILD_ROOT%{_datadir}/%{name}-%{version}
+%{__rm} -Rfv $RPM_BUILD_ROOT%{_datadir}/cmake/%{name}
+
+
 %clean
 %{__rm} -rf $RPM_BUILD_ROOT
 
@@ -661,9 +669,6 @@ find $RPM_BUILD_ROOT%{_includedir}/ \( -name '*.pl' -o -name '*.sh' \) -exec %{_
 %doc LICENSE_1_0.txt
 %{_includedir}/%{name}
 %{_libdir}/libboost_*.so
-%{_datadir}/%{name}-%{version}
-%dir %{_datadir}/cmake/%{name}/
-%{_datadir}/cmake/%{name}/BoostConfig*.cmake
 
 %files static
 %defattr(-, root, root, -)
@@ -731,6 +736,10 @@ find $RPM_BUILD_ROOT%{_includedir}/ \( -name '*.pl' -o -name '*.sh' \) -exec %{_
 %endif
 
 %changelog
+* Fri Jun  4 2010 Petr Machata <pmachata@redhat.com> - 1.41.0-12
+- Don't distribute cmake support files.
+- Related: #597020
+
 * Wed Jun  2 2010 Dan Horák <dan[at]danny.cz> - 1.41.0-11
 - don't build with mpich2/openmpi on s390/s390x
 
