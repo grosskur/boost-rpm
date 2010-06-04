@@ -11,9 +11,12 @@
 %endif
 
 # Configuration of MPI backends
-%ifnarch s390 s390x
 %bcond_without mpich2
-%bcond_without openmpi
+%ifarch s390 s390x arm
+  # No OpenMPI support on these arches
+  %bcond_with openmpi
+%else
+  %bcond_without openmpi
 %endif
 
 Name: boost
@@ -736,6 +739,10 @@ find $RPM_BUILD_ROOT%{_includedir}/ \( -name '*.pl' -o -name '*.sh' \) -exec %{_
 %endif
 
 %changelog
+* Fri Jun  4 2010 Petr Machata <pmachata@redhat.com> - 1.41.0-12
+- Turn on mpich2 on s390.  Add arm to the list of arches that openmpi
+  doesn't support.
+
 * Fri Jun  4 2010 Petr Machata <pmachata@redhat.com> - 1.41.0-12
 - Don't distribute cmake support files.
 - Related: #597020
