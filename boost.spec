@@ -12,7 +12,7 @@
 
 # Configuration of MPI backends
 %bcond_without mpich2
-%ifarch s390 s390x arm
+%ifarch s390 s390x %{arm}
   # No OpenMPI support on these arches
   %bcond_with openmpi
 %else
