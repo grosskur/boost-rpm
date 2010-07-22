@@ -22,7 +22,7 @@
 Name: boost
 Summary: The free peer-reviewed portable C++ source libraries
 Version: 1.41.0
-Release: 12%{?dist}
+Release: 13%{?dist}
 License: Boost
 URL: http://sodium.resophonic.com/boost-cmake/%{version}.cmake0/
 Group: System Environment/Libraries
@@ -739,6 +739,9 @@ find $RPM_BUILD_ROOT%{_includedir}/ \( -name '*.pl' -o -name '*.sh' \) -exec %{_
 %endif
 
 %changelog
+* Thu Jul 22 2010 David Malcolm <dmalcolm@redhat.com> - 1.41.0-13
+- Rebuilt for https://fedoraproject.org/wiki/Features/Python_2.7/MassRebuild
+
 * Fri Jun  4 2010 Petr Machata <pmachata@redhat.com> - 1.41.0-12
 - Turn on mpich2 on s390.  Add arm to the list of arches that openmpi
   doesn't support.
