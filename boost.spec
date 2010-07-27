@@ -21,12 +21,12 @@
 
 Name: boost
 Summary: The free peer-reviewed portable C++ source libraries
-Version: 1.41.0
-Release: 13%{?dist}
+Version: 1.44.0
+Release: 0.1%{?dist}
 License: Boost
-URL: http://sodium.resophonic.com/boost-cmake/%{version}.cmake0/
+URL: http://gitorious.org/boost/zeuners-boost-cmake/archive-tarball/%{version}
 Group: System Environment/Libraries
-%define full_version %{name}-%{version}.cmake0
+%define full_version %{name}-%{version}.cmake
 Source: %{url}/%{full_version}.tar.bz2
 
 # From the version 13 of Fedora, the Boost libraries are delivered
@@ -38,7 +38,7 @@ Source: %{url}/%{full_version}.tar.bz2
 %if 0%{?fedora} >= 13
   %define sonamever %{version}
 %else
-  %define sonamever 5
+  %define sonamever 7
 %endif
 
 # boost is an "umbrella" package that pulls in all other boost
@@ -70,10 +70,6 @@ BuildRequires: libicu-devel
 BuildRequires: chrpath
 
 Patch0: boost-cmake-soname.patch
-Patch1: boost-graph-compile.patch
-Patch2: boost-1.41.0-mapnik.patch
-Patch3: boost-1.41.0-shared_ptr_serialization.patch
-Patch4: boost-1.41.0-iostreams-zlib.patch
 
 %bcond_with tests
 %bcond_with docs_generated
@@ -364,10 +360,6 @@ backend to do the parallel work.
 %setup -q -n %{full_version}
 
 sed 's/_FEDORA_SONAME/%{sonamever}/' %{PATCH0} | %{__patch} -p0 --fuzz=0
-%patch1 -p0
-%patch2 -p0
-%patch3 -p1
-%patch4 -p2
 
 %build
 # Support for building tests.
@@ -536,6 +528,7 @@ find $RPM_BUILD_ROOT%{_includedir}/ \( -name '*.pl' -o -name '*.sh' \) -exec %{_
 # MPI subpackages don't need the ldconfig magic.  They are hidden by
 # default, in MPI backend-specific directory, and only show to the
 # user after the relevant environment module has been loaded.
+# rpmlint will report that as errors, but it is fine.
 
 %post date-time -p /sbin/ldconfig
 
@@ -739,6 +732,10 @@ find $RPM_BUILD_ROOT%{_includedir}/ \( -name '*.pl' -o -name '*.sh' \) -exec %{_
 %endif
 
 %changelog
+* Fri Jul 23 2010 Denis Arnaud <denis.arnaud_fedora@m4x.org> - 1.44.0-0.1
+- Upstream update: Boost-1.44 with CMake enabled
+- Resolves: #607615
+
 * Thu Jul 22 2010 David Malcolm <dmalcolm@redhat.com> - 1.41.0-13
 - Rebuilt for https://fedoraproject.org/wiki/Features/Python_2.7/MassRebuild
 
