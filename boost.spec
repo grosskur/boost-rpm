@@ -22,7 +22,7 @@
 Name: boost
 Summary: The free peer-reviewed portable C++ source libraries
 Version: 1.44.0
-Release: 0.2%{?dist}
+Release: 0.3%{?dist}
 License: Boost
 URL: http://gitorious.org/boost/zeuners-boost-cmake/archive-tarball/%{version}
 Group: System Environment/Libraries
@@ -732,6 +732,9 @@ find $RPM_BUILD_ROOT%{_includedir}/ \( -name '*.pl' -o -name '*.sh' \) -exec %{_
 %endif
 
 %changelog
+* Tue Jul 27 2010 Orcan Ogetbil <oget[dot]fedora[at]gmail[dot]com> - 1.44.0-0.3
+- Rebuilt for https://fedoraproject.org/wiki/Features/Python_2.7/MassRebuild
+
 * Tue Jul 27 2010 Benjamin Kosnik <bkoz@redhat.com> - 1.44.0-0.2
 - Rebuild.
 
