@@ -1,1 +1,5 @@
 boost-1.44.0.cmake.tar.bz2
+boost-*.src.rpm
+clog
+.build*.log
+
