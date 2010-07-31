@@ -22,9 +22,14 @@
 Name: boost
 Summary: The free peer-reviewed portable C++ source libraries
 Version: 1.44.0
-Release: 0.3%{?dist}
+Release: 0.4%{?dist}
 License: Boost
-URL: http://gitorious.org/boost/zeuners-boost-cmake/archive-tarball/%{version}
+
+# Temporarily get the source from a clone repository of the upstream maintainer,
+# until that latter fixes the compilation bug. A merge request has been made:
+# http://gitorious.org/~zeuner/boost/zeuners-boost-cmake/merge_requests/1
+#URL: http://gitorious.org/boost/zeuners-boost-cmake/archive-tarball/%{version}
+URL: http://gitorious.org/boost/denisarnauds-zeuners-boost-cmake/archive-tarball/%{version}
 Group: System Environment/Libraries
 %define full_version %{name}-%{version}.cmake
 Source: %{url}/%{full_version}.tar.bz2
@@ -732,6 +737,9 @@ find $RPM_BUILD_ROOT%{_includedir}/ \( -name '*.pl' -o -name '*.sh' \) -exec %{_
 %endif
 
 %changelog
+* Fri Jul 31 2010 Denis Arnaud <denis.arnaud_fedora@m4x.org> - 1.44.0-0.4
+- Added missing header files in boost/random/detail. Resolves: #619869
+
 * Tue Jul 27 2010 Orcan Ogetbil <oget[dot]fedora[at]gmail[dot]com> - 1.44.0-0.3
 - Rebuilt for https://fedoraproject.org/wiki/Features/Python_2.7/MassRebuild
 
