@@ -1,4 +1,5 @@
 boost-*.tar.*
+boost-*.src.rpm
 boost-cmake-soname.patch
 clog
 .build*
