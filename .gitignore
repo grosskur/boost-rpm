@@ -4,3 +4,4 @@ boost-cmake-soname.patch
 clog
 .build*
 
+boost-1.44.0.cmake.tar.bz2

@@ -22,7 +22,7 @@
 Name: boost
 Summary: The free peer-reviewed portable C++ source libraries
 Version: 1.44.0
-Release: 0.4%{?dist}
+Release: 0.5%{?dist}
 License: Boost
 
 # Temporarily get the source from a clone repository of the upstream maintainer,
@@ -737,6 +737,9 @@ find $RPM_BUILD_ROOT%{_includedir}/ \( -name '*.pl' -o -name '*.sh' \) -exec %{_
 %endif
 
 %changelog
+* Fri Aug  6 2010 Denis Arnaud <denis.arnaud_fedora@m4x.org> - 1.44.0-0.5
+- Patched header file in boost/random/detail. Resolves: #621631
+
 * Fri Jul 31 2010 Denis Arnaud <denis.arnaud_fedora@m4x.org> - 1.44.0-0.4
 - Added missing header files in boost/random/detail. Resolves: #619869
 
