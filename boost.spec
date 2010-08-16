@@ -22,14 +22,17 @@
 Name: boost
 Summary: The free peer-reviewed portable C++ source libraries
 Version: 1.44.0
-Release: 0.5%{?dist}
+Release: 0.6%{?dist}
 License: Boost
 
-# Temporarily get the source from a clone repository of the upstream maintainer,
-# until that latter fixes the compilation bug. A merge request has been made:
-# http://gitorious.org/~zeuner/boost/zeuners-boost-cmake/merge_requests/1
+# The CMake build framework is added on top of the official Boost release
+# (http://www.boost.org), and hosted on Gitorious, for now in the following
+# Git repository: http://gitorious.org/boost/denisarnauds-zeuners-boost-cmake
+# Optionally, the CMake framework (set of CMakeLists.txt and module.cmake files)
+# could be added thanks to a patch.
 #URL: http://gitorious.org/boost/zeuners-boost-cmake/archive-tarball/%{version}
-URL: http://gitorious.org/boost/denisarnauds-zeuners-boost-cmake/archive-tarball/%{version}
+#URL: http://gitorious.org/boost/denisarnauds-zeuners-boost-cmake/archive-tarball/%{version}
+URL: http://www.boost.org
 Group: System Environment/Libraries
 %define full_version %{name}-%{version}.cmake
 Source: %{url}/%{full_version}.tar.bz2
@@ -737,6 +740,9 @@ find $RPM_BUILD_ROOT%{_includedir}/ \( -name '*.pl' -o -name '*.sh' \) -exec %{_
 %endif
 
 %changelog
+* Fri Aug 16 2010 Denis Arnaud <denis.arnaud_fedora@m4x.org> - 1.44.0-0.6
+- Merged the latest changes from the now final release of Boost-1.44
+
 * Fri Aug  6 2010 Denis Arnaud <denis.arnaud_fedora@m4x.org> - 1.44.0-0.5
 - Patched header file in boost/random/detail. Resolves: #621631
 
