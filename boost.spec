@@ -22,17 +22,20 @@
 Name: boost
 Summary: The free peer-reviewed portable C++ source libraries
 Version: 1.44.0
-Release: 0.5%{?dist}
+%define pristine_version 1_44_0
+Release: 1%{?dist}
 License: Boost
 
-# Temporarily get the source from a clone repository of the upstream maintainer,
-# until that latter fixes the compilation bug. A merge request has been made:
-# http://gitorious.org/~zeuner/boost/zeuners-boost-cmake/merge_requests/1
-#URL: http://gitorious.org/boost/zeuners-boost-cmake/archive-tarball/%{version}
-URL: http://gitorious.org/boost/denisarnauds-zeuners-boost-cmake/archive-tarball/%{version}
+# The CMake build framework (set of CMakeLists.txt and module.cmake files) is
+# added on top of the official Boost release (http://www.boost.org), thanks to
+# a dedicated patch. That CMake framework (and patch) is hosted and maintained
+# on Gitorious, for now in the following Git repository:
+# http://gitorious.org/boost/denisarnauds-zeuners-boost-cmake
+%define full_pristine_version %{name}_%{pristine_version}
+%define full_cmake_version %{name}-%{version}.cmake
+URL: http://www.boost.org
 Group: System Environment/Libraries
-%define full_version %{name}-%{version}.cmake
-Source: %{url}/%{full_version}.tar.bz2
+Source: http://downloads.sourceforge.net/%{name}/%{full_pristine_version}.tar.bz2
 
 # From the version 13 of Fedora, the Boost libraries are delivered
 # with sonames equal to the Boost version (e.g., 1.41.0).  On older
@@ -74,7 +77,8 @@ BuildRequires: python-devel
 BuildRequires: libicu-devel
 BuildRequires: chrpath
 
-Patch0: boost-cmake-soname.patch
+Patch0: cmakeify_boost_1440.patch
+#Patch1: boost-cmake-soname.patch
 
 %bcond_with tests
 %bcond_with docs_generated
@@ -362,9 +366,10 @@ backend to do the parallel work.
 
 
 %prep
-%setup -q -n %{full_version}
+%setup -q -n %{full_pristine_version}
 
-sed 's/_FEDORA_SONAME/%{sonamever}/' %{PATCH0} | %{__patch} -p0 --fuzz=0
+# CMake framework (CMakeLists.txt, *.cmake and documentation files)
+%patch0 -p1
 
 %build
 # Support for building tests.
@@ -440,14 +445,14 @@ if [ -f testing.log ]; then
 else
   echo "error with results"
 fi
-cd %{_builddir}/%{full_version}
+cd %{_builddir}/%{full_pristine_version}
 %endif
 
 
 %install
 %{__rm} -rf $RPM_BUILD_ROOT
 
-cd %{_builddir}/%{full_version}/
+cd %{_builddir}/%{full_pristine_version}/
 
 %if %{with openmpi}
 %{_openmpi_load}
@@ -501,7 +506,7 @@ find $RPM_BUILD_ROOT/%{_libdir} -name '*.cmake' -exec %{__rm} -f {} \;
 %{__rm} -rf %{boost_docdir} && %{__mkdir_p} %{boost_docdir}/html
 
 # Install documentation files (HTML pages) within the temporary place
-cd %{_builddir}/%{full_version}
+cd %{_builddir}/%{full_pristine_version}
 DOCPATH=%{boost_docdir}
 find libs doc more -type f \( -name \*.htm -o -name \*.html \) \
     | sed -n '/\//{s,/[^/]*$,,;p}' \
@@ -737,6 +742,13 @@ find $RPM_BUILD_ROOT%{_includedir}/ \( -name '*.pl' -o -name '*.sh' \) -exec %{_
 %endif
 
 %changelog
+* Sat Aug 21 2010 Denis Arnaud <denis.arnaud_fedora@m4x.org> - 1.44.0-1
+- Split the CMake-buildable tar-ball into pristine upstream tar-ball
+  and CMake framework patch
+
+* Fri Aug 16 2010 Denis Arnaud <denis.arnaud_fedora@m4x.org> - 1.44.0-0.6
+- Merged the latest changes from the now final release of Boost-1.44
+
 * Fri Aug  6 2010 Denis Arnaud <denis.arnaud_fedora@m4x.org> - 1.44.0-0.5
 - Patched header file in boost/random/detail. Resolves: #621631
 
