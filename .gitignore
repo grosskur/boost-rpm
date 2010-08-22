@@ -1,7 +1,6 @@
-boost-*.tar.*
+boost*.tar.*
 boost-*.src.rpm
-boost-cmake-soname.patch
+cmakeify_boost_1440.patch
 clog
 .build*
 
-boost-1.44.0.cmake.tar.bz2
