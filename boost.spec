@@ -23,7 +23,7 @@ Name: boost
 Summary: The free peer-reviewed portable C++ source libraries
 Version: 1.44.0
 %define pristine_version 1_44_0
-Release: 1%{?dist}
+Release: 1.1%{?dist}
 License: Boost
 
 # The CMake build framework (set of CMakeLists.txt and module.cmake files) is
@@ -742,6 +742,9 @@ find $RPM_BUILD_ROOT%{_includedir}/ \( -name '*.pl' -o -name '*.sh' \) -exec %{_
 %endif
 
 %changelog
+* Sat Oct 23 2010 Denis Arnaud <denis.arnaud_fedora@m4x.org> - 1.44.0-1.1
+- Rebuild.
+
 * Sat Aug 21 2010 Denis Arnaud <denis.arnaud_fedora@m4x.org> - 1.44.0-1
 - Split the CMake-buildable tar-ball into pristine upstream tar-ball
   and CMake framework patch
