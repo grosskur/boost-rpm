@@ -23,7 +23,7 @@ Name: boost
 Summary: The free peer-reviewed portable C++ source libraries
 Version: 1.44.0
 %define pristine_version 1_44_0
-Release: 1.1%{?dist}
+Release: 2%{?dist}
 License: Boost
 
 # The CMake build framework (set of CMakeLists.txt and module.cmake files) is
@@ -364,6 +364,29 @@ backend to do the parallel work.
 
 %endif
 
+%package build
+Summary: Cross platform build system for C++ projects
+Group: Development/Tools
+Requires: boost-jam
+BuildArch: noarch
+
+%description build
+Boost.Build is an easy way to build C++ projects, everywhere. You 
+name your executables and libraries and list their sources. 
+Boost.Build takes care about compiling your sources with the right 
+options, creating static and shared libraries, making executables, 
+and other chores -- whether you're using gcc, msvc, or a dozen 
+more supported C++ compilers -- on Windows, OSX, Linux and 
+commercial UNIX systems. 
+
+%package jam
+Summary: A low-level build tool
+Group: Development/Tools
+
+%description jam
+Boost.Jam (BJam) is the low-level build engine tool for Boost.Build.
+Historically, Boost.Jam is based on on FTJam and on Perforce Jam but has grown
+a number of significant features and is now developed independently
 
 %prep
 %setup -q -n %{full_pristine_version}
@@ -420,6 +443,12 @@ export MPI_COMPILER
 %{_mpich2_unload}
 %endif
 
+# Build Boost Jam
+echo ============================= build Jam ==================
+pushd tools/jam
+export CFLAGS="%{optflags}"
+./build_dist.sh
+popd
 
 %check
 %if %{with tests}
@@ -519,6 +548,20 @@ cat tmp-doc-directories | while read tobeinstalleddocdir; do
 done
 %{__rm} -f tmp-doc-directories
 %{__install} -p -m 644 -t $DOCPATH LICENSE_1_0.txt index.htm index.html
+
+echo ============================= install jam ==================
+mkdir -p $RPM_BUILD_ROOT%{_bindir}
+pushd tools/jam
+%{__install} -m 755 stage/bin.linux*/bjam $RPM_BUILD_ROOT%{_bindir}
+popd
+
+echo ============================= install build ==================
+mkdir -p $RPM_BUILD_ROOT%{_datadir}/boost-build
+pushd tools/build/v2
+cp -a boost-build.jam bootstrap.jam build/ kernel/ options/ tools/ util/ user-config.jam $RPM_BUILD_ROOT%{_datadir}/boost-build/
+# Not a real file
+rm -f $RPM_BUILD_ROOT%{_datadir}/boost-build/build/project.ann.py
+popd
 
 # Remove scripts used to generate include files
 find $RPM_BUILD_ROOT%{_includedir}/ \( -name '*.pl' -o -name '*.sh' \) -exec %{__rm} -f {} \;
@@ -741,7 +784,19 @@ find $RPM_BUILD_ROOT%{_includedir}/ \( -name '*.pl' -o -name '*.sh' \) -exec %{_
 
 %endif
 
+%files build
+%defattr(-, root, root, -)
+%{_datadir}/boost-build/
+
+%files jam
+%defattr(-, root, root, -)
+%doc LICENSE_1_0.txt
+%{_bindir}/bjam
+
 %changelog
+* Tue Nov 30 2010 Tom "spot" Callaway <spot@fedoraproject.org> - 1.44.0-2
+- add boost-build, boost-jam subpackages
+
 * Sat Oct 23 2010 Denis Arnaud <denis.arnaud_fedora@m4x.org> - 1.44.0-1.1
 - Rebuild.
 
