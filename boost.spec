@@ -23,7 +23,7 @@ Name: boost
 Summary: The free peer-reviewed portable C++ source libraries
 Version: 1.44.0
 %define pristine_version 1_44_0
-Release: 3%{?dist}
+Release: 4%{?dist}
 License: Boost
 
 # The CMake build framework (set of CMakeLists.txt and module.cmake files) is
@@ -406,7 +406,9 @@ a number of significant features and is now developed independently
   cd serial
   %cmake -DCMAKE_BUILD_TYPE=RelWithDebInfo %{boost_testflags} \
          -DENABLE_SINGLE_THREADED=YES -DINSTALL_VERSIONED=OFF \
-         -DWITH_MPI=OFF ..
+         -DWITH_MPI=OFF \
+         -DCMAKE_CXX_FLAGS=-DBOOST_IOSTREAMS_USE_DEPRECATED \
+         ..
   make VERBOSE=1 %{?_smp_mflags}
 )
 
@@ -794,6 +796,10 @@ find $RPM_BUILD_ROOT%{_includedir}/ \( -name '*.pl' -o -name '*.sh' \) -exec %{_
 %{_bindir}/bjam
 
 %changelog
+* Wed Dec  8 2010 Petr Machata <pmachata@redhat.com> - 1.44.0-4
+- Build with support for iostreams deprecated functions
+- Resolves: #654480
+
 * Fri Dec  3 2010 Tom "spot" Callaway <spot@fedoraproject.org> - 1.44.0-3
 - also package build-system.jam in boost-build
 
