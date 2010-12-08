@@ -1,6 +1,6 @@
 boost*.tar.*
 boost-*.src.rpm
-cmakeify_boost_1440.patch
 clog
 .build*
-
+boost_*/
+*/*.rpm
