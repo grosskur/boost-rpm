@@ -59,6 +59,7 @@ Requires: boost-graph = %{version}-%{release}
 Requires: boost-iostreams = %{version}-%{release}
 Requires: boost-program-options = %{version}-%{release}
 Requires: boost-python = %{version}-%{release}
+Requires: boost-random = %{version}-%{release}
 Requires: boost-regex = %{version}-%{release}
 Requires: boost-serialization = %{version}-%{release}
 Requires: boost-signals = %{version}-%{release}
@@ -79,6 +80,7 @@ BuildRequires: chrpath
 
 Patch0: cmakeify_boost_1440.patch
 #Patch1: boost-cmake-soname.patch
+Patch2: boost-random-dso.patch
 
 %bcond_with tests
 %bcond_with docs_generated
@@ -162,6 +164,14 @@ C++. It allows you to quickly and seamlessly expose C++ classes
 functions and objects to Python, and vice versa, using no special
 tools -- just your C++ compiler.  This package contains runtime
 support for Boost Python Library.
+
+%package random
+Summary: Runtime component of boost random library
+Group: System Environment/Libraries
+
+%description random
+
+Runtime support for boost random library.
 
 %package regex
 Summary: Runtime component of boost regular expression library
@@ -393,6 +403,7 @@ a number of significant features and is now developed independently
 
 # CMake framework (CMakeLists.txt, *.cmake and documentation files)
 %patch0 -p1
+%patch2 -p1
 
 %build
 # Support for building tests.
@@ -609,6 +620,10 @@ find $RPM_BUILD_ROOT%{_includedir}/ \( -name '*.pl' -o -name '*.sh' \) -exec %{_
 
 %postun python -p /sbin/ldconfig
 
+%post random -p /sbin/ldconfig
+
+%postun random -p /sbin/ldconfig
+
 %post regex -p /sbin/ldconfig
 
 %postun regex -p /sbin/ldconfig
@@ -679,6 +694,11 @@ find $RPM_BUILD_ROOT%{_includedir}/ \( -name '*.pl' -o -name '*.sh' \) -exec %{_
 %defattr(-, root, root, -)
 %doc LICENSE_1_0.txt
 %{_libdir}/libboost_python*.so.%{sonamever}
+
+%files random
+%defattr(-, root, root, -)
+%doc LICENSE_1_0.txt
+%{_libdir}/libboost_random*.so.%{sonamever}
 
 %files regex
 %defattr(-, root, root, -)
@@ -796,6 +816,10 @@ find $RPM_BUILD_ROOT%{_includedir}/ \( -name '*.pl' -o -name '*.sh' \) -exec %{_
 %{_bindir}/bjam
 
 %changelog
+* Mon Jan  3 2011 Petr Machata <pmachata@redhat.com> - 1.44.0-5
+- Add boost-random DSOs
+- Resolves: #665679
+
 * Wed Dec  8 2010 Petr Machata <pmachata@redhat.com> - 1.44.0-4
 - Build with support for iostreams deprecated functions
 - Resolves: #654480
