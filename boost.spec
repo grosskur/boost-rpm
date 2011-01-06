@@ -23,14 +23,15 @@ Name: boost
 Summary: The free peer-reviewed portable C++ source libraries
 Version: 1.44.0
 %define pristine_version 1_44_0
-Release: 5%{?dist}
+Release: 6%{?dist}
 License: Boost
 
 # The CMake build framework (set of CMakeLists.txt and module.cmake files) is
 # added on top of the official Boost release (http://www.boost.org), thanks to
 # a dedicated patch. That CMake framework (and patch) is hosted and maintained
 # on Gitorious, for now in the following Git repository:
-# http://gitorious.org/boost/denisarnauds-zeuners-boost-cmake
+#   http://gitorious.org/boost/denisarnauds-zeuners-boost-cmake
+#   http://git.gitorious.org/~denisarnaud/boost/denisarnauds-zeuners-boost-cmake.git
 %define full_pristine_version %{name}_%{pristine_version}
 %define full_cmake_version %{name}-%{version}.cmake
 URL: http://www.boost.org
@@ -418,7 +419,7 @@ a number of significant features and is now developed independently
   %cmake -DCMAKE_BUILD_TYPE=RelWithDebInfo %{boost_testflags} \
          -DENABLE_SINGLE_THREADED=YES -DINSTALL_VERSIONED=OFF \
          -DWITH_MPI=OFF \
-         -DCMAKE_CXX_FLAGS=-DBOOST_IOSTREAMS_USE_DEPRECATED \
+         -DCMAKE_CXX_FLAGS="%{optflags} -DBOOST_IOSTREAMS_USE_DEPRECATED" \
          ..
   make VERBOSE=1 %{?_smp_mflags}
 )
@@ -816,6 +817,10 @@ find $RPM_BUILD_ROOT%{_includedir}/ \( -name '*.pl' -o -name '*.sh' \) -exec %{_
 %{_bindir}/bjam
 
 %changelog
+* Thu Jan  6 2011 Petr Machata <pmachata@redhat.com> - 1.44.0-6
+- Don't override CXXFLAGS with -DBOOST_IOSTREAMS_USE_DEPRECATED
+- Resolves: #667294
+
 * Mon Jan  3 2011 Petr Machata <pmachata@redhat.com> - 1.44.0-5
 - Add boost-random DSOs
 - Resolves: #665679
