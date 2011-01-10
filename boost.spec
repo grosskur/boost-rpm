@@ -23,7 +23,7 @@ Name: boost
 Summary: The free peer-reviewed portable C++ source libraries
 Version: 1.44.0
 %define pristine_version 1_44_0
-Release: 6%{?dist}
+Release: 7%{?dist}
 License: Boost
 
 # The CMake build framework (set of CMakeLists.txt and module.cmake files) is
