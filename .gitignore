@@ -4,5 +4,5 @@ clog
 .build*
 boost_*/
 */*.rpm
-/boost-1.44.0.cmake.tar.bz2
+/boost_1_44_0.tar.bz2
 /cmakeify_boost_1440_2.patch
