@@ -21,9 +21,9 @@
 
 Name: boost
 Summary: The free peer-reviewed portable C++ source libraries
-Version: 1.44.0
-%define pristine_version 1_44_0
-Release: 7%{?dist}
+Version: 1.46.0
+%define version_enc 1_46_0_beta1
+Release: 0.beta1%{?dist}
 License: Boost
 
 # The CMake build framework (set of CMakeLists.txt and module.cmake files) is
@@ -35,11 +35,10 @@ License: Boost
 #   http://gitorious.org/~denisarnaud/boost/denisarnauds-cmake
 # Upstream work is synchronised thanks to the Ryppl's hosted Git clone:
 #   https://github.com/ryppl/boost-svn/tree/trunk
-%define full_pristine_version %{name}_%{pristine_version}
-%define full_cmake_version %{name}-%{version}.cmake
+%define toplev_dirname %{name}_%{version_enc}
 URL: http://www.boost.org
 Group: System Environment/Libraries
-Source: http://downloads.sourceforge.net/%{name}/%{full_pristine_version}.tar.bz2
+Source: http://downloads.sourceforge.net/%{name}/%{toplev_dirname}.tar.bz2
 
 # From the version 13 of Fedora, the Boost libraries are delivered
 # with sonames equal to the Boost version (e.g., 1.41.0).  On older
@@ -82,9 +81,12 @@ BuildRequires: python-devel
 BuildRequires: libicu-devel
 BuildRequires: chrpath
 
-Patch0: cmakeify_boost_1440_3.patch
-#Patch1: boost-cmake-soname.patch
-#Patch2: boost-random-dso.patch
+Patch0: boost-1.46.0-cmakeify.patch
+Patch1: boost-1.46.0-cmakeify-more.patch
+#Patch2: boost-cmake-soname.patch
+
+# https://svn.boost.org/trac/boost/ticket/4999
+Patch3: boost-1.46.0-signals-erase.patch
 
 %bcond_with tests
 %bcond_with docs_generated
@@ -403,10 +405,15 @@ Historically, Boost.Jam is based on on FTJam and on Perforce Jam but has grown
 a number of significant features and is now developed independently
 
 %prep
-%setup -q -n %{full_pristine_version}
+%setup -q -n %{toplev_dirname}
 
 # CMake framework (CMakeLists.txt, *.cmake and documentation files)
 %patch0 -p1
+%patch1 -p1
+
+# fixes
+%patch3 -p1
+
 
 %build
 # Support for building tests.
@@ -461,7 +468,7 @@ export MPI_COMPILER
 
 # Build Boost Jam
 echo ============================= build Jam ==================
-pushd tools/jam
+pushd tools/build/v2/engine/
 export CFLAGS="%{optflags}"
 ./build_dist.sh
 popd
@@ -490,14 +497,14 @@ if [ -f testing.log ]; then
 else
   echo "error with results"
 fi
-cd %{_builddir}/%{full_pristine_version}
+cd %{_builddir}/%{toplev_dirname}
 %endif
 
 
 %install
 %{__rm} -rf $RPM_BUILD_ROOT
 
-cd %{_builddir}/%{full_pristine_version}/
+cd %{_builddir}/%{toplev_dirname}
 
 %if %{with openmpi}
 %{_openmpi_load}
@@ -551,7 +558,7 @@ find $RPM_BUILD_ROOT/%{_libdir} -name '*.cmake' -exec %{__rm} -f {} \;
 %{__rm} -rf %{boost_docdir} && %{__mkdir_p} %{boost_docdir}/html
 
 # Install documentation files (HTML pages) within the temporary place
-cd %{_builddir}/%{full_pristine_version}
+cd %{_builddir}/%{toplev_dirname}
 DOCPATH=%{boost_docdir}
 find libs doc more -type f \( -name \*.htm -o -name \*.html \) \
     | sed -n '/\//{s,/[^/]*$,,;p}' \
@@ -567,7 +574,7 @@ done
 
 echo ============================= install jam ==================
 mkdir -p $RPM_BUILD_ROOT%{_bindir}
-pushd tools/jam
+pushd tools/build/v2/engine/
 %{__install} -m 755 stage/bin.linux*/bjam $RPM_BUILD_ROOT%{_bindir}
 popd
 
@@ -819,6 +826,10 @@ find $RPM_BUILD_ROOT%{_includedir}/ \( -name '*.pl' -o -name '*.sh' \) -exec %{_
 %{_bindir}/bjam
 
 %changelog
+* Thu Feb  3 2011 Petr Machata <pmachata@redhat.com> - 1.46.0-0.beta1
+- Package 1.46.0-beta1
+- Related: #656410
+
 * Mon Jan 10 2011 Denis Arnaud <denis.arnaud_fedora@m4x.org> - 1.44.0-7
 - Integrated Petr's work to fix missing Boost.Filesystem V3 issue
 - Resolves: #667740
