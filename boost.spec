@@ -83,7 +83,7 @@ BuildRequires: chrpath
 
 Patch0: boost-1.46.0-cmakeify.patch
 Patch1: boost-1.46.0-cmakeify-more.patch
-#Patch2: boost-cmake-soname.patch
+Patch2: boost-cmake-soname.patch
 
 # https://svn.boost.org/trac/boost/ticket/4999
 Patch3: boost-1.46.0-signals-erase.patch
@@ -410,6 +410,7 @@ a number of significant features and is now developed independently
 # CMake framework (CMakeLists.txt, *.cmake and documentation files)
 %patch0 -p1
 %patch1 -p1
+sed 's/_FEDORA_SONAME/%{sonamever}/' %{PATCH2} | %{__patch} -p0 --fuzz=0
 
 # fixes
 %patch3 -p1
@@ -828,6 +829,7 @@ find $RPM_BUILD_ROOT%{_includedir}/ \( -name '*.pl' -o -name '*.sh' \) -exec %{_
 %changelog
 * Thu Feb  3 2011 Petr Machata <pmachata@redhat.com> - 1.46.0-0.beta1
 - Package 1.46.0-beta1
+- Reintroduce the soname patch
 - Related: #656410
 
 * Mon Jan 10 2011 Denis Arnaud <denis.arnaud_fedora@m4x.org> - 1.44.0-7

@@ -1,0 +1,19 @@
+*** tools/build/CMake/BoostCore.cmake.orig	2010-01-12 20:01:46.006547352 -0800
+--- tools/build/CMake/BoostCore.cmake	2010-01-12 20:02:54.222546929 -0800
+*************** macro(boost_library_variant LIBNAME)
+*** 755,761 ****
+        if (BUILD_SOVERSIONED)
+  	set_target_properties(${VARIANT_LIBNAME}
+  	  PROPERTIES
+! 	  SOVERSION "${BOOST_VERSION}"
+  	  )
+        endif()
+      endif ()
+--- 755,761 ----
+        if (BUILD_SOVERSIONED)
+  	set_target_properties(${VARIANT_LIBNAME}
+  	  PROPERTIES
+! 	  SOVERSION "_FEDORA_SONAME"
+  	  )
+        endif()
+      endif ()
