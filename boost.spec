@@ -23,7 +23,7 @@ Name: boost
 Summary: The free peer-reviewed portable C++ source libraries
 Version: 1.46.0
 %define version_enc 1_46_0_beta1
-Release: 0.beta1%{?dist}
+Release: 0.1.beta1%{?dist}
 License: Boost
 
 # The CMake build framework (set of CMakeLists.txt and module.cmake files) is
@@ -827,7 +827,7 @@ find $RPM_BUILD_ROOT%{_includedir}/ \( -name '*.pl' -o -name '*.sh' \) -exec %{_
 %{_bindir}/bjam
 
 %changelog
-* Thu Feb  3 2011 Petr Machata <pmachata@redhat.com> - 1.46.0-0.beta1
+* Thu Feb  3 2011 Petr Machata <pmachata@redhat.com> - 1.46.0-0.1.beta1
 - Package 1.46.0-beta1
 - Reintroduce the soname patch
 - Related: #656410
