@@ -88,6 +88,9 @@ Patch2: boost-cmake-soname.patch
 # https://svn.boost.org/trac/boost/ticket/4999
 Patch3: boost-1.46.0-signals-erase.patch
 
+# https://svn.boost.org/trac/boost/ticket/5119
+Patch4: boost-1.46.0-unordered-cctor.patch
+
 %bcond_with tests
 %bcond_with docs_generated
 
@@ -414,6 +417,7 @@ sed 's/_FEDORA_SONAME/%{sonamever}/' %{PATCH2} | %{__patch} -p0 --fuzz=0
 
 # fixes
 %patch3 -p1
+%patch4 -p2
 
 
 %build
@@ -830,6 +834,10 @@ find $RPM_BUILD_ROOT%{_includedir}/ \( -name '*.pl' -o -name '*.sh' \) -exec %{_
 * Thu Feb  3 2011 Petr Machata <pmachata@redhat.com> - 1.46.0-0.1.beta1
 - Package 1.46.0-beta1
 - Reintroduce the soname patch
+- unordered-cctor.patch: Add copy constructors and assignment
+  operators when using rvalue references
+- signals-erase.patch: Pass const_iterator to map::erase to avoid
+  ambigous overload vs. templatized value_type ctor
 - Related: #656410
 
 * Mon Jan 10 2011 Denis Arnaud <denis.arnaud_fedora@m4x.org> - 1.44.0-7
