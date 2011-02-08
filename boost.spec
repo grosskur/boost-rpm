@@ -23,7 +23,7 @@ Name: boost
 Summary: The free peer-reviewed portable C++ source libraries
 Version: 1.46.0
 %define version_enc 1_46_0_beta1
-Release: 0.1.beta1%{?dist}
+Release: 0.2.beta1%{?dist}
 License: Boost
 
 # The CMake build framework (set of CMakeLists.txt and module.cmake files) is
@@ -90,6 +90,8 @@ Patch3: boost-1.46.0-signals-erase.patch
 
 # https://svn.boost.org/trac/boost/ticket/5119
 Patch4: boost-1.46.0-unordered-cctor.patch
+
+Patch5: boost-1.46.0-spirit.patch
 
 %bcond_with tests
 %bcond_with docs_generated
@@ -418,6 +420,7 @@ sed 's/_FEDORA_SONAME/%{sonamever}/' %{PATCH2} | %{__patch} -p0 --fuzz=0
 # fixes
 %patch3 -p1
 %patch4 -p2
+%patch5 -p0
 
 
 %build
@@ -831,6 +834,10 @@ find $RPM_BUILD_ROOT%{_includedir}/ \( -name '*.pl' -o -name '*.sh' \) -exec %{_
 %{_bindir}/bjam
 
 %changelog
+* Tue Feb  8 2011 Petr Machata <pmachata@redhat.com> - 1.46.0-0.2.beta1
+- spirit.patch: Fix a problem in using boost::spirit with utf-8
+  strings.  Thanks to Hicham HAOUARI for digging up the fix.
+
 * Thu Feb  3 2011 Petr Machata <pmachata@redhat.com> - 1.46.0-0.1.beta1
 - Package 1.46.0-beta1
 - Reintroduce the soname patch
