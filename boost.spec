@@ -22,17 +22,17 @@
 Name: boost
 Summary: The free peer-reviewed portable C++ source libraries
 Version: 1.46.0
-%define version_enc 1_46_0_beta1
-Release: 0.3.beta1%{?dist}
+%define version_enc 1_46_0
+Release: 0.4%{?dist}
 License: Boost
 
 # The CMake build framework (set of CMakeLists.txt and module.cmake files) is
 # added on top of the official Boost release (http://www.boost.org), thanks to
 # a dedicated patch. That CMake framework (and patch) is hosted and maintained
 # on GitHub, for now in the following Git repository:
-#   https://github.com/denisarnaud/boost-cmake
+#   https://github.com/boost-lib/boost-cmake
 # A clone also exists on Gitorious, where CMake-related work was formely done:
-#   http://gitorious.org/~denisarnaud/boost/denisarnauds-cmake
+#   http://gitorious.org/boost/cmake
 # Upstream work is synchronised thanks to the Ryppl's hosted Git clone:
 #   https://github.com/ryppl/boost-svn/tree/trunk
 %define toplev_dirname %{name}_%{version_enc}
@@ -53,8 +53,8 @@ Source: http://downloads.sourceforge.net/%{name}/%{toplev_dirname}.tar.bz2
 %endif
 
 # boost is an "umbrella" package that pulls in all other boost
-# components, except for MPI sub-packages.  Those are "speacial", one
-# doesn't necessarily need them and the more typical scenario, I
+# components, except for MPI sub-packages.  Those are "special": one
+# does not necessarily need them and the more typical scenario, I
 # think, will be that the developer wants to pick one MPI flavor.
 Requires: boost-date-time = %{version}-%{release}
 Requires: boost-filesystem = %{version}-%{release}
@@ -81,16 +81,24 @@ BuildRequires: python-devel
 BuildRequires: libicu-devel
 BuildRequires: chrpath
 
-Patch0: boost-1.46.0-cmakeify.patch
-Patch1: boost-1.46.0-cmakeify-more.patch
+# CMake-related files (CMakeLists.txt and module.cmake files)
+Patch0: boost-1.46.0-cmakeify-full.patch
+# Mainly Web-related documentation for the Trac Wiki devoted to "old"
+# Boost-CMake (up-to-date until Boost-1.41.0). Now part of 
+# boost-1.46.0-cmakeify-full.patch
+#Patch1: boost-1.46.0-cmakeify-more.patch
 Patch2: boost-cmake-soname.patch
 
-# https://svn.boost.org/trac/boost/ticket/4999
+# The patch may break c++03, and there is therefore no plan yet to include
+# it upstream: https://svn.boost.org/trac/boost/ticket/4999
 Patch3: boost-1.46.0-signals-erase.patch
 
-# https://svn.boost.org/trac/boost/ticket/5119
+# Will be fixed in Boost-1.47: https://svn.boost.org/trac/boost/ticket/5119
 Patch4: boost-1.46.0-unordered-cctor.patch
 
+# http://comments.gmane.org/gmane.comp.lib.boost.devel/214323
+# Has been fixed on Boost trunk (will be fixed in Boost-1.47:
+#  https://svn.boost.org/trac/boost/changeset/68725)
 Patch5: boost-1.46.0-spirit.patch
 
 %bcond_with tests
@@ -414,7 +422,6 @@ a number of significant features and is now developed independently
 
 # CMake framework (CMakeLists.txt, *.cmake and documentation files)
 %patch0 -p1
-%patch1 -p1
 sed 's/_FEDORA_SONAME/%{sonamever}/' %{PATCH2} | %{__patch} -p0 --fuzz=0
 
 # fixes
@@ -834,6 +841,9 @@ find $RPM_BUILD_ROOT%{_includedir}/ \( -name '*.pl' -o -name '*.sh' \) -exec %{_
 %{_bindir}/bjam
 
 %changelog
+* Thu Feb 24 2011 Denis Arnaud <denis.arnaud_fedora@m4x.org> - 1.46.0-0.4
+- Merged the latest changes from the now final release of Boost-1.46
+
 * Tue Feb  8 2011 Petr Machata <pmachata@redhat.com> - 1.46.0-0.3.beta1
 - spirit.patch: Fix a problem in using boost::spirit with utf-8
   strings.  Thanks to Hicham HAOUARI for digging up the fix.
