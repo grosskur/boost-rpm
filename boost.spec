@@ -21,9 +21,9 @@
 
 Name: boost
 Summary: The free peer-reviewed portable C++ source libraries
-Version: 1.46.0
-%define version_enc 1_46_0
-Release: 0.5%{?dist}
+Version: 1.46.1
+%define version_enc 1_46_1
+Release: 1%{?dist}
 License: Boost
 
 # The CMake build framework (set of CMakeLists.txt and module.cmake files) is
@@ -82,24 +82,24 @@ BuildRequires: libicu-devel
 BuildRequires: chrpath
 
 # CMake-related files (CMakeLists.txt and module.cmake files)
-Patch0: boost-1.46.0-cmakeify-full.patch
+Patch0: boost-1.46.1-cmakeify-full.patch
 # Mainly Web-related documentation for the Trac Wiki devoted to "old"
 # Boost-CMake (up-to-date until Boost-1.41.0). Now part of 
-# boost-1.46.0-cmakeify-full.patch
-#Patch1: boost-1.46.0-cmakeify-more.patch
+# boost-1.46.1-cmakeify-full.patch
+#Patch1: boost-1.46.1-cmakeify-more.patch
 Patch2: boost-cmake-soname.patch
 
 # The patch may break c++03, and there is therefore no plan yet to include
 # it upstream: https://svn.boost.org/trac/boost/ticket/4999
-Patch3: boost-1.46.0-signals-erase.patch
+Patch3: boost-1.46.1-signals-erase.patch
 
-# Will be fixed in Boost-1.47: https://svn.boost.org/trac/boost/ticket/5119
-Patch4: boost-1.46.0-unordered-cctor.patch
+# Has been fixed in Boost-1.46.1: https://svn.boost.org/trac/boost/ticket/5119
+#Patch4: boost-1.46.0-unordered-cctor.patch
 
 # http://comments.gmane.org/gmane.comp.lib.boost.devel/214323
 # Has been fixed on Boost trunk (will be fixed in Boost-1.47:
 #  https://svn.boost.org/trac/boost/changeset/68725)
-Patch5: boost-1.46.0-spirit.patch
+Patch5: boost-1.46.1-spirit.patch
 
 %bcond_with tests
 %bcond_with docs_generated
@@ -426,7 +426,6 @@ sed 's/_FEDORA_SONAME/%{sonamever}/' %{PATCH2} | %{__patch} -p0 --fuzz=0
 
 # fixes
 %patch3 -p1
-%patch4 -p2
 %patch5 -p0
 
 
@@ -841,6 +840,9 @@ find $RPM_BUILD_ROOT%{_includedir}/ \( -name '*.pl' -o -name '*.sh' \) -exec %{_
 %{_bindir}/bjam
 
 %changelog
+* Sun Mar 13 2011 Denis Arnaud <denis.arnaud_fedora@m4x.org> - 1.46.1-1
+- Merged the latest changes from the bug-fix release of Boost-1.46
+
 * Mon Mar 07 2011 Caolán McNamara <caolanm@redhat.com> - 1.46.0-0.5
 - rebuild for icu 4.6
 
