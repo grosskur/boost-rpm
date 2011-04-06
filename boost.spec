@@ -400,13 +400,12 @@ Requires: boost-jam
 BuildArch: noarch
 
 %description build
-Boost.Build is an easy way to build C++ projects, everywhere. You 
-name your executables and libraries and list their sources. 
-Boost.Build takes care about compiling your sources with the right 
-options, creating static and shared libraries, making executables, 
-and other chores -- whether you're using gcc, msvc, or a dozen 
-more supported C++ compilers -- on Windows, OSX, Linux and 
-commercial UNIX systems. 
+Boost.Build is an easy way to build C++ projects, everywhere. You name
+your executables and libraries and list their sources.  Boost.Build
+takes care about compiling your sources with the right options,
+creating static and shared libraries, making executables, and other
+chores -- whether you're using gcc, msvc, or a dozen more supported
+C++ compilers -- on Windows, OSX, Linux and commercial UNIX systems.
 
 %package jam
 Summary: A low-level build tool
