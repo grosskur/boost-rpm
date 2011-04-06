@@ -23,7 +23,7 @@ Name: boost
 Summary: The free peer-reviewed portable C++ source libraries
 Version: 1.46.1
 %define version_enc 1_46_1
-Release: 2%{?dist}
+Release: 3%{?dist}
 License: Boost
 
 # The CMake build framework (set of CMakeLists.txt and module.cmake files) is
@@ -839,11 +839,14 @@ find $RPM_BUILD_ROOT%{_includedir}/ \( -name '*.pl' -o -name '*.sh' \) -exec %{_
 %{_bindir}/bjam
 
 %changelog
-* Mon Apr  4 2011 Petr Machata <pmachata@redhat.com> - 1.46.1-2
+* Mon Apr  4 2011 Petr Machata <pmachata@redhat.com> - 1.46.1-3
 - Yet another way to pass -DBOOST_LIB_INSTALL_DIR to cmake.  Passing
   via CMAKE_CXX_FLAGS for some reason breaks when rpm re-quotes the
   expression as a result of %%{optflags} expansion.
 - Related: #667294
+
+* Wed Mar 30 2011 Deji Akingunola <dakingun@gmail.com> - 1.46.1-2
+- Rebuild for mpich2 soname bump
 
 * Sun Mar 13 2011 Denis Arnaud <denis.arnaud_fedora@m4x.org> - 1.46.1-1
 - Merged the latest changes from the bug-fix release of Boost-1.46
