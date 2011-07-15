@@ -1,6 +1,6 @@
 # Support for documentation installation
 # As the %%doc macro erases the target directory, namely
-# $RPM_BUILD_ROOT%{_docdir}/%{name}-%{version}, manually installed
+# $RPM_BUILD_ROOT%%{_docdir}/%%{name}-%%{version}, manually installed
 # documentation must be saved into a temporary dedicated directory.
 %define boost_docdir __tmp_docdir
 
@@ -10,7 +10,7 @@
   %define disable_long_double 1
 %endif
 
-# Configuration of MPI backends
+# Configuration of MPI back-ends
 %ifarch %{arm}
   %bcond_with mpich2
 %else
@@ -25,16 +25,16 @@
 
 Name: boost
 Summary: The free peer-reviewed portable C++ source libraries
-Version: 1.46.1
-%define version_enc 1_46_1
-Release: 4%{?dist}
+Version: 1.47.0
+%define version_enc 1_47_0
+Release: 1%{?dist}
 License: Boost
 
 # The CMake build framework (set of CMakeLists.txt and module.cmake files) is
 # added on top of the official Boost release (http://www.boost.org), thanks to
 # a dedicated patch. That CMake framework (and patch) is hosted and maintained
 # on GitHub, for now in the following Git repository:
-#   https://github.com/boost-lib/boost-cmake
+#   https://github.com/pocb/boost.git
 # A clone also exists on Gitorious, where CMake-related work was formely done:
 #   http://gitorious.org/boost/cmake
 # Upstream work is synchronised thanks to the Ryppl's hosted Git clone:
@@ -45,21 +45,17 @@ Group: System Environment/Libraries
 Source: http://downloads.sourceforge.net/%{name}/%{toplev_dirname}.tar.bz2
 
 # From the version 13 of Fedora, the Boost libraries are delivered
-# with sonames equal to the Boost version (e.g., 1.41.0).  On older
-# versions of Fedora (e.g., Fedora 12), the Boost libraries are
-# delivered with another scheme for sonames (e.g., a soname of 5 for
-# Fedora 12).  If for some reason you wish to set the sonamever
-# yourself, you can do it here.
-%if 0%{?fedora} >= 13
-  %define sonamever %{version}
-%else
-  %define sonamever 7
-%endif
+# with sonames equal to the Boost version (e.g., 1.41.0). On EPEL versions
+# (e.g., EPEL 5), the Boost libraries are delivered with another scheme
+# for sonames (e.g., a soname of 3 for EPEL 5).
+# If for some reason you wish to set the sonamever yourself, you can do it here.
+%define sonamever %{version}
 
 # boost is an "umbrella" package that pulls in all other boost
 # components, except for MPI sub-packages.  Those are "special": one
 # does not necessarily need them and the more typical scenario, I
 # think, will be that the developer wants to pick one MPI flavor.
+Requires: boost-chrono = %{version}-%{release}
 Requires: boost-date-time = %{version}-%{release}
 Requires: boost-filesystem = %{version}-%{release}
 Requires: boost-graph = %{version}-%{release}
@@ -85,25 +81,15 @@ BuildRequires: python-devel
 BuildRequires: libicu-devel
 BuildRequires: chrpath
 
-# CMake-related files (CMakeLists.txt and module.cmake files)
-Patch0: boost-1.46.1-cmakeify-full.patch
-# Mainly Web-related documentation for the Trac Wiki devoted to "old"
-# Boost-CMake (up-to-date until Boost-1.41.0). Now part of 
-# boost-1.46.1-cmakeify-full.patch
-#Patch1: boost-1.46.1-cmakeify-more.patch
-Patch2: boost-cmake-soname.patch
+# CMake-related files (CMakeLists.txt and module.cmake files).
+# That patch also contains Web-related documentation for the Trac Wiki
+# devoted to "old" Boost-CMake (up-to-date until Boost-1.41.0).
+Patch0: boost-1.47.0-cmakeify-full.patch
+Patch1: boost-cmake-soname.patch
 
 # The patch may break c++03, and there is therefore no plan yet to include
 # it upstream: https://svn.boost.org/trac/boost/ticket/4999
-Patch3: boost-1.46.1-signals-erase.patch
-
-# Has been fixed in Boost-1.46.1: https://svn.boost.org/trac/boost/ticket/5119
-#Patch4: boost-1.46.0-unordered-cctor.patch
-
-# http://comments.gmane.org/gmane.comp.lib.boost.devel/214323
-# Has been fixed on Boost trunk (will be fixed in Boost-1.47:
-#  https://svn.boost.org/trac/boost/changeset/68725)
-Patch5: boost-1.46.1-spirit.patch
+Patch2: boost-1.47.0-signals-erase.patch
 
 %bcond_with tests
 %bcond_with docs_generated
@@ -117,42 +103,50 @@ libraries are suitable for eventual standardization. (Some of the
 libraries have already been proposed for inclusion in the C++
 Standards Committee's upcoming C++ Standard Library Technical Report.)
 
+%package chrono
+Summary: Run-Time component of boost chrono library
+Group: System Environment/Libraries
+
+%description chrono
+
+Run-Time support for Boost.Chrono, a set of useful time utilities.
+
 %package date-time
-Summary: Runtime component of boost date-time library
+Summary: Run-Time component of boost date-time library
 Group: System Environment/Libraries
 
 %description date-time
 
-Runtime support for Boost Date Time, set of date-time libraries based
+Run-Time support for Boost Date Time, set of date-time libraries based
 on generic programming concepts.
 
 %package filesystem
-Summary: Runtime component of boost filesystem library
+Summary: Run-Time component of boost filesystem library
 Group: System Environment/Libraries
 
 %description filesystem
 
-Runtime support for the Boost Filesystem Library, which provides
+Run-Time support for the Boost Filesystem Library, which provides
 portable facilities to query and manipulate paths, files, and
 directories.
 
 %package graph
-Summary: Runtime component of boost graph library
+Summary: Run-Time component of boost graph library
 Group: System Environment/Libraries
 
 %description graph
 
-Runtime support for the BGL graph library.  BGL interface and graph
+Run-Time support for the BGL graph library.  BGL interface and graph
 components are generic, in the same sense as the the Standard Template
 Library (STL).
 
 %package iostreams
-Summary: Runtime component of boost iostreams library
+Summary: Run-Time component of boost iostreams library
 Group: System Environment/Libraries
 
 %description iostreams
 
-Runtime support for Boost.IOStreams, a framework for defining streams,
+Run-Time support for Boost.IOStreams, a framework for defining streams,
 stream buffers and i/o filters.
 
 %package math
@@ -161,23 +155,23 @@ Group: System Environment/Libraries
 
 %description math
 
-This package is a stub that used to contain runtime component of boost
+This package is a stub that used to contain run-time component of boost
 math library.  Now that boost math library is header-only, this
 package is empty.  It's kept around only so that during yum-assisted
 update, old libraries from boost-math package aren't left around.
 
 %package program-options
-Summary:  Runtime component of boost program_options library
+Summary:  Run-Time component of boost program_options library
 Group: System Environment/Libraries
 
 %description program-options
 
-Runtime support of boost program options library, which allows program
+Run-Time support of boost program options library, which allows program
 developers to obtain (name, value) pairs from the user, via
 conventional methods such as command line and configuration file.
 
 %package python
-Summary: Runtime component of boost python library
+Summary: Run-Time component of boost python library
 Group: System Environment/Libraries
 
 %description python
@@ -185,80 +179,80 @@ Group: System Environment/Libraries
 The Boost Python Library is a framework for interfacing Python and
 C++. It allows you to quickly and seamlessly expose C++ classes
 functions and objects to Python, and vice versa, using no special
-tools -- just your C++ compiler.  This package contains runtime
+tools -- just your C++ compiler.  This package contains run-time
 support for Boost Python Library.
 
 %package random
-Summary: Runtime component of boost random library
+Summary: Run-Time component of boost random library
 Group: System Environment/Libraries
 
 %description random
 
-Runtime support for boost random library.
+Run-Time support for boost random library.
 
 %package regex
-Summary: Runtime component of boost regular expression library
+Summary: Run-Time component of boost regular expression library
 Group: System Environment/Libraries
 
 %description regex
 
-Runtime support for boost regular expression library.
+Run-Time support for boost regular expression library.
 
 %package serialization
-Summary: Runtime component of boost serialization library
+Summary: Run-Time component of boost serialization library
 Group: System Environment/Libraries
 
 %description serialization
 
-Runtime support for serialization for persistence and marshaling.
+Run-Time support for serialization for persistence and marshaling.
 
 %package signals
-Summary: Runtime component of boost signals and slots library
+Summary: Run-Time component of boost signals and slots library
 Group: System Environment/Libraries
 
 %description signals
 
-Runtime support for managed signals & slots callback implementation.
+Run-Time support for managed signals & slots callback implementation.
 
 %package system
-Summary: Runtime component of boost system support library
+Summary: Run-Time component of boost system support library
 Group: System Environment/Libraries
 
 %description system
 
-Runtime component of Boost operating system support library, including
+Run-Time component of Boost operating system support library, including
 the diagnostics support that will be part of the C++0x standard
 library.
 
 %package test
-Summary: Runtime component of boost test library
+Summary: Run-Time component of boost test library
 Group: System Environment/Libraries
 
 %description test
 
-Runtime support for simple program testing, full unit testing, and for
+Run-Time support for simple program testing, full unit testing, and for
 program execution monitoring.
 
 %package thread
-Summary: Runtime component of boost thread library
+Summary: Run-Time component of boost thread library
 Group: System Environment/Libraries
 
 %description thread
 
-Runtime component Boost.Thread library, which provides classes and
+Run-Time component Boost.Thread library, which provides classes and
 functions for managing multiple threads of execution, and for
 synchronizing data between the threads or providing separate copies of
 data specific to individual threads.
 
 %package wave
-Summary: Runtime component of boost C99/C++ preprocessing library
+Summary: Run-Time component of boost C99/C++ pre-processing library
 Group: System Environment/Libraries
 
 %description wave
 
-Runtime support for the Boost.Wave library, a Standards conformant,
+Run-Time support for the Boost.Wave library, a Standards conforming,
 and highly configurable implementation of the mandated C99/C++
-preprocessor functionality.
+pre-processor functionality.
 
 %package devel
 Summary: The Boost C++ headers and shared development libraries
@@ -270,7 +264,7 @@ Provides: boost-python-devel = %{version}-%{release}
 Requires: cmake
 
 %description devel
-Headers and shared object symlinks for the Boost C++ libraries.
+Headers and shared object symbolic links for the Boost C++ libraries.
 
 %package static
 Summary: The Boost C++ static development libraries
@@ -299,18 +293,18 @@ web page (http://www.boost.org/doc/libs/1_40_0).
 %if %{with openmpi}
 
 %package openmpi
-Summary: Runtime component of Boost.MPI library
+Summary: Run-Time component of Boost.MPI library
 Group: System Environment/Libraries
 Requires: openmpi
 BuildRequires: openmpi-devel
 
 %description openmpi
 
-Runtime support for Boost.MPI-OpenMPI, a library providing a clean C++
+Run-Time support for Boost.MPI-OpenMPI, a library providing a clean C++
 API over the OpenMPI implementation of MPI.
 
 %package openmpi-devel
-Summary: Shared library symlinks for Boost.MPI
+Summary: Shared library symbolic links for Boost.MPI
 Group: System Environment/Libraries
 Requires: boost-devel = %{version}-%{release}
 Requires: boost-openmpi = %{version}-%{release}
@@ -323,7 +317,7 @@ Devel package for Boost.MPI-OpenMPI, a library providing a clean C++
 API over the OpenMPI implementation of MPI.
 
 %package openmpi-python
-Summary: Python runtime component of Boost.MPI library
+Summary: Python run-time component of Boost.MPI library
 Group: System Environment/Libraries
 Requires: boost-openmpi = %{version}-%{release}
 
@@ -333,16 +327,16 @@ Python support for Boost.MPI-OpenMPI, a library providing a clean C++
 API over the OpenMPI implementation of MPI.
 
 %package graph-openmpi
-Summary: Runtime component of parallel boost graph library
+Summary: Run-Time component of parallel boost graph library
 Group: System Environment/Libraries
 Requires: boost-openmpi = %{version}-%{release}
 
 %description graph-openmpi
 
-Runtime support for the Parallel BGL graph library.  The interface and
+Run-Time support for the Parallel BGL graph library.  The interface and
 graph components are generic, in the same sense as the the Standard
 Template Library (STL).  This libraries in this package use OpenMPI
-backend to do the parallel work.
+back-end to do the parallel work.
 
 %endif
 
@@ -350,18 +344,18 @@ backend to do the parallel work.
 %if %{with mpich2}
 
 %package mpich2
-Summary: Runtime component of Boost.MPI library
+Summary: Run-Time component of Boost.MPI library
 Group: System Environment/Libraries
 Requires: mpich2
 BuildRequires: mpich2-devel
 
 %description mpich2
 
-Runtime support for Boost.MPI-MPICH2, a library providing a clean C++
+Run-Time support for Boost.MPI-MPICH2, a library providing a clean C++
 API over the MPICH2 implementation of MPI.
 
 %package mpich2-devel
-Summary: Shared library symlinks for Boost.MPI
+Summary: Shared library symbolic links for Boost.MPI
 Group: System Environment/Libraries
 Requires: boost-devel = %{version}-%{release}
 Requires: boost-mpich2 = %{version}-%{release}
@@ -374,7 +368,7 @@ Devel package for Boost.MPI-MPICH2, a library providing a clean C++
 API over the MPICH2 implementation of MPI.
 
 %package mpich2-python
-Summary: Python runtime component of Boost.MPI library
+Summary: Python run-time component of Boost.MPI library
 Group: System Environment/Libraries
 Requires: boost-mpich2 = %{version}-%{release}
 
@@ -384,16 +378,16 @@ Python support for Boost.MPI-MPICH2, a library providing a clean C++
 API over the MPICH2 implementation of MPI.
 
 %package graph-mpich2
-Summary: Runtime component of parallel boost graph library
+Summary: Run-Time component of parallel boost graph library
 Group: System Environment/Libraries
 Requires: boost-mpich2 = %{version}-%{release}
 
 %description graph-mpich2
 
-Runtime support for the Parallel BGL graph library.  The interface and
+Run-Time support for the Parallel BGL graph library.  The interface and
 graph components are generic, in the same sense as the the Standard
 Template Library (STL).  This libraries in this package use MPICH2
-backend to do the parallel work.
+back-end to do the parallel work.
 
 %endif
 
@@ -405,10 +399,10 @@ BuildArch: noarch
 
 %description build
 Boost.Build is an easy way to build C++ projects, everywhere. You name
-your executables and libraries and list their sources.  Boost.Build
+your pieces of executable and libraries and list their sources.  Boost.Build
 takes care about compiling your sources with the right options,
-creating static and shared libraries, making executables, and other
-chores -- whether you're using gcc, msvc, or a dozen more supported
+creating static and shared libraries, making pieces of executable, and other
+chores -- whether you're using GCC, MSVC, or a dozen more supported
 C++ compilers -- on Windows, OSX, Linux and commercial UNIX systems.
 
 %package jam
@@ -425,12 +419,10 @@ a number of significant features and is now developed independently
 
 # CMake framework (CMakeLists.txt, *.cmake and documentation files)
 %patch0 -p1
-sed 's/_FEDORA_SONAME/%{sonamever}/' %{PATCH2} | %{__patch} -p0 --fuzz=0
+sed 's/_FEDORA_SONAME/%{sonamever}/' %{PATCH1} | %{__patch} -p0 --fuzz=0
 
-# fixes
-%patch3 -p1
-%patch5 -p0
-
+# Fixes
+%patch2 -p1
 
 %build
 # Support for building tests.
@@ -487,7 +479,7 @@ export MPI_COMPILER
 echo ============================= build Jam ==================
 pushd tools/build/v2/engine/
 export CFLAGS="%{optflags}"
-./build_dist.sh
+./build.sh
 popd
 
 %check
@@ -592,15 +584,21 @@ done
 echo ============================= install jam ==================
 mkdir -p $RPM_BUILD_ROOT%{_bindir}
 pushd tools/build/v2/engine/
-%{__install} -m 755 stage/bin.linux*/bjam $RPM_BUILD_ROOT%{_bindir}
+%{__install} -m 755 bin.linux*/bjam $RPM_BUILD_ROOT%{_bindir}
 popd
 
 echo ============================= install build ==================
 mkdir -p $RPM_BUILD_ROOT%{_datadir}/boost-build
 pushd tools/build/v2
-cp -a boost-build.jam bootstrap.jam build-system.jam build/ kernel/ options/ tools/ util/ user-config.jam $RPM_BUILD_ROOT%{_datadir}/boost-build/
+# Fix some permissions
+%{__chmod} -x build/alias.py
+%{__chmod} +x tools/doxproc.py
+# Empty file
+%{__rm} -f tools/doxygen/windows-paths-check.hpp
 # Not a real file
-rm -f $RPM_BUILD_ROOT%{_datadir}/boost-build/build/project.ann.py
+%{__rm} -f build/project.ann.py
+# Move into a dedicated location
+cp -a boost-build.jam bootstrap.jam build-system.jam build/ kernel/ options/ tools/ util/ user-config.jam $RPM_BUILD_ROOT%{_datadir}/boost-build/
 popd
 
 # Remove scripts used to generate include files
@@ -619,9 +617,13 @@ find $RPM_BUILD_ROOT%{_includedir}/ \( -name '*.pl' -o -name '*.sh' \) -exec %{_
 
 
 # MPI subpackages don't need the ldconfig magic.  They are hidden by
-# default, in MPI backend-specific directory, and only show to the
+# default, in MPI back-end-specific directory, and only show to the
 # user after the relevant environment module has been loaded.
 # rpmlint will report that as errors, but it is fine.
+
+%post chrono -p /sbin/ldconfig
+
+%postun chrono -p /sbin/ldconfig
 
 %post date-time -p /sbin/ldconfig
 
@@ -682,6 +684,13 @@ find $RPM_BUILD_ROOT%{_includedir}/ \( -name '*.pl' -o -name '*.sh' \) -exec %{_
 
 
 %files
+%defattr(-, root, root, -)
+%doc LICENSE_1_0.txt
+
+%files chrono
+%defattr(-, root, root, -)
+%doc LICENSE_1_0.txt
+%{_libdir}/libboost_chrono*.so.%{sonamever}
 
 %files date-time
 %defattr(-, root, root, -)
@@ -705,6 +714,8 @@ find $RPM_BUILD_ROOT%{_includedir}/ \( -name '*.pl' -o -name '*.sh' \) -exec %{_
 %{_libdir}/libboost_iostreams*.so.%{sonamever}
 
 %files math
+%defattr(-, root, root, -)
+%doc LICENSE_1_0.txt
 
 %files test
 %defattr(-, root, root, -)
@@ -835,6 +846,7 @@ find $RPM_BUILD_ROOT%{_includedir}/ \( -name '*.pl' -o -name '*.sh' \) -exec %{_
 
 %files build
 %defattr(-, root, root, -)
+%doc LICENSE_1_0.txt
 %{_datadir}/boost-build/
 
 %files jam
@@ -843,6 +855,10 @@ find $RPM_BUILD_ROOT%{_includedir}/ \( -name '*.pl' -o -name '*.sh' \) -exec %{_
 %{_bindir}/bjam
 
 %changelog
+* Thu Jul 14 2011 Denis Arnaud <denis.arnaud_fedora@m4x.org> - 1.47.0-1
+- Upgrade to Boost-1.47.0, adding three new header-only components
+  (Geometry, Phoenix, Ratio) and a new library (Chrono).
+
 * Sat Jun 18 2011 Peter Robinson <pbrobinson@gmail.com> - 1.46.1-4
 - Fix compile on ARM platforms
 
@@ -960,7 +976,7 @@ find $RPM_BUILD_ROOT%{_includedir}/ \( -name '*.pl' -o -name '*.sh' \) -exec %{_
 * Tue Feb  2 2010 Petr Machata <pmachata@redhat.com> - 1.41.0-6
 - More subpackage interdependency adjustments
   - boost doesn't bring in the MPI stuff.  Instead, $MPI-devel does.
-    It needs to, so that the symlinks don't dangle.
+    It needs to, so that the symbolic links don't dangle.
   - boost-graph-$MPI depends on boost-$MPI so that boost-mpich2
     doesn't satisfy the SONAME dependency of boost-graph-openmpi.
 - Resolves: #559009
@@ -1263,8 +1279,8 @@ find $RPM_BUILD_ROOT%{_includedir}/ \( -name '*.pl' -o -name '*.sh' \) -exec %{_
 
 * Tue May 24 2005 Benjamin Kosnik <bkoz@redhat.com> 1.32.0-6
 - (#153093: boost warns that gcc 4.0.0 is an unknown compiler)
-- (#152205: development .so symlinks should be in -devel subpackage)
-- (#154783: linker .so symlinks missing from boost-devel package)
+- (#152205: development .so symbolic links should be in -devel subpackage)
+- (#154783: linker .so symbolic links missing from boost-devel package)
 
 * Fri Mar 18 2005 Benjamin Kosnik <bkoz@redhat.com> 1.32.0-5
 - Revert boost-base.patch to old behavior.
@@ -1274,7 +1290,7 @@ find $RPM_BUILD_ROOT%{_includedir}/ \( -name '*.pl' -o -name '*.sh' \) -exec %{_
 - (#142612: Compiling Boost 1.32.0 Failed in RHEL 3.0 on Itanium2)
 - (#150069: libboost_python.so is missing)
 - (#141617: bad patch boost-base.patch)
-- (#122817: libboost_*.so symlinks missing)
+- (#122817: libboost_*.so symbolic links missing)
 - Re-add boost-thread.patch.
 - Change boost-base.patch to show thread tags.
 - Change boost-gcc-tools.patch to use SOTAG, compile with dllversion.
@@ -1282,7 +1298,7 @@ find $RPM_BUILD_ROOT%{_includedir}/ \( -name '*.pl' -o -name '*.sh' \) -exec %{_
 - Sanity check can compile with gcc-3.3.x, gcc-3.4.2, gcc-4.0.x., gcc-4.1.x.
 
 * Thu Dec 02 2004 Benjamin Kosnik <bkoz@redhat.com> 1.32.0-3
-- (#122817: libboost_*.so symlinks missing)
+- (#122817: libboost_*.so symbolic links missing)
 - (#141574: half of the package is missing)
 - (#141617: bad patch boost-base.patch)
 
