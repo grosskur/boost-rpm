@@ -91,6 +91,7 @@ Patch1: boost-cmake-soname.patch
 # it upstream: https://svn.boost.org/trac/boost/ticket/4999
 Patch2: boost-1.47.0-signals-erase.patch
 
+# https://svn.boost.org/trac/boost/ticket/5731
 Patch3: boost-1.47.0-exceptions.patch
 
 %bcond_with tests
