@@ -27,7 +27,7 @@ Name: boost
 Summary: The free peer-reviewed portable C++ source libraries
 Version: 1.47.0
 %define version_enc 1_47_0
-Release: 1%{?dist}
+Release: 2%{?dist}
 License: Boost
 
 # The CMake build framework (set of CMakeLists.txt and module.cmake files) is
@@ -90,6 +90,8 @@ Patch1: boost-cmake-soname.patch
 # The patch may break c++03, and there is therefore no plan yet to include
 # it upstream: https://svn.boost.org/trac/boost/ticket/4999
 Patch2: boost-1.47.0-signals-erase.patch
+
+Patch3: boost-1.47.0-exceptions.patch
 
 %bcond_with tests
 %bcond_with docs_generated
@@ -423,6 +425,7 @@ sed 's/_FEDORA_SONAME/%{sonamever}/' %{PATCH1} | %{__patch} -p0 --fuzz=0
 
 # Fixes
 %patch2 -p1
+%patch3 -p0
 
 %build
 # Support for building tests.
@@ -855,6 +858,11 @@ find $RPM_BUILD_ROOT%{_includedir}/ \( -name '*.pl' -o -name '*.sh' \) -exec %{_
 %{_bindir}/bjam
 
 %changelog
+* Fri Jul 22 2011 Petr Machata <pmachata@redhat.com> - 1.47.0-2
+- Convert two throws in boost/numeric/conversion to
+  boost::throw_exception to allow compilation with -fno-exception
+- Resolves: #724015
+
 * Thu Jul 14 2011 Denis Arnaud <denis.arnaud_fedora@m4x.org> - 1.47.0-1
 - Upgrade to Boost-1.47.0, adding three new header-only components
   (Geometry, Phoenix, Ratio) and a new library (Chrono).
