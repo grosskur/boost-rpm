@@ -3,6 +3,7 @@
 # $RPM_BUILD_ROOT%%{_docdir}/%%{name}-%%{version}, manually installed
 # documentation must be saved into a temporary dedicated directory.
 %define boost_docdir __tmp_docdir
+%define boost_examplesdir __tmp_examplesdir
 
 # Support for long double
 %define disable_long_double 0
@@ -27,7 +28,7 @@ Name: boost
 Summary: The free peer-reviewed portable C++ source libraries
 Version: 1.47.0
 %define version_enc 1_47_0
-Release: 2%{?dist}
+Release: 3%{?dist}
 License: Boost
 
 # The CMake build framework (set of CMakeLists.txt and module.cmake files) is
@@ -291,6 +292,17 @@ Provides: boost-python-docs = %{version}-%{release}
 This package contains the documentation in the HTML format of the Boost C++
 libraries. The documentation provides the same content as that on the Boost
 web page (http://www.boost.org/doc/libs/1_40_0).
+
+%package examples
+Summary: HTML documentation for the Boost C++ libraries
+Group: Documentation
+%if 0%{?fedora} >= 10
+BuildArch: noarch
+%endif
+Requires: boost-devel = %{version}-%{release}
+
+%description examples
+This package contains example source files distributed with boost.
 
 
 %if %{with openmpi}
@@ -567,24 +579,6 @@ DESTDIR=$RPM_BUILD_ROOT make -C serial VERBOSE=1 install
 # Remove cmake configuration files used to build the Boost libraries
 find $RPM_BUILD_ROOT/%{_libdir} -name '*.cmake' -exec %{__rm} -f {} \;
 
-# Prepare the place to temporary store the generated documentation
-%{__rm} -rf %{boost_docdir} && %{__mkdir_p} %{boost_docdir}/html
-
-# Install documentation files (HTML pages) within the temporary place
-cd %{_builddir}/%{toplev_dirname}
-DOCPATH=%{boost_docdir}
-find libs doc more -type f \( -name \*.htm -o -name \*.html \) \
-    | sed -n '/\//{s,/[^/]*$,,;p}' \
-    | sort -u > tmp-doc-directories
-sed "s:^:$DOCPATH/:" tmp-doc-directories \
-    | xargs --no-run-if-empty %{__install} -d
-cat tmp-doc-directories | while read tobeinstalleddocdir; do
-    find $tobeinstalleddocdir -mindepth 1 -maxdepth 1 -name \*.htm\* \
-    | xargs %{__install} -p -m 644 -t $DOCPATH/$tobeinstalleddocdir
-done
-%{__rm} -f tmp-doc-directories
-%{__install} -p -m 644 -t $DOCPATH LICENSE_1_0.txt index.htm index.html
-
 echo ============================= install jam ==================
 mkdir -p $RPM_BUILD_ROOT%{_bindir}
 pushd tools/build/v2/engine/
@@ -604,6 +598,40 @@ pushd tools/build/v2
 # Move into a dedicated location
 cp -a boost-build.jam bootstrap.jam build-system.jam build/ kernel/ options/ tools/ util/ user-config.jam $RPM_BUILD_ROOT%{_datadir}/boost-build/
 popd
+
+# Install documentation files (HTML pages) within the temporary place
+echo ============================= install documentation ==================
+cd %{_builddir}/%{toplev_dirname}
+# Prepare the place to temporary store the generated documentation
+%{__rm} -rf %{boost_docdir} && %{__mkdir_p} %{boost_docdir}/html
+DOCPATH=%{boost_docdir}
+find libs doc more -type f \( -name \*.htm -o -name \*.html \) \
+    | sed -n '/\//{s,/[^/]*$,,;p}' \
+    | sort -u > tmp-doc-directories
+sed "s:^:$DOCPATH/:" tmp-doc-directories \
+    | xargs --no-run-if-empty %{__install} -d
+cat tmp-doc-directories | while read tobeinstalleddocdir; do
+    find $tobeinstalleddocdir -mindepth 1 -maxdepth 1 -name \*.htm\* \
+    | xargs %{__install} -p -m 644 -t $DOCPATH/$tobeinstalleddocdir
+done
+%{__rm} -f tmp-doc-directories
+%{__install} -p -m 644 -t $DOCPATH LICENSE_1_0.txt index.htm index.html
+
+echo ============================= install examples ==================
+# Prepare the place to temporary store the examples
+%{__rm} -rf %{boost_examplesdir} && %{__mkdir_p} %{boost_examplesdir}/html
+EXAMPLESPATH=%{boost_examplesdir}
+find libs -type d -name example -exec find {} -type f \; \
+    | sed -n '/\//{s,/[^/]*$,,;p}' \
+    | sort -u > tmp-doc-directories
+sed "s:^:$EXAMPLESPATH/:" tmp-doc-directories \
+    | xargs --no-run-if-empty %{__install} -d
+cat tmp-doc-directories | while read tobeinstalleddocdir; do
+    find $tobeinstalleddocdir -mindepth 1 -maxdepth 1 -type f \
+    | xargs %{__install} -p -m 644 -t $EXAMPLESPATH/$tobeinstalleddocdir
+done
+%{__rm} -f tmp-doc-directories
+%{__install} -p -m 644 -t $EXAMPLESPATH LICENSE_1_0.txt
 
 # Remove scripts used to generate include files
 find $RPM_BUILD_ROOT%{_includedir}/ \( -name '*.pl' -o -name '*.sh' \) -exec %{__rm} -f {} \;
@@ -777,6 +805,10 @@ find $RPM_BUILD_ROOT%{_includedir}/ \( -name '*.pl' -o -name '*.sh' \) -exec %{_
 %defattr(-, root, root, -)
 %doc %{boost_docdir}/*
 
+%files examples
+%defattr(-, root, root, -)
+%doc %{boost_examplesdir}/*
+
 %files devel
 %defattr(-, root, root, -)
 %doc LICENSE_1_0.txt
@@ -859,6 +891,10 @@ find $RPM_BUILD_ROOT%{_includedir}/ \( -name '*.pl' -o -name '*.sh' \) -exec %{_
 %{_bindir}/bjam
 
 %changelog
+* Tue Jul 26 2011 Petr Machata <pmachata@redhat.com> - 1.47.0-3
+- Package examples
+- Resolves: #722844
+
 * Fri Jul 22 2011 Petr Machata <pmachata@redhat.com> - 1.47.0-2
 - Convert two throws in boost/numeric/conversion to
   boost::throw_exception to allow compilation with -fno-exception
