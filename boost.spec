@@ -28,8 +28,8 @@ Name: boost
 Summary: The free peer-reviewed portable C++ source libraries
 Version: 1.47.0
 %define version_enc 1_47_0
-Release: 3%{?dist}
-License: Boost
+Release: 4%{?dist}
+License: Boost and MIT and Python
 
 # The CMake build framework (set of CMakeLists.txt and module.cmake files) is
 # added on top of the official Boost release (http://www.boost.org), thanks to
@@ -43,7 +43,7 @@ License: Boost
 %define toplev_dirname %{name}_%{version_enc}
 URL: http://www.boost.org
 Group: System Environment/Libraries
-Source: http://downloads.sourceforge.net/%{name}/%{toplev_dirname}.tar.bz2
+Source0: http://downloads.sourceforge.net/%{name}/%{toplev_dirname}.tar.bz2
 
 # From the version 13 of Fedora, the Boost libraries are delivered
 # with sonames equal to the Boost version (e.g., 1.41.0). On EPEL versions
@@ -72,14 +72,12 @@ Requires: boost-test = %{version}-%{release}
 Requires: boost-thread = %{version}-%{release}
 Requires: boost-wave = %{version}-%{release}
 
-BuildRoot: %{_tmppath}/%{name}-%{version}-%{release}-root-%(%{__id_u} -n)
 BuildRequires: cmake
-BuildRequires: libstdc++-devel
-BuildRequires: bzip2-libs
-BuildRequires: bzip2-devel
-BuildRequires: zlib-devel
-BuildRequires: python-devel
-BuildRequires: libicu-devel
+BuildRequires: libstdc++-devel%{?_isa}
+BuildRequires: bzip2-devel%{?_isa}
+BuildRequires: zlib-devel%{?_isa}
+BuildRequires: python-devel%{?_isa}
+BuildRequires: libicu-devel%{?_isa}
 BuildRequires: chrpath
 
 # CMake-related files (CMakeLists.txt and module.cmake files).
@@ -891,6 +889,16 @@ find $RPM_BUILD_ROOT%{_includedir}/ \( -name '*.pl' -o -name '*.sh' \) -exec %{_
 %{_bindir}/bjam
 
 %changelog
+* Tue Aug 30 2011 Petr Machata <pmachata@redhat.com> - 1.47.0-4
+- Drop BR bzip2-libs, which is brought it via bzip2-devel
+- Source->Source0
+- Drop unnecessary BuildRoot tag
+- Update License tag to include all licenses that are found in
+  sources.  Python license is at the main package, not to the python
+  sub-package, because python22_fixed.h is in -devel.
+  - Related: #673839
+- Resolves: #225622
+
 * Tue Jul 26 2011 Petr Machata <pmachata@redhat.com> - 1.47.0-3
 - Package examples
 - Resolves: #722844
