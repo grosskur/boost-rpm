@@ -28,7 +28,7 @@ Name: boost
 Summary: The free peer-reviewed portable C++ source libraries
 Version: 1.47.0
 %define version_enc 1_47_0
-Release: 4%{?dist}
+Release: 5%{?dist}
 License: Boost and MIT and Python
 
 # The CMake build framework (set of CMakeLists.txt and module.cmake files) is
@@ -889,6 +889,10 @@ find $RPM_BUILD_ROOT%{_includedir}/ \( -name '*.pl' -o -name '*.sh' \) -exec %{_
 %{_bindir}/bjam
 
 %changelog
+* Fri Sep  9 2011 Petr Machata <pmachata@redhat.com> - 1.47.0-5
+- Rebuild for libicu soname bump
+- Resolves: #736890
+
 * Tue Aug 30 2011 Petr Machata <pmachata@redhat.com> - 1.47.0-4
 - Drop BR bzip2-libs, which is brought it via bzip2-devel
 - Source->Source0
