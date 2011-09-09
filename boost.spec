@@ -28,7 +28,7 @@ Name: boost
 Summary: The free peer-reviewed portable C++ source libraries
 Version: 1.47.0
 %define version_enc 1_47_0
-Release: 5%{?dist}
+Release: 6%{?dist}
 License: Boost and MIT and Python
 
 # The CMake build framework (set of CMakeLists.txt and module.cmake files) is
@@ -472,6 +472,7 @@ export MPI_COMPILER
   make VERBOSE=1 %{?_smp_mflags}
 )
 %{_openmpi_unload}
+export PATH=/bin${PATH:+:}$PATH
 %endif
 
 # Build MPI parts of Boost with MPICH2 support
@@ -487,6 +488,7 @@ export MPI_COMPILER
   make VERBOSE=1 %{?_smp_mflags}
 )
 %{_mpich2_unload}
+export PATH=/bin${PATH:+:}$PATH
 %endif
 
 # Build Boost Jam
@@ -549,6 +551,7 @@ DESTDIR=$RPM_BUILD_ROOT make -C $MPI_COMPILER VERBOSE=1 install
 # Remove cmake configuration files used to build the Boost libraries
 find $RPM_BUILD_ROOT/$MPI_LIB -name '*.cmake' -exec %{__rm} -f {} \;
 %{_openmpi_unload}
+export PATH=/bin${PATH:+:}$PATH
 %endif
 
 %if %{with mpich2}
@@ -568,6 +571,7 @@ DESTDIR=$RPM_BUILD_ROOT make -C $MPI_COMPILER VERBOSE=1 install
 # Remove cmake configuration files used to build the Boost libraries
 find $RPM_BUILD_ROOT/$MPI_LIB -name '*.cmake' -exec %{__rm} -f {} \;
 %{_mpich2_unload}
+export PATH=/bin${PATH:+:}$PATH
 %endif
 
 echo ============================= install serial ==================
@@ -889,8 +893,9 @@ find $RPM_BUILD_ROOT%{_includedir}/ \( -name '*.pl' -o -name '*.sh' \) -exec %{_
 %{_bindir}/bjam
 
 %changelog
-* Fri Sep  9 2011 Petr Machata <pmachata@redhat.com> - 1.47.0-5
+* Fri Sep  9 2011 Petr Machata <pmachata@redhat.com> - 1.47.0-6
 - Rebuild for libicu soname bump
+- Hack /bin back to PATH after MPI module unload
 - Resolves: #736890
 
 * Tue Aug 30 2011 Petr Machata <pmachata@redhat.com> - 1.47.0-4
