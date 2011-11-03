@@ -28,7 +28,7 @@ Name: boost
 Summary: The free peer-reviewed portable C++ source libraries
 Version: 1.47.0
 %define version_enc 1_47_0
-Release: 6%{?dist}
+Release: 7%{?dist}
 License: Boost and MIT and Python
 
 # The CMake build framework (set of CMakeLists.txt and module.cmake files) is
@@ -92,6 +92,9 @@ Patch2: boost-1.47.0-signals-erase.patch
 
 # https://svn.boost.org/trac/boost/ticket/5731
 Patch3: boost-1.47.0-exceptions.patch
+
+# https://svn.boost.org/trac/boost/ticket/5934
+Patch4: boost-1.47.0-tuple.patch
 
 %bcond_with tests
 %bcond_with docs_generated
@@ -437,6 +440,7 @@ sed 's/_FEDORA_SONAME/%{sonamever}/' %{PATCH1} | %{__patch} -p0 --fuzz=0
 # Fixes
 %patch2 -p1
 %patch3 -p0
+%patch4 -p2
 
 %build
 # Support for building tests.
@@ -893,6 +897,10 @@ find $RPM_BUILD_ROOT%{_includedir}/ \( -name '*.pl' -o -name '*.sh' \) -exec %{_
 %{_bindir}/bjam
 
 %changelog
+* Thu Nov  3 2011 Petr Machata <pmachata@redhat.com> - 1.47.0-7
+- Use <boost/tr1/tuple> instead of C++11 header <tuple> in boost math.
+- Resolves: #751210
+
 * Fri Sep  9 2011 Petr Machata <pmachata@redhat.com> - 1.47.0-6
 - Rebuild for libicu soname bump
 - Hack /bin back to PATH after MPI module unload
