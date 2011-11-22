@@ -309,7 +309,7 @@ This package contains the documentation in the HTML format of the Boost C++
 libraries. The documentation provides the same content as that on the Boost
 web page (http://www.boost.org/doc/libs/1_40_0).
 
-%package examples-devel
+%package examples
 Summary: Source examples for the Boost C++ libraries
 Group: Documentation
 %if 0%{?fedora} >= 10
@@ -317,7 +317,7 @@ BuildArch: noarch
 %endif
 Requires: boost-devel = %{version}-%{release}
 
-%description examples-devel
+%description examples
 This package contains example source files distributed with boost.
 
 
@@ -863,7 +863,7 @@ rm -rf $RPM_BUILD_ROOT
 %defattr(-, root, root, -)
 %doc %{boost_docdir}/*
 
-%files examples-devel
+%files examples
 %defattr(-, root, root, -)
 %doc %{boost_examplesdir}/*
 
@@ -957,8 +957,7 @@ rm -rf $RPM_BUILD_ROOT
 - Added a patch with a manual page for the bjam executable.
 - Added a patch to fix the non-UTF8-encoded example source file.
 - Re-worked a little bit the example section, so as to fix the
-  DOS-formatted and the ISO-8859-encoded files. The examples
-  sub-package itself has been renamed into examples-devel.
+  DOS-formatted and the ISO-8859-encoded files.
 
 * Thu Nov  3 2011 Petr Machata <pmachata@redhat.com> - 1.47.0-7
 - Use <boost/tr1/tuple> instead of C++11 header <tuple> in boost math.
