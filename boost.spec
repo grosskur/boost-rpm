@@ -28,7 +28,7 @@ Name: boost
 Summary: The free peer-reviewed portable C++ source libraries
 Version: 1.48.0
 %define version_enc 1_48_0
-Release: 1%{?dist}
+Release: 2%{?dist}
 License: Boost and MIT and Python
 
 # The CMake build framework (set of CMakeLists.txt and module.cmake files) is
@@ -101,6 +101,14 @@ Patch4: boost-1.48.0-fix-non-utf8-files.patch
 # on-line documentation:
 # http://www.boost.org/boost-build2/doc/html/bbv2/overview.html
 Patch5: boost-1.48.0-add-bjam-man-page.patch
+
+# https://bugzilla.redhat.com/show_bug.cgi?id=757385
+# https://svn.boost.org/trac/boost/ticket/6182
+Patch6: boost-1.48.0-lexical_cast-incomplete.patch
+
+# https://bugzilla.redhat.com/show_bug.cgi?id=756005
+# https://svn.boost.org/trac/boost/ticket/6131
+Patch7: boost-1.48.0-foreach.patch
 
 %bcond_with tests
 %bcond_with docs_generated
@@ -457,6 +465,8 @@ sed 's/_FEDORA_SONAME/%{sonamever}/' %{PATCH1} | %{__patch} -p0 --fuzz=0
 %patch3 -p0
 %patch4 -p1
 %patch5 -p1
+%patch6 -p1
+%patch7 -p2
 
 %build
 # Support for building tests.
@@ -950,6 +960,10 @@ rm -rf $RPM_BUILD_ROOT
 %{_mandir}/man1/bjam.1*
 
 %changelog
+* Tue Nov 29 2011 Petr Machata <pmachata@redhat.com> - 1.48.0-2
+- Add an upstream patch for BOOST_FOREACH declaration issue #756005
+- Add a proposed patch for error in boost lexical_cast #757385
+
 * Sat Nov 19 2011 Denis Arnaud <denis.arnaud_fedora@m4x.org> - 1.48.0-1
 - Upgrade to Boost-1.48.0, adding two new header-only components
   (Container and Move) and a new library (Locale).
