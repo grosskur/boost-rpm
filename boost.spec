@@ -28,7 +28,7 @@ Name: boost
 Summary: The free peer-reviewed portable C++ source libraries
 Version: 1.48.0
 %define version_enc 1_48_0
-Release: 2%{?dist}
+Release: 3%{?dist}
 License: Boost and MIT and Python
 
 # The CMake build framework (set of CMakeLists.txt and module.cmake files) is
@@ -109,6 +109,9 @@ Patch6: boost-1.48.0-lexical_cast-incomplete.patch
 # https://bugzilla.redhat.com/show_bug.cgi?id=756005
 # https://svn.boost.org/trac/boost/ticket/6131
 Patch7: boost-1.48.0-foreach.patch
+
+# https://svn.boost.org/trac/boost/ticket/6165
+Patch8: boost-1.48.0-gcc47-pthreads.patch
 
 %bcond_with tests
 %bcond_with docs_generated
@@ -467,6 +470,7 @@ sed 's/_FEDORA_SONAME/%{sonamever}/' %{PATCH1} | %{__patch} -p0 --fuzz=0
 %patch5 -p1
 %patch6 -p1
 %patch7 -p2
+%patch8 -p0
 
 %build
 # Support for building tests.
@@ -960,6 +964,9 @@ rm -rf $RPM_BUILD_ROOT
 %{_mandir}/man1/bjam.1*
 
 %changelog
+* Tue Jan  3 2012 Petr Machata <pmachata@redhat.com> - 1.48.0-3
+- Add an upstream patch for BOOST_ENABLE_THREADS
+
 * Tue Nov 29 2011 Petr Machata <pmachata@redhat.com> - 1.48.0-2
 - Add an upstream patch for BOOST_FOREACH declaration issue #756005
 - Add a proposed patch for error in boost lexical_cast #757385
