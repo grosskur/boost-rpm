@@ -28,7 +28,7 @@ Name: boost
 Summary: The free peer-reviewed portable C++ source libraries
 Version: 1.48.0
 %define version_enc 1_48_0
-Release: 3%{?dist}
+Release: 4%{?dist}
 License: Boost and MIT and Python
 
 # The CMake build framework (set of CMakeLists.txt and module.cmake files) is
@@ -113,6 +113,9 @@ Patch7: boost-1.48.0-foreach.patch
 # https://svn.boost.org/trac/boost/ticket/6165
 Patch8: boost-1.48.0-gcc47-pthreads.patch
 
+# https://bugzilla.redhat.com/show_bug.cgi?id=771370
+Patch9: boost-1.48.0-mathlib.patch
+
 %bcond_with tests
 %bcond_with docs_generated
 
@@ -181,15 +184,13 @@ Run-Time support for Boost.Locale, a set of localization and Unicode
 handling tools.
 
 %package math
-Summary: Stub that used to contain boost math library
+Summary: Math functions for boost TR1 library
 Group: System Environment/Libraries
 
 %description math
 
-This package is a stub that used to contain run-time component of boost
-math library.  Now that boost math library is header-only, this
-package is empty.  It's kept around only so that during yum-assisted
-update, old libraries from boost-math package aren't left around.
+Run-Time support for C99 and C++ TR1 C-style Functions from math
+portion of Boost.TR1.
 
 %package program-options
 Summary:  Run-Time component of boost program_options library
@@ -471,6 +472,7 @@ sed 's/_FEDORA_SONAME/%{sonamever}/' %{PATCH1} | %{__patch} -p0 --fuzz=0
 %patch6 -p1
 %patch7 -p2
 %patch8 -p0
+%patch9 -p1
 
 %build
 # Support for building tests.
@@ -820,6 +822,7 @@ rm -rf $RPM_BUILD_ROOT
 %files math
 %defattr(-, root, root, -)
 %doc LICENSE_1_0.txt
+%{_libdir}/libboost_math*.so.%{sonamever}
 
 %files test
 %defattr(-, root, root, -)
@@ -964,6 +967,10 @@ rm -rf $RPM_BUILD_ROOT
 %{_mandir}/man1/bjam.1*
 
 %changelog
+* Wed Jan  4 2012 Petr Machata <pmachata@redhat.com> - 1.48.0-4
+- Build math portion of Boost.TR1, package DSOs in boost-math.
+- Resolves: #771370
+
 * Tue Jan  3 2012 Petr Machata <pmachata@redhat.com> - 1.48.0-3
 - Add an upstream patch for BOOST_ENABLE_THREADS
 
