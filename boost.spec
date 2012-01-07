@@ -28,7 +28,7 @@ Name: boost
 Summary: The free peer-reviewed portable C++ source libraries
 Version: 1.48.0
 %define version_enc 1_48_0
-Release: 5%{?dist}
+Release: 6%{?dist}
 License: Boost and MIT and Python
 
 # The CMake build framework (set of CMakeLists.txt and module.cmake files) is
@@ -71,6 +71,7 @@ Requires: boost-signals = %{version}-%{release}
 Requires: boost-system = %{version}-%{release}
 Requires: boost-test = %{version}-%{release}
 Requires: boost-thread = %{version}-%{release}
+Requires: boost-timer = %{version}-%{release}
 Requires: boost-wave = %{version}-%{release}
 
 BuildRequires: cmake
@@ -272,6 +273,16 @@ Run-Time component Boost.Thread library, which provides classes and
 functions for managing multiple threads of execution, and for
 synchronizing data between the threads or providing separate copies of
 data specific to individual threads.
+
+%package timer
+Summary: Run-Time component of boost timer library
+Group: System Environment/Libraries
+
+%description timer
+
+"How long does my C++ code take to run?"
+The Boost Timer library answers that question and does so portably,
+with as little as one #include and one additional line of code.
 
 %package wave
 Summary: Run-Time component of boost C99/C++ pre-processing library
@@ -774,6 +785,10 @@ rm -rf $RPM_BUILD_ROOT
 
 %postun thread -p /sbin/ldconfig
 
+%post timer -p /sbin/ldconfig
+
+%postun timer -p /sbin/ldconfig
+
 %post wave -p /sbin/ldconfig
 
 %postun wave -p /sbin/ldconfig
@@ -866,6 +881,11 @@ rm -rf $RPM_BUILD_ROOT
 %defattr(-, root, root, -)
 %doc LICENSE_1_0.txt
 %{_libdir}/libboost_thread*.so.%{sonamever}
+
+%files timer
+%defattr(-, root, root, -)
+%doc LICENSE_1_0.txt
+%{_libdir}/libboost_timer*.so.%{sonamever}
 
 %files wave
 %defattr(-, root, root, -)
@@ -963,6 +983,9 @@ rm -rf $RPM_BUILD_ROOT
 %{_mandir}/man1/bjam.1*
 
 %changelog
+* Sat Jan  7 2012 Denis Arnaud <denis.arnaud_fedora@m4x.org> - 1.48.0-6
+- Added the Boost.Timer sub-package. Resolves: #772397
+
 * Wed Jan  4 2012 Denis Arnaud <denis.arnaud_fedora@m4x.org> - 1.48.0-5
 - Integrated into "upstream" (CMake-ified Boost) the Boost.TR1/Math patch.
 

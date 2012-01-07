@@ -2346,12 +2346,12 @@ index 0000000..9512e2e
 +
 diff --git a/libs/chrono/CMakeLists.txt b/libs/chrono/CMakeLists.txt
 new file mode 100644
-index 0000000..1ebc520
+index 0000000..fb69f5c
 --- /dev/null
 +++ b/libs/chrono/CMakeLists.txt
 @@ -0,0 +1,24 @@
 +#----------------------------------------------------------------------------
-+# CMake framework maintained by Denis Arnaud on git@github.com:pocb/boost
++# CMake framework maintained by Denis Arnaud on git://github.com/pocb/boost
 +#----------------------------------------------------------------------------
 +#
 +# Add a variable to hold the headers for the library
@@ -2383,12 +2383,12 @@ index 0000000..f160fbd
 +boost_module(chrono DEPENDS system)
 diff --git a/libs/chrono/src/CMakeLists.txt b/libs/chrono/src/CMakeLists.txt
 new file mode 100644
-index 0000000..e94dfbb
+index 0000000..68e844e
 --- /dev/null
 +++ b/libs/chrono/src/CMakeLists.txt
-@@ -0,0 +1,14 @@
+@@ -0,0 +1,15 @@
 +#----------------------------------------------------------------------------
-+# CMake framework maintained by Denis Arnaud on git@github.com:pocb/boost
++# CMake framework maintained by Denis Arnaud on git://github.com/pocb/boost
 +#----------------------------------------------------------------------------
 +#
 +set (BOOST_CHRONO_EXTRA_SOURCES)
@@ -2400,15 +2400,16 @@ index 0000000..e94dfbb
 +  thread_clock.cpp
 +
 +  SHARED_COMPILE_FLAGS "-DBOOST_CHRONO_DYN_LINK=1"
++  STATIC_COMPILE_FLAGS "-DBOOST_CHRONO_STATIC_LINK=1"
 +)
 diff --git a/libs/chrono/test/CMakeLists.txt b/libs/chrono/test/CMakeLists.txt
 new file mode 100644
-index 0000000..455a63e
+index 0000000..39542b4
 --- /dev/null
 +++ b/libs/chrono/test/CMakeLists.txt
 @@ -0,0 +1,41 @@
 +#----------------------------------------------------------------------------
-+# CMake framework maintained by Denis Arnaud on git@github.com:pocb/boost
++# CMake framework maintained by Denis Arnaud on git://github.com/pocb/boost
 +#----------------------------------------------------------------------------
 +#
 +boost_additional_test_dependencies(chrono BOOST_DEPENDS test)
@@ -2695,12 +2696,12 @@ index 0000000..1e31993
 \ No newline at end of file
 diff --git a/libs/container/CMakeLists.txt b/libs/container/CMakeLists.txt
 new file mode 100644
-index 0000000..6fa7745
+index 0000000..89bc1ba
 --- /dev/null
 +++ b/libs/container/CMakeLists.txt
 @@ -0,0 +1,21 @@
 +#----------------------------------------------------------------------------
-+# CMake framework maintained by Denis Arnaud on git@github.com:pocb/boost
++# CMake framework maintained by Denis Arnaud on git://github.com/pocb/boost
 +#----------------------------------------------------------------------------
 +# Add a variable to hold the headers for the library
 +set (lib_headers
@@ -2730,12 +2731,12 @@ index 0000000..07f4053
 \ No newline at end of file
 diff --git a/libs/container/test/CMakeLists.txt b/libs/container/test/CMakeLists.txt
 new file mode 100644
-index 0000000..64a0e79
+index 0000000..fe14f8b
 --- /dev/null
 +++ b/libs/container/test/CMakeLists.txt
 @@ -0,0 +1,24 @@
 +#----------------------------------------------------------------------------
-+# CMake framework maintained by Denis Arnaud on git@github.com:pocb/boost
++# CMake framework maintained by Denis Arnaud on git://github.com/pocb/boost
 +#----------------------------------------------------------------------------
 +#
 +boost_additional_test_dependencies (container BOOST_DEPENDS test)
@@ -2919,12 +2920,12 @@ index 0000000..536947d
 \ No newline at end of file
 diff --git a/libs/date_time/src/CMakeLists.txt b/libs/date_time/src/CMakeLists.txt
 new file mode 100644
-index 0000000..b9137bb
+index 0000000..45d1ea3
 --- /dev/null
 +++ b/libs/date_time/src/CMakeLists.txt
 @@ -0,0 +1,14 @@
 +#----------------------------------------------------------------------------
-+# CMake framework maintained by Denis Arnaud on git@github.com:pocb/boost
++# CMake framework maintained by Denis Arnaud on git://github.com/pocb/boost
 +#----------------------------------------------------------------------------
 +#
 +add_definitions (-DBOOST_DATE_TIME_DYN_LINK=1 -DDATE_TIME_INLINE)
@@ -4211,12 +4212,12 @@ index 0000000..fa210eb
 \ No newline at end of file
 diff --git a/libs/geometry/CMakeLists.txt b/libs/geometry/CMakeLists.txt
 new file mode 100644
-index 0000000..65fd8ce
+index 0000000..6f0ec1b
 --- /dev/null
 +++ b/libs/geometry/CMakeLists.txt
 @@ -0,0 +1,25 @@
 +#----------------------------------------------------------------------------
-+# CMake framework maintained by Denis Arnaud on git@github.com:pocb/boost
++# CMake framework maintained by Denis Arnaud on git://github.com/pocb/boost
 +#----------------------------------------------------------------------------
 +#
 +# Add a variable to hold the headers for the library
@@ -4250,12 +4251,12 @@ index 0000000..523adeb
 \ No newline at end of file
 diff --git a/libs/geometry/test/CMakeLists.txt b/libs/geometry/test/CMakeLists.txt
 new file mode 100644
-index 0000000..5353515
+index 0000000..6fb8446
 --- /dev/null
 +++ b/libs/geometry/test/CMakeLists.txt
 @@ -0,0 +1,28 @@
 +#----------------------------------------------------------------------------
-+# CMake framework maintained by Denis Arnaud on git@github.com:pocb/boost
++# CMake framework maintained by Denis Arnaud on git://github.com/pocb/boost
 +#----------------------------------------------------------------------------
 +#
 +boost_additional_test_dependencies (geometry BOOST_DEPENDS test)
@@ -5492,12 +5493,12 @@ index 0000000..4f9a74f
 +boost_test_run(switch_construct DEPENDS boost_test_exec_monitor)
 diff --git a/libs/locale/CMakeLists.txt b/libs/locale/CMakeLists.txt
 new file mode 100644
-index 0000000..be3b625
+index 0000000..668d0cc
 --- /dev/null
 +++ b/libs/locale/CMakeLists.txt
 @@ -0,0 +1,24 @@
 +#----------------------------------------------------------------------------
-+# CMake framework maintained by Denis Arnaud on git@github.com:pocb/boost
++# CMake framework maintained by Denis Arnaud on git://github.com/pocb/boost
 +#----------------------------------------------------------------------------
 +#
 +# Add a variable to hold the headers for the library
@@ -5529,12 +5530,12 @@ index 0000000..16740be
 +boost_module (locale DEPENDS thread)
 diff --git a/libs/locale/src/CMakeLists.txt b/libs/locale/src/CMakeLists.txt
 new file mode 100644
-index 0000000..e9b5e9b
+index 0000000..c63fb3f
 --- /dev/null
 +++ b/libs/locale/src/CMakeLists.txt
 @@ -0,0 +1,38 @@
 +#----------------------------------------------------------------------------
-+# CMake framework maintained by Denis Arnaud on git@github.com:pocb/boost
++# CMake framework maintained by Denis Arnaud on git://github.com/pocb/boost
 +#----------------------------------------------------------------------------
 +#
 +set (BOOST_LOCALE_ICU_LIBRARIES)
@@ -5573,12 +5574,12 @@ index 0000000..e9b5e9b
 +  )
 diff --git a/libs/locale/test/CMakeLists.txt b/libs/locale/test/CMakeLists.txt
 new file mode 100644
-index 0000000..11d5c0a
+index 0000000..40546db
 --- /dev/null
 +++ b/libs/locale/test/CMakeLists.txt
 @@ -0,0 +1,60 @@
 +#----------------------------------------------------------------------------
-+# CMake framework maintained by Denis Arnaud on git@github.com:pocb/boost
++# CMake framework maintained by Denis Arnaud on git://github.com/pocb/boost
 +#----------------------------------------------------------------------------
 +#
 +boost_additional_test_dependencies (locale BOOST_DEPENDS test)
@@ -5862,12 +5863,12 @@ index 0000000..88f26b7
 +  
 diff --git a/libs/move/CMakeLists.txt b/libs/move/CMakeLists.txt
 new file mode 100644
-index 0000000..33853af
+index 0000000..e682d31
 --- /dev/null
 +++ b/libs/move/CMakeLists.txt
 @@ -0,0 +1,22 @@
 +#----------------------------------------------------------------------------
-+# CMake framework maintained by Denis Arnaud on git@github.com:pocb/boost
++# CMake framework maintained by Denis Arnaud on git://github.com/pocb/boost
 +#----------------------------------------------------------------------------
 +#
 +# Add a variable to hold the headers for the library
@@ -5898,12 +5899,12 @@ index 0000000..2be0f4c
 \ No newline at end of file
 diff --git a/libs/move/test/CMakeLists.txt b/libs/move/test/CMakeLists.txt
 new file mode 100644
-index 0000000..2415cf7
+index 0000000..00df6af
 --- /dev/null
 +++ b/libs/move/test/CMakeLists.txt
 @@ -0,0 +1,24 @@
 +#----------------------------------------------------------------------------
-+# CMake framework maintained by Denis Arnaud on git@github.com:pocb/boost
++# CMake framework maintained by Denis Arnaud on git://github.com/pocb/boost
 +#----------------------------------------------------------------------------
 +#
 +boost_additional_test_dependencies (move BOOST_DEPENDS test)
@@ -8563,12 +8564,12 @@ index 0000000..3c9c0ae
 \ No newline at end of file
 diff --git a/libs/regex/src/CMakeLists.txt b/libs/regex/src/CMakeLists.txt
 new file mode 100644
-index 0000000..c92f266
+index 0000000..fa3d29b
 --- /dev/null
 +++ b/libs/regex/src/CMakeLists.txt
 @@ -0,0 +1,44 @@
 +#----------------------------------------------------------------------------
-+# CMake framework maintained by Denis Arnaud on git@github.com:pocb/boost
++# CMake framework maintained by Denis Arnaud on git://github.com/pocb/boost
 +#----------------------------------------------------------------------------
 +#
 +set (BOOST_REGEX_ICU_LIBRARIES)
@@ -10330,34 +10331,29 @@ index 0000000..23f2939
 +boost_test_compile_fail(no_implicit_assign_from_lvalue_thread)
 diff --git a/libs/timer/CMakeLists.txt b/libs/timer/CMakeLists.txt
 new file mode 100644
-index 0000000..02967a6
+index 0000000..a73986c
 --- /dev/null
 +++ b/libs/timer/CMakeLists.txt
-@@ -0,0 +1,28 @@
-+#
-+# Copyright Troy D. Straszheim
-+#
-+# Distributed under the Boost Software License, Version 1.0.
-+# See http://www.boost.org/LICENSE_1_0.txt
-+#
+@@ -0,0 +1,23 @@
 +#----------------------------------------------------------------------------
-+# This file was automatically generated from the original CMakeLists.txt file
++# CMake framework maintained by Denis Arnaud on http://github.com/pocb/boost
++#----------------------------------------------------------------------------
++#
 +# Add a variable to hold the headers for the library
 +set (lib_headers
 +    timer.hpp
-+    
 +)
 +
 +# Add a library target to the build system
-+boost_library_project(
++boost_library_project (
 +  timer
-+  #  SRCDIRS 
++  SRCDIRS  src
 +  TESTDIRS  test
 +  HEADERS ${lib_headers}
 +  #  DOCDIRS 
-+  #  DESCRIPTION 
++  DESCRIPTION  "The timer library calculates how long C++ code takes to run."
 +  MODULARIZED 
-+  #  AUTHORS 
++  AUTHORS  "Beman Dawes <bdawes - at - acm.org>"
 +  #  MAINTAINERS 
 +)
 +
@@ -10369,6 +10365,26 @@ index 0000000..0ce8984
 +++ b/libs/timer/module.cmake
 @@ -0,0 +1 @@
 +boost_module(timer DEPENDS config)
+diff --git a/libs/timer/src/CMakeLists.txt b/libs/timer/src/CMakeLists.txt
+new file mode 100644
+index 0000000..859814f
+--- /dev/null
++++ b/libs/timer/src/CMakeLists.txt
+@@ -0,0 +1,14 @@
++#----------------------------------------------------------------------------
++# CMake framework maintained by Denis Arnaud on http://github.com/pocb/boost
++#----------------------------------------------------------------------------
++#
++set (BOOST_TIMER_EXTRA_SOURCES)
++set (BOOST_TIMER_LIBRARIES)
++
++boost_add_library (timer
++  auto_timers_construction.cpp
++  cpu_timer.cpp
++
++  SHARED_COMPILE_FLAGS "-DBOOST_TIMER_DYN_LINK=1"
++  STATIC_COMPILE_FLAGS "-DBOOST_TIMER_STATIC_LINK=1"
++)
 diff --git a/libs/timer/test/CMakeLists.txt b/libs/timer/test/CMakeLists.txt
 new file mode 100644
 index 0000000..bfa115a
