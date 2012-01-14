@@ -5530,10 +5530,10 @@ index 0000000..16740be
 +boost_module (locale DEPENDS thread)
 diff --git a/libs/locale/src/CMakeLists.txt b/libs/locale/src/CMakeLists.txt
 new file mode 100644
-index 0000000..c63fb3f
+index 0000000..7732199
 --- /dev/null
 +++ b/libs/locale/src/CMakeLists.txt
-@@ -0,0 +1,38 @@
+@@ -0,0 +1,46 @@
 +#----------------------------------------------------------------------------
 +# CMake framework maintained by Denis Arnaud on git://github.com/pocb/boost
 +#----------------------------------------------------------------------------
@@ -5550,6 +5550,12 @@ index 0000000..c63fb3f
 +  colormsg (CYAN "+-- ICU (unicode) not available for locale, disabling support.")
 +endif (ICU_FOUND AND ICU_I18N_FOUND)
 + 
++if (WIN32)
++  add_definitions (-DBOOST_LOCALE_NO_POSIX_BACKEND=1)
++  set (WIN32_SOURCES win32/collate.cpp win32/converter.cpp win32/lcid.cpp
++       win32/numeric.cpp win32/win_backend.cpp std/codecvt.cpp std/collate.cpp
++       std/converter.cpp std/numeric.cpp std/std_backend.cpp util/gregorian.cpp)
++endif (WIN32)
 +
 +add_definitions (-DBOOST_THREAD_NO_LIB=1)
 +boost_add_library (
@@ -5563,6 +5569,7 @@ index 0000000..c63fb3f
 +  shared/localization_backend.cpp
 +  shared/message.cpp
 +  shared/mo_lambda.cpp
++  ${WIN32_SOURCES}
 +  util/codecvt_converter.cpp
 +  util/default_locale.cpp
 +  util/info.cpp
@@ -5571,7 +5578,8 @@ index 0000000..c63fb3f
 +  LINK_LIBS ${BOOST_LOCALE_ICU_LIBRARIES}
 +  SHARED_COMPILE_FLAGS -DBOOST_LOCALE_DYN_LINK=1
 +  ${NO_STATIC_IF_ICU_FOUND}
-+  )
++)
++
 diff --git a/libs/locale/test/CMakeLists.txt b/libs/locale/test/CMakeLists.txt
 new file mode 100644
 index 0000000..40546db
@@ -10360,11 +10368,11 @@ index 0000000..a73986c
 +
 diff --git a/libs/timer/module.cmake b/libs/timer/module.cmake
 new file mode 100644
-index 0000000..0ce8984
+index 0000000..79f7f2a
 --- /dev/null
 +++ b/libs/timer/module.cmake
 @@ -0,0 +1 @@
-+boost_module(timer DEPENDS config)
++boost_module (timer DEPENDS config system chrono)
 diff --git a/libs/timer/src/CMakeLists.txt b/libs/timer/src/CMakeLists.txt
 new file mode 100644
 index 0000000..859814f
