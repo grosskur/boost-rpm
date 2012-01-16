@@ -28,7 +28,7 @@ Name: boost
 Summary: The free peer-reviewed portable C++ source libraries
 Version: 1.48.0
 %define version_enc 1_48_0
-Release: 7%{?dist}
+Release: 8%{?dist}
 License: Boost and MIT and Python
 
 # The CMake build framework (set of CMakeLists.txt and module.cmake files) is
@@ -113,6 +113,9 @@ Patch7: boost-1.48.0-foreach.patch
 
 # https://svn.boost.org/trac/boost/ticket/6165
 Patch8: boost-1.48.0-gcc47-pthreads.patch
+
+# https://bugzilla.redhat.com/show_bug.cgi?id=781859
+Patch9: boost-1.48.0-attribute.patch
 
 %bcond_with tests
 %bcond_with docs_generated
@@ -480,6 +483,7 @@ sed 's/_FEDORA_SONAME/%{sonamever}/' %{PATCH1} | %{__patch} -p0 --fuzz=0
 %patch6 -p1
 %patch7 -p2
 %patch8 -p0
+%patch9 -p1
 
 %build
 # Support for building tests.
@@ -983,6 +987,11 @@ rm -rf $RPM_BUILD_ROOT
 %{_mandir}/man1/bjam.1*
 
 %changelog
+* Mon Jan 16 2012 Petr Machata <pmachata@redhat.com> - 1.48.0-8
+- Add underscores around several uses of __attribute__((X)) to prevent
+  interactions with user-defined macro X
+- Resolves: #781859
+
 * Sat Jan 14 2012 Denis Arnaud <denis.arnaud_fedora@m4x.org> - 1.48.0-7
 - Added source source files for mingw cross-compilation of Boost.Locale.
 - Resolves: #781751
