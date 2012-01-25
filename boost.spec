@@ -28,7 +28,7 @@ Name: boost
 Summary: The free peer-reviewed portable C++ source libraries
 Version: 1.48.0
 %define version_enc 1_48_0
-Release: 8%{?dist}
+Release: 9%{?dist}
 License: Boost and MIT and Python
 
 # The CMake build framework (set of CMakeLists.txt and module.cmake files) is
@@ -127,6 +127,9 @@ Patch8: boost-1.48.0-gcc47-pthreads.patch
 # https://svn.boost.org/trac/boost/ticket/6415
 # https://svn.boost.org/trac/boost/ticket/6416
 Patch9: boost-1.48.0-attribute.patch
+
+# https://bugzilla.redhat.com/show_bug.cgi?id=783660
+Patch10: boost-1.48.0-long-double.patch
 
 %bcond_with tests
 %bcond_with docs_generated
@@ -495,6 +498,7 @@ sed 's/_FEDORA_SONAME/%{sonamever}/' %{PATCH1} | %{__patch} -p0 --fuzz=0
 %patch7 -p2
 %patch8 -p0
 %patch9 -p1
+%patch10 -p1
 
 %build
 # Support for building tests.
@@ -998,6 +1002,14 @@ rm -rf $RPM_BUILD_ROOT
 %{_mandir}/man1/bjam.1*
 
 %changelog
+* Wed Jan 25 2012 Petr Machata <pmachata@redhat.com> - 1.48.0-9
+- Only build the long double math libraries on arches that support
+  long double.
+- ARM was considered unsupporting, because libc defines
+  __NO_LONG_DOUBLE_MATH.  Ignore this setting, ARM has perfectly
+  working long double that just happens to be only as long as double.
+- Resolves: #783660
+
 * Mon Jan 16 2012 Petr Machata <pmachata@redhat.com> - 1.48.0-8
 - Add underscores around several uses of __attribute__((X)) to prevent
   interactions with user-defined macro X
