@@ -129,7 +129,8 @@ Patch8: boost-1.48.0-gcc47-pthreads.patch
 Patch9: boost-1.48.0-attribute.patch
 
 # https://bugzilla.redhat.com/show_bug.cgi?id=783660
-Patch10: boost-1.48.0-long-double.patch
+Patch10: boost-1.48.0-long-double-1.patch
+Patch11: boost-1.48.0-long-double.patch
 
 %bcond_with tests
 %bcond_with docs_generated
@@ -499,6 +500,7 @@ sed 's/_FEDORA_SONAME/%{sonamever}/' %{PATCH1} | %{__patch} -p0 --fuzz=0
 %patch8 -p0
 %patch9 -p1
 %patch10 -p1
+%patch11 -p1
 
 %build
 # Support for building tests.
