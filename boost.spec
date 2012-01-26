@@ -132,6 +132,9 @@ Patch9: boost-1.48.0-attribute.patch
 Patch10: boost-1.48.0-long-double-1.patch
 Patch11: boost-1.48.0-long-double.patch
 
+# https://bugzilla.redhat.com/show_bug.cgi?id=784654
+Patch12: boost-1.48.0-polygon.patch
+
 %bcond_with tests
 %bcond_with docs_generated
 
@@ -1011,6 +1014,8 @@ rm -rf $RPM_BUILD_ROOT
   __NO_LONG_DOUBLE_MATH.  Ignore this setting, ARM has perfectly
   working long double that just happens to be only as long as double.
 - Resolves: #783660
+- Add a missing sort adaptor include to boost polygon
+- Resolves: #784654
 
 * Mon Jan 16 2012 Petr Machata <pmachata@redhat.com> - 1.48.0-8
 - Add underscores around several uses of __attribute__((X)) to prevent
