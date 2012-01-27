@@ -116,19 +116,20 @@ Patch8: boost-1.48.0-gcc47-pthreads.patch
 
 # https://bugzilla.redhat.com/show_bug.cgi?id=781859
 # https://svn.boost.org/trac/boost/ticket/6406
-# https://svn.boost.org/trac/boost/ticket/6407
+# https://svn.boost.org/trac/boost/ticket/6407 fixed
 # https://svn.boost.org/trac/boost/ticket/6408
-# https://svn.boost.org/trac/boost/ticket/6409
+# https://svn.boost.org/trac/boost/ticket/6409 fixed
 # https://svn.boost.org/trac/boost/ticket/6410
 # https://svn.boost.org/trac/boost/ticket/6411
 # https://svn.boost.org/trac/boost/ticket/6412
 # https://svn.boost.org/trac/boost/ticket/6413
-# https://svn.boost.org/trac/boost/ticket/6414
+# https://svn.boost.org/trac/boost/ticket/6414 fixed
 # https://svn.boost.org/trac/boost/ticket/6415
-# https://svn.boost.org/trac/boost/ticket/6416
+# https://svn.boost.org/trac/boost/ticket/6416 fixed
 Patch9: boost-1.48.0-attribute.patch
 
 # https://bugzilla.redhat.com/show_bug.cgi?id=783660
+# https://svn.boost.org/trac/boost/ticket/6459
 Patch10: boost-1.48.0-long-double-1.patch
 Patch11: boost-1.48.0-long-double.patch
 
