@@ -341,7 +341,7 @@ Static Boost C++ libraries.
 %package doc
 Summary: HTML documentation for the Boost C++ libraries
 Group: Documentation
-%if 0%{?fedora} >= 10
+%if 0%{?fedora} >= 10 || 0%{?rhel} >= 6
 BuildArch: noarch
 %endif
 Provides: boost-python-docs = %{version}-%{release}
@@ -354,7 +354,7 @@ web page (http://www.boost.org/doc/libs/1_40_0).
 %package examples
 Summary: Source examples for the Boost C++ libraries
 Group: Documentation
-%if 0%{?fedora} >= 10
+%if 0%{?fedora} >= 10 || 0%{?rhel} >= 6
 BuildArch: noarch
 %endif
 Requires: boost-devel = %{version}-%{release}
@@ -505,6 +505,7 @@ sed 's/_FEDORA_SONAME/%{sonamever}/' %{PATCH1} | %{__patch} -p0 --fuzz=0
 %patch9 -p1
 %patch10 -p1
 %patch11 -p1
+%patch12 -p1
 
 %build
 # Support for building tests.
