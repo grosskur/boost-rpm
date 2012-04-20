@@ -506,7 +506,7 @@ sed 's/_FEDORA_SONAME/%{sonamever}/' %{PATCH1} | %{__patch} -p0 --fuzz=0
 %patch9 -p1
 %patch10 -p1
 %patch11 -p1
-%patch12 -p1
+%patch12 -p3
 
 %build
 # Support for building tests.
