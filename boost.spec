@@ -28,7 +28,7 @@ Name: boost
 Summary: The free peer-reviewed portable C++ source libraries
 Version: 1.48.0
 %define version_enc 1_48_0
-Release: 10%{?dist}
+Release: 11%{?dist}
 License: Boost and MIT and Python
 
 # The CMake build framework (set of CMakeLists.txt and module.cmake files) is
@@ -370,6 +370,7 @@ Summary: Run-Time component of Boost.MPI library
 Group: System Environment/Libraries
 Requires: openmpi
 BuildRequires: openmpi-devel
+BuildRequires: hwloc-devel
 
 %description openmpi
 
@@ -1009,6 +1010,10 @@ rm -rf $RPM_BUILD_ROOT
 %{_mandir}/man1/bjam.1*
 
 %changelog
+* Fri Apr 20 2012 Petr Machata <pmachata@redhat.com> - 1.48.0-11
+- Add hwloc-devel BR to work around a probable bug in openmpi-devel
+  which fails to pull it in
+
 * Tue Feb 28 2012 Fedora Release Engineering <rel-eng@lists.fedoraproject.org> - 1.48.0-10
 - Rebuilt for c++ ABI breakage
 
