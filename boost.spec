@@ -28,7 +28,7 @@ Name: boost
 Summary: The free peer-reviewed portable C++ source libraries
 Version: 1.48.0
 %define version_enc 1_48_0
-Release: 11%{?dist}
+Release: 12%{?dist}
 License: Boost and MIT and Python
 
 # The CMake build framework (set of CMakeLists.txt and module.cmake files) is
@@ -62,6 +62,7 @@ Requires: boost-filesystem = %{version}-%{release}
 Requires: boost-graph = %{version}-%{release}
 Requires: boost-iostreams = %{version}-%{release}
 Requires: boost-locale = %{version}-%{release}
+Requires: boost-math = %{version}-%{release}
 Requires: boost-program-options = %{version}-%{release}
 Requires: boost-python = %{version}-%{release}
 Requires: boost-random = %{version}-%{release}
@@ -776,6 +777,10 @@ rm -rf $RPM_BUILD_ROOT
 
 %postun locale -p /sbin/ldconfig
 
+%post math -p /sbin/ldconfig
+
+%postun math -p /sbin/ldconfig
+
 %post program-options -p /sbin/ldconfig
 
 %postun program-options -p /sbin/ldconfig
@@ -1010,6 +1015,10 @@ rm -rf $RPM_BUILD_ROOT
 %{_mandir}/man1/bjam.1*
 
 %changelog
+* Sun Apr 22 2012 Robert Scheck <robert@fedoraproject.org> - 1.48.0-12
+- Included -math subpackage into umbrella package
+- Added missing /sbin/ldconfig for -math subpackage
+
 * Fri Apr 20 2012 Petr Machata <pmachata@redhat.com> - 1.48.0-11
 - Add hwloc-devel BR to work around a probable bug in openmpi-devel
   which fails to pull it in
