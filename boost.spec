@@ -26,7 +26,7 @@ Name: boost
 Summary: The free peer-reviewed portable C++ source libraries
 Version: 1.48.0
 %define version_enc 1_48_0
-Release: 12%{?dist}
+Release: 13%{?dist}
 License: Boost and MIT and Python
 
 # The CMake build framework (set of CMakeLists.txt and module.cmake files) is
@@ -1068,6 +1068,10 @@ rm -rf $RPM_BUILD_ROOT
 %{_mandir}/man1/bjam.1*
 
 %changelog
+* Wed May  2 2012 Petr Machata <pmachata@redhat.com> - 1.48.0-13
+- Support building boost-python against Python 3
+- Resolves: #807780
+
 * Sun Apr 22 2012 Robert Scheck <robert@fedoraproject.org> - 1.48.0-12
 - Included -math subpackage into umbrella package
 - Added missing /sbin/ldconfig for -math subpackage
