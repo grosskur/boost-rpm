@@ -5,12 +5,6 @@
 %define boost_docdir __tmp_docdir
 %define boost_examplesdir __tmp_examplesdir
 
-# Support for long double
-%define disable_long_double 0
-%ifarch %{arm}
-  %define disable_long_double 1
-%endif
-
 # Configuration of MPI back-ends
 %ifarch %{arm}
   %bcond_with mpich2
