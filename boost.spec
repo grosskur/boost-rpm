@@ -120,13 +120,13 @@ Patch7: boost-1.48.0-foreach.patch
 Patch8: boost-1.48.0-gcc47-pthreads.patch
 
 # https://bugzilla.redhat.com/show_bug.cgi?id=781859
-# https://svn.boost.org/trac/boost/ticket/6406
+# https://svn.boost.org/trac/boost/ticket/6406 fixed
 # https://svn.boost.org/trac/boost/ticket/6407 fixed
 # https://svn.boost.org/trac/boost/ticket/6408
 # https://svn.boost.org/trac/boost/ticket/6409 fixed
 # https://svn.boost.org/trac/boost/ticket/6410
-# https://svn.boost.org/trac/boost/ticket/6411
-# https://svn.boost.org/trac/boost/ticket/6412
+# https://svn.boost.org/trac/boost/ticket/6411 fixed
+# https://svn.boost.org/trac/boost/ticket/6412 fixed
 # https://svn.boost.org/trac/boost/ticket/6413
 # https://svn.boost.org/trac/boost/ticket/6414 fixed
 # https://svn.boost.org/trac/boost/ticket/6415
@@ -134,7 +134,7 @@ Patch8: boost-1.48.0-gcc47-pthreads.patch
 Patch9: boost-1.48.0-attribute.patch
 
 # https://bugzilla.redhat.com/show_bug.cgi?id=783660
-# https://svn.boost.org/trac/boost/ticket/6459
+# https://svn.boost.org/trac/boost/ticket/6459 fixed
 Patch10: boost-1.48.0-long-double-1.patch
 Patch11: boost-1.48.0-long-double.patch
 
