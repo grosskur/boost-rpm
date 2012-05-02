@@ -18,6 +18,10 @@
   %bcond_without openmpi
 %endif
 
+# Configuration of Python 3
+%bcond_without python3
+%define python3_version 3.2mu
+
 Name: boost
 Summary: The free peer-reviewed portable C++ source libraries
 Version: 1.48.0
@@ -68,12 +72,18 @@ Requires: boost-test = %{version}-%{release}
 Requires: boost-thread = %{version}-%{release}
 Requires: boost-timer = %{version}-%{release}
 Requires: boost-wave = %{version}-%{release}
+%if %{with python3}
+Requires: boost-python3 = %{version}-%{release}
+%endif
 
 BuildRequires: cmake
 BuildRequires: libstdc++-devel%{?_isa}
 BuildRequires: bzip2-devel%{?_isa}
 BuildRequires: zlib-devel%{?_isa}
 BuildRequires: python-devel%{?_isa}
+%if %{with python3}
+BuildRequires: python3-devel%{?_isa}
+%endif
 BuildRequires: libicu-devel%{?_isa}
 BuildRequires: chrpath
 
@@ -130,6 +140,9 @@ Patch11: boost-1.48.0-long-double.patch
 
 # https://bugzilla.redhat.com/show_bug.cgi?id=784654
 Patch12: boost-1.48.0-polygon.patch
+
+# https://bugzilla.redhat.com/show_bug.cgi?id=807780
+Patch13: boost-1.48.0-python3.patch
 
 %bcond_with tests
 %bcond_with docs_generated
@@ -228,6 +241,22 @@ C++. It allows you to quickly and seamlessly expose C++ classes
 functions and objects to Python, and vice versa, using no special
 tools -- just your C++ compiler.  This package contains run-time
 support for Boost Python Library.
+
+%if %{with python3}
+
+%package python3
+Summary: Run-Time component of boost python library for Python 3
+Group: System Environment/Libraries
+
+%description python3
+
+The Boost Python Library is a framework for interfacing Python and
+C++. It allows you to quickly and seamlessly expose C++ classes
+functions and objects to Python, and vice versa, using no special
+tools -- just your C++ compiler.  This package contains run-time
+support for Boost Python Library compiled for Python 3.
+
+%endif
 
 %package random
 Summary: Run-Time component of boost random library
@@ -502,6 +531,7 @@ sed 's/_FEDORA_SONAME/%{sonamever}/' %{PATCH1} | %{__patch} -p0 --fuzz=0
 %patch10 -p1
 %patch11 -p1
 %patch12 -p3
+%patch13 -p1
 
 %build
 # Support for building tests.
@@ -520,6 +550,24 @@ sed 's/_FEDORA_SONAME/%{sonamever}/' %{PATCH1} | %{__patch} -p0 --fuzz=0
          ..
   make VERBOSE=1 %{?_smp_mflags}
 )
+
+%if %{with python3}
+
+# Build boost-python for Python 3
+( echo ============================= build Python 3 ==================
+  mkdir serial-python3
+  cd serial-python3
+  %cmake -DCMAKE_BUILD_TYPE=RelWithDebInfo %{boost_testflags} \
+         -DENABLE_SINGLE_THREADED=YES -DINSTALL_VERSIONED=OFF \
+         -DBUILD_PROJECTS="python" -DWITH_MPI=OFF \
+	 -DPython_ADDITIONAL_VERSIONS=%{python3_version} \
+	 -DPYTHON_EXECUTABLE=python%{python3_version} \
+	 -DBOOST_PYTHON_SUFFIX=3 \
+         ..
+  make VERBOSE=1 %{?_smp_mflags}
+)
+
+%endif
 
 # Build MPI parts of Boost with OpenMPI support
 %if %{with openmpi}
@@ -638,6 +686,9 @@ find $RPM_BUILD_ROOT/$MPI_LIB -name '*.cmake' -exec rm -f {} \;
 %{_mpich2_unload}
 export PATH=/bin${PATH:+:}$PATH
 %endif
+
+echo ============================= install Python 3 ==================
+DESTDIR=$RPM_BUILD_ROOT make -C serial-python3 VERBOSE=1 install
 
 echo ============================= install serial ==================
 DESTDIR=$RPM_BUILD_ROOT make -C serial VERBOSE=1 install
@@ -875,7 +926,15 @@ rm -rf $RPM_BUILD_ROOT
 %files python
 %defattr(-, root, root, -)
 %doc LICENSE_1_0.txt
-%{_libdir}/libboost_python*.so.%{sonamever}
+%{_libdir}/libboost_python.so.%{sonamever}
+%{_libdir}/libboost_python-mt.so.%{sonamever}
+
+%if %{with python3}
+%files python3
+%defattr(-, root, root, -)
+%doc LICENSE_1_0.txt
+%{_libdir}/libboost_python3*.so.%{sonamever}
+%endif
 
 %files random
 %defattr(-, root, root, -)

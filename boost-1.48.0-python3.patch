@@ -1,0 +1,15 @@
+diff -up boost_1_48_0/libs/python/src/CMakeLists.txt\~ boost_1_48_0/libs/python/src/CMakeLists.txt
+--- boost_1_48_0/libs/python/src/CMakeLists.txt~	2012-05-02 20:29:17.095570094 +0200
++++ boost_1_48_0/libs/python/src/CMakeLists.txt	2012-05-02 20:29:27.645898988 +0200
+@@ -29,7 +29,8 @@ endif (PYTHON_DEBUG_LIBRARIES AND BUILD_
+ # Always build the non-debug variants of the boost_python library
+ set(BUILD_PYTHON_NODEBUG ON)
+ 
+-boost_add_library(python
++colormsg (GREEN "+-- BOOST_PYTHON_SUFFIX=${BOOST_PYTHON_SUFFIX}")
++boost_add_library(python${BOOST_PYTHON_SUFFIX}
+   numeric.cpp 
+   list.cpp 
+   long.cpp 
+
+Diff finished.  Wed May  2 20:29:38 2012
