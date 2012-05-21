@@ -394,7 +394,6 @@ Summary: Run-Time component of Boost.MPI library
 Group: System Environment/Libraries
 Requires: openmpi
 BuildRequires: openmpi-devel
-BuildRequires: hwloc-devel
 
 %description openmpi
 
@@ -1068,6 +1067,9 @@ rm -rf $RPM_BUILD_ROOT
 %{_mandir}/man1/bjam.1*
 
 %changelog
+* Mon May 21 2012 Petr Machata <pmachata@redhat.com> - 1.48.0-13
+- BR on hwloc-devel shouldn't be required anymore (see #814798)
+
 * Wed May  2 2012 Petr Machata <pmachata@redhat.com> - 1.48.0-13
 - Support building boost-python against Python 3
 - Resolves: #807780
