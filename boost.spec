@@ -26,7 +26,7 @@ Name: boost
 Summary: The free peer-reviewed portable C++ source libraries
 Version: 1.48.0
 %define version_enc 1_48_0
-Release: 13%{?dist}
+Release: 14%{?dist}
 License: Boost and MIT and Python
 
 # The CMake build framework (set of CMakeLists.txt and module.cmake files) is
@@ -686,8 +686,10 @@ find $RPM_BUILD_ROOT/$MPI_LIB -name '*.cmake' -exec rm -f {} \;
 export PATH=/bin${PATH:+:}$PATH
 %endif
 
+%if %{with python3}
 echo ============================= install Python 3 ==================
 DESTDIR=$RPM_BUILD_ROOT make -C serial-python3 VERBOSE=1 install
+%endif
 
 echo ============================= install serial ==================
 DESTDIR=$RPM_BUILD_ROOT make -C serial VERBOSE=1 install
@@ -1067,7 +1069,10 @@ rm -rf $RPM_BUILD_ROOT
 %{_mandir}/man1/bjam.1*
 
 %changelog
-* Mon May 21 2012 Petr Machata <pmachata@redhat.com> - 1.48.0-13
+* Thu May 24 2012 Petr Machata <pmachata@redhat.com> - 1.48.0-14
+- Don't attempt to install Python 3 portions of boost when given
+  --without python3
+- Resolves: #824810
 - BR on hwloc-devel shouldn't be required anymore (see #814798)
 
 * Wed May  2 2012 Petr Machata <pmachata@redhat.com> - 1.48.0-13
