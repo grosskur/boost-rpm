@@ -144,6 +144,10 @@ Patch12: boost-1.48.0-polygon.patch
 # https://bugzilla.redhat.com/show_bug.cgi?id=807780
 Patch13: boost-1.48.0-python3.patch
 
+# https://bugzilla.redhat.com/show_bug.cgi?id=824810
+# https://svn.boost.org/trac/boost/ticket/6940
+Patch14: boost-1.48.0-xtime.patch
+
 %bcond_with tests
 %bcond_with docs_generated
 
@@ -531,6 +535,7 @@ sed 's/_FEDORA_SONAME/%{sonamever}/' %{PATCH1} | %{__patch} -p0 --fuzz=0
 %patch11 -p1
 %patch12 -p3
 %patch13 -p1
+%patch14 -p1
 
 %build
 # Support for building tests.
@@ -1072,6 +1077,11 @@ rm -rf $RPM_BUILD_ROOT
 * Thu May 24 2012 Petr Machata <pmachata@redhat.com> - 1.48.0-14
 - Don't attempt to install Python 3 portions of boost when given
   --without python3
+- glibc newly defines a macro TIME_UTC, which collides with
+  boost::TIME_UTC.  We can't avoid expanding that macro, but the value
+  happens to be the same as that of boost::TIME_UTC.  So drop enum
+  xtime_clock_types.  Update boost to use macro TIME_UTC instead of
+  the scoped enum value.  External clients will have to do the same.
 - Resolves: #824810
 - BR on hwloc-devel shouldn't be required anymore (see #814798)
 
