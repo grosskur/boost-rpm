@@ -26,7 +26,7 @@ Name: boost
 Summary: The free peer-reviewed portable C++ source libraries
 Version: 1.48.0
 %define version_enc 1_48_0
-Release: 15%{?dist}
+Release: 16%{?dist}
 License: Boost and MIT and Python
 
 # The CMake build framework (set of CMakeLists.txt and module.cmake files) is
@@ -151,6 +151,9 @@ Patch14: boost-1.48.0-xtime.patch
 # https://bugzilla.redhat.com/show_bug.cgi?id=828856
 # https://bugzilla.redhat.com/show_bug.cgi?id=828857
 Patch15: boost-1.48.0-pool.patch
+
+# https://bugzilla.redhat.com/show_bug.cgi?id=832265
+Patch16: boost-1.48.0-locale.patch
 
 %bcond_with tests
 %bcond_with docs_generated
@@ -541,6 +544,7 @@ sed 's/_FEDORA_SONAME/%{sonamever}/' %{PATCH1} | %{__patch} -p0 --fuzz=0
 %patch13 -p1
 %patch14 -p1
 %patch15 -p0
+%patch16 -p1
 
 %build
 # Support for building tests.
@@ -1079,6 +1083,10 @@ rm -rf $RPM_BUILD_ROOT
 %{_mandir}/man1/bjam.1*
 
 %changelog
+* Thu Jun 21 2012 Petr Machata <pmachata@redhat.com> - 1.48.0-16
+- Build Boost.Locale backends
+- Resolves: #832265
+
 * Wed Jun  6 2012 Petr Machata <pmachata@redhat.com> - 1.48.0-15
 - In Boost.Pool, be careful not to overflow allocated chunk size.
 - Resolves: #828857
