@@ -19,14 +19,15 @@
 %endif
 
 # Configuration of Python 3
-%bcond_without python3
+# xxx note this is not supported with jam-based builds yet
+%bcond_with python3
 %define python3_version 3.2mu
 
 Name: boost
 Summary: The free peer-reviewed portable C++ source libraries
-Version: 1.48.0
-%define version_enc 1_48_0
-Release: 17%{?dist}
+Version: 1.50.0
+%define version_enc 1_50_0
+Release: 1%{?dist}
 License: Boost and MIT and Python
 
 # The CMake build framework (set of CMakeLists.txt and module.cmake files) is
@@ -87,73 +88,44 @@ BuildRequires: python3-devel%{?_isa}
 BuildRequires: libicu-devel%{?_isa}
 BuildRequires: chrpath
 
-# CMake-related files (CMakeLists.txt and module.cmake files).
-# That patch also contains Web-related documentation for the Trac Wiki
-# devoted to "old" Boost-CMake (up-to-date until Boost-1.41.0).
-Patch0: boost-1.48.0-cmakeify-full.patch
-Patch1: boost-cmake-soname.patch
-
 # The patch may break c++03, and there is therefore no plan yet to include
 # it upstream: https://svn.boost.org/trac/boost/ticket/4999
-Patch2: boost-1.48.0-signals-erase.patch
-
-# https://svn.boost.org/trac/boost/ticket/5731
-Patch3: boost-1.48.0-exceptions.patch
+Patch2: boost-1.50.0-signals-erase.patch
 
 # https://svn.boost.org/trac/boost/ticket/6150
-Patch4: boost-1.48.0-fix-non-utf8-files.patch
+Patch4: boost-1.50.0-fix-non-utf8-files.patch
 
 # Add a manual page for the sole executable, namely bjam, based on the
 # on-line documentation:
 # http://www.boost.org/boost-build2/doc/html/bbv2/overview.html
 Patch5: boost-1.48.0-add-bjam-man-page.patch
 
-# https://bugzilla.redhat.com/show_bug.cgi?id=757385
-# https://svn.boost.org/trac/boost/ticket/6182
-Patch6: boost-1.48.0-lexical_cast-incomplete.patch
-
 # https://bugzilla.redhat.com/show_bug.cgi?id=756005
 # https://svn.boost.org/trac/boost/ticket/6131
-Patch7: boost-1.48.0-foreach.patch
-
-# https://svn.boost.org/trac/boost/ticket/6165
-Patch8: boost-1.48.0-gcc47-pthreads.patch
+Patch7: boost-1.50.0-foreach.patch
 
 # https://bugzilla.redhat.com/show_bug.cgi?id=781859
-# https://svn.boost.org/trac/boost/ticket/6406 fixed
-# https://svn.boost.org/trac/boost/ticket/6407 fixed
+# The following tickets have still to be fixed by upstream.
+# https://svn.boost.org/trac/boost/ticket/6406 fixed, but only in Boost-1.51.0
 # https://svn.boost.org/trac/boost/ticket/6408
-# https://svn.boost.org/trac/boost/ticket/6409 fixed
 # https://svn.boost.org/trac/boost/ticket/6410
-# https://svn.boost.org/trac/boost/ticket/6411 fixed
-# https://svn.boost.org/trac/boost/ticket/6412 fixed
 # https://svn.boost.org/trac/boost/ticket/6413
-# https://svn.boost.org/trac/boost/ticket/6414 fixed
 # https://svn.boost.org/trac/boost/ticket/6415
-# https://svn.boost.org/trac/boost/ticket/6416 fixed
-Patch9: boost-1.48.0-attribute.patch
+Patch9: boost-1.50.0-attribute.patch
 
 # https://bugzilla.redhat.com/show_bug.cgi?id=783660
 # https://svn.boost.org/trac/boost/ticket/6459 fixed
-Patch10: boost-1.48.0-long-double-1.patch
-Patch11: boost-1.48.0-long-double.patch
+Patch10: boost-1.50.0-long-double-1.patch
 
 # https://bugzilla.redhat.com/show_bug.cgi?id=784654
-Patch12: boost-1.48.0-polygon.patch
+Patch12: boost-1.50.0-polygon.patch
 
 # https://bugzilla.redhat.com/show_bug.cgi?id=807780
-Patch13: boost-1.48.0-python3.patch
-
-# https://bugzilla.redhat.com/show_bug.cgi?id=824810
-# https://svn.boost.org/trac/boost/ticket/6940
-Patch14: boost-1.48.0-xtime.patch
+#Patch13: boost-1.48.0-python3.patch
 
 # https://bugzilla.redhat.com/show_bug.cgi?id=828856
 # https://bugzilla.redhat.com/show_bug.cgi?id=828857
-Patch15: boost-1.48.0-pool.patch
-
-# https://bugzilla.redhat.com/show_bug.cgi?id=832265
-Patch16: boost-1.48.0-locale.patch
+Patch15: boost-1.50.0-pool.patch
 
 %bcond_with tests
 %bcond_with docs_generated
@@ -525,44 +497,33 @@ a number of significant features and is now developed independently
 %prep
 %setup -q -n %{toplev_dirname}
 
-# CMake framework (CMakeLists.txt, *.cmake and documentation files)
-%patch0 -p1
-sed 's/_FEDORA_SONAME/%{sonamever}/' %{PATCH1} | %{__patch} -p0 --fuzz=0
-
 # Fixes
 %patch2 -p1
-%patch3 -p0
 %patch4 -p1
 %patch5 -p1
-%patch6 -p1
 %patch7 -p2
-%patch8 -p0
 %patch9 -p1
 %patch10 -p1
-%patch11 -p1
 %patch12 -p3
-%patch13 -p1
-%patch14 -p1
+#%patch13 -p1
 %patch15 -p0
-%patch16 -p1
 
 %build
-# Support for building tests.
-%define boost_testflags -DBUILD_TESTS="NONE"
-%if %{with tests}
-  %define boost_testflags -DBUILD_TESTS="ALL"
-%endif
+cat >> ./tools/build/v2/user-config.jam << EOF
+using mpi ;
+EOF
 
-( echo ============================= build serial ==================
-  mkdir serial
-  cd serial
-  export CXXFLAGS="-DBOOST_IOSTREAMS_USE_DEPRECATED %{optflags}"
-  %cmake -DCMAKE_BUILD_TYPE=RelWithDebInfo %{boost_testflags} \
-         -DENABLE_SINGLE_THREADED=YES -DINSTALL_VERSIONED=OFF \
-         -DWITH_MPI=OFF \
-         ..
-  make VERBOSE=1 %{?_smp_mflags}
-)
+./bootstrap.sh --with-toolset=gcc --with-icu
+
+# N.B. When we build the following with PCH, parts of boost (math
+# library in particular) end up being built second time during
+# installation.  Unsure why that is, but all sub-builds need to be
+# built with pch=off to avoid this.
+
+echo ============================= build serial ==================
+./b2 -d+2 -q %{?_smp_mflags} --layout=tagged \
+  --without-mpi --without-graph_parallel --build-dir=serial \
+  variant=release threading=single,multi debug-symbols=on pch=off stage
 
 %if %{with python3}
 
@@ -585,18 +546,11 @@ sed 's/_FEDORA_SONAME/%{sonamever}/' %{PATCH1} | %{__patch} -p0 --fuzz=0
 # Build MPI parts of Boost with OpenMPI support
 %if %{with openmpi}
 %{_openmpi_load}
-# Work around the bug: https://bugzilla.redhat.com/show_bug.cgi?id=560224
-MPI_COMPILER=openmpi-%{_arch}
-export MPI_COMPILER
-( echo ============================= build $MPI_COMPILER ==================
-  mkdir $MPI_COMPILER
-  cd $MPI_COMPILER
-  %cmake -DCMAKE_BUILD_TYPE=RelWithDebInfo %{boost_testflags} \
-         -DENABLE_SINGLE_THREADED=YES -DINSTALL_VERSIONED=OFF \
-         -DBUILD_PROJECTS="serialization;python;mpi;graph_parallel" \
-         -DBOOST_LIB_INSTALL_DIR=$MPI_LIB ..
-  make VERBOSE=1 %{?_smp_mflags}
-)
+echo ============================= build $MPI_COMPILER ==================
+# This doesn't seem to allow single-threaded builds anymore.
+./b2 -d+2 -q %{?_smp_mflags} --layout=tagged \
+	--with-mpi --with-graph_parallel --build-dir=$MPI_COMPILER \
+	variant=release threading=multi debug-symbols=on pch=off stage
 %{_openmpi_unload}
 export PATH=/bin${PATH:+:}$PATH
 %endif
@@ -604,25 +558,17 @@ export PATH=/bin${PATH:+:}$PATH
 # Build MPI parts of Boost with MPICH2 support
 %if %{with mpich2}
 %{_mpich2_load}
-( echo ============================= build $MPI_COMPILER ==================
-  mkdir $MPI_COMPILER
-  cd $MPI_COMPILER
-  %cmake -DCMAKE_BUILD_TYPE=RelWithDebInfo %{boost_testflags} \
-         -DENABLE_SINGLE_THREADED=YES -DINSTALL_VERSIONED=OFF \
-         -DBUILD_PROJECTS="serialization;python;mpi;graph_parallel" \
-         -DBOOST_LIB_INSTALL_DIR=$MPI_LIB ..
-  make VERBOSE=1 %{?_smp_mflags}
-)
+echo ============================= build $MPI_COMPILER ==================
+./b2 -d+2 -q %{?_smp_mflags} --layout=tagged \
+	--with-mpi --with-graph_parallel --build-dir=$MPI_COMPILER \
+	variant=release threading=multi debug-symbols=on pch=off stage
 %{_mpich2_unload}
 export PATH=/bin${PATH:+:}$PATH
 %endif
 
-# Build Boost Jam
-echo ============================= build Jam ==================
-pushd tools/build/v2/engine/
-export CFLAGS="%{optflags}"
-./build.sh
-popd
+echo ============================= build Boost.Build ==================
+(cd tools/build/v2
+ ./bootstrap.sh --with-toolset=gcc)
 
 %check
 %if %{with tests}
@@ -659,23 +605,15 @@ cd %{_builddir}/%{toplev_dirname}
 
 %if %{with openmpi}
 %{_openmpi_load}
-# Work around the bug: https://bugzilla.redhat.com/show_bug.cgi?id=560224
-MPI_COMPILER=openmpi-%{_arch}
-export MPI_COMPILER
 echo ============================= install $MPI_COMPILER ==================
-DESTDIR=$RPM_BUILD_ROOT make -C $MPI_COMPILER VERBOSE=1 install
-# Remove parts of boost that we don't want installed in MPI directory.
-rm -f $RPM_BUILD_ROOT/$MPI_LIB/libboost_{python,{w,}serialization}*
-# Suppress the mpi.so python module, as it not currently properly
-# generated (some dependencies are missing. It is temporary until
-# upstream Boost-CMake fixes that (see
-# http://lists.boost.org/boost-cmake/2009/12/0859.php for more
-# details)
-rm -f $RPM_BUILD_ROOT/$MPI_LIB/mpi.so
-# Kill any debug library versions that may show up un-invited.
-rm -f $RPM_BUILD_ROOT/$MPI_LIB/*-d.*
-# Remove cmake configuration files used to build the Boost libraries
-find $RPM_BUILD_ROOT/$MPI_LIB -name '*.cmake' -exec rm -f {} \;
+./b2 -q %{?_smp_mflags} --layout=tagged \
+    --with-mpi --with-graph_parallel --build-dir=$MPI_COMPILER \
+    --stagedir=${RPM_BUILD_ROOT}${MPI_HOME} \
+    variant=release threading=multi debug-symbols=on pch=off stage
+
+# Remove generic parts of boost that were built for dependencies.
+rm -f ${RPM_BUILD_ROOT}${MPI_HOME}/%{_lib}/libboost_{python,{w,}serialization}*
+
 %{_openmpi_unload}
 export PATH=/bin${PATH:+:}$PATH
 %endif
@@ -683,60 +621,50 @@ export PATH=/bin${PATH:+:}$PATH
 %if %{with mpich2}
 %{_mpich2_load}
 echo ============================= install $MPI_COMPILER ==================
-DESTDIR=$RPM_BUILD_ROOT make -C $MPI_COMPILER VERBOSE=1 install
-# Remove parts of boost that we don't want installed in MPI directory.
-rm -f $RPM_BUILD_ROOT/$MPI_LIB/libboost_{python,{w,}serialization}*
-# Suppress the mpi.so python module, as it not currently properly
-# generated (some dependencies are missing. It is temporary until
-# upstream Boost-CMake fixes that (see
-# http://lists.boost.org/boost-cmake/2009/12/0859.php for more
-# details)
-rm -f $RPM_BUILD_ROOT/$MPI_LIB/mpi.so
-# Kill any debug library versions that may show up un-invited.
-rm -f $RPM_BUILD_ROOT/$MPI_LIB/*-d.*
-# Remove cmake configuration files used to build the Boost libraries
-find $RPM_BUILD_ROOT/$MPI_LIB -name '*.cmake' -exec rm -f {} \;
+./b2 -q %{?_smp_mflags} --layout=tagged \
+    --with-mpi --with-graph_parallel --build-dir=$MPI_COMPILER \
+    --stagedir=${RPM_BUILD_ROOT}${MPI_HOME} \
+    variant=release threading=multi debug-symbols=on pch=off stage
+
+# Remove generic parts of boost that were built for dependencies.
+rm -f ${RPM_BUILD_ROOT}${MPI_HOME}/%{_lib}/libboost_{python,{w,}serialization}*
+
 %{_mpich2_unload}
 export PATH=/bin${PATH:+:}$PATH
 %endif
 
+if false; then :
 %if %{with python3}
 echo ============================= install Python 3 ==================
 DESTDIR=$RPM_BUILD_ROOT make -C serial-python3 VERBOSE=1 install
 %endif
 
+fi
+
 echo ============================= install serial ==================
-DESTDIR=$RPM_BUILD_ROOT make -C serial VERBOSE=1 install
-# Kill any debug library versions that may show up un-invited.
-rm -f $RPM_BUILD_ROOT/%{_libdir}/*-d.*
-# Remove cmake configuration files used to build the Boost libraries
-find $RPM_BUILD_ROOT/%{_libdir} -name '*.cmake' -exec rm -f {} \;
+./b2 -d+2 -q %{?_smp_mflags} --layout=tagged \
+    --without-mpi --without-graph_parallel --build-dir=serial \
+    --prefix=$RPM_BUILD_ROOT%{_prefix} \
+    variant=release threading=single,multi debug-symbols=on pch=off install
 
-echo ============================= install jam ==================
-mkdir -p $RPM_BUILD_ROOT%{_bindir}
-pushd tools/build/v2/engine/
-%{__install} -m 755 bin.linux*/bjam $RPM_BUILD_ROOT%{_bindir}
-popd
-# Install the manual page
-%{__install} -p -m 644 tools/build/v2/doc/bjam.1 -D $RPM_BUILD_ROOT%{_mandir}/man1/bjam.1
-
-echo ============================= install build ==================
-mkdir -p $RPM_BUILD_ROOT%{_datadir}/boost-build
-pushd tools/build/v2
-# Fix some permissions
-chmod -x build/alias.py
-chmod +x tools/doxproc.py
-# Empty file
-rm -f tools/doxygen/windows-paths-check.hpp
-# Not a real file
-rm -f build/project.ann.py
-# Move into a dedicated location
-cp -a boost-build.jam bootstrap.jam build-system.jam build/ kernel/ options/ tools/ util/ user-config.jam $RPM_BUILD_ROOT%{_datadir}/boost-build/
-popd
+echo ============================= install Boost.Build ==================
+(cd tools/build/v2
+ ./b2 --prefix=$RPM_BUILD_ROOT%{_prefix} install
+ # Fix some permissions
+ chmod -x $RPM_BUILD_ROOT%{_datadir}/boost-build/build/alias.py
+ chmod +x $RPM_BUILD_ROOT%{_datadir}/boost-build/tools/doxproc.py
+ # We don't want to distribute this
+ rm -f $RPM_BUILD_ROOT%{_bindir}/b2
+ # Not a real file
+ rm -f $RPM_BUILD_ROOT%{_datadir}/boost-build/build/project.ann.py
+ # Empty file
+ rm -f $RPM_BUILD_ROOT%{_datadir}/boost-build/tools/doxygen/windows-paths-check.hpp
+ # Install the manual page
+ %{__install} -p -m 644 doc/bjam.1 -D $RPM_BUILD_ROOT%{_mandir}/man1/bjam.1
+)
 
 # Install documentation files (HTML pages) within the temporary place
 echo ============================= install documentation ==================
-cd %{_builddir}/%{toplev_dirname}
 # Prepare the place to temporary store the generated documentation
 rm -rf %{boost_docdir} && %{__mkdir_p} %{boost_docdir}/html
 DOCPATH=%{boost_docdir}
@@ -792,17 +720,6 @@ done
 rm -f tmp-doc-files-to-be-installed
 rm -f tmp-doc-directories
 %{__install} -p -m 644 -t $EXAMPLESPATH LICENSE_1_0.txt
-
-# Remove scripts used to generate include files
-find $RPM_BUILD_ROOT%{_includedir}/ \( -name '*.pl' -o -name '*.sh' \) -exec rm -f {} \;
-
-# boost support of cmake needs some tuning.  For the time being, leave
-# the files out, and rely on cmake's FindBoost to DTRT, as it had been
-# doing in pre-cmake-boost times.  For further info, see:
-#   https://bugzilla.redhat.com/show_bug.cgi?id=597020
-rm -Rfv $RPM_BUILD_ROOT%{_datadir}/%{name}-%{version}
-rm -Rfv $RPM_BUILD_ROOT%{_datadir}/cmake/%{name}
-
 
 %clean
 rm -rf $RPM_BUILD_ROOT
@@ -1023,7 +940,6 @@ rm -rf $RPM_BUILD_ROOT
 %files openmpi
 %defattr(-, root, root, -)
 %doc LICENSE_1_0.txt
-%{_libdir}/openmpi/lib/libboost_mpi.so.%{sonamever}
 %{_libdir}/openmpi/lib/libboost_mpi-mt.so.%{sonamever}
 
 %files openmpi-devel
@@ -1035,11 +951,11 @@ rm -rf $RPM_BUILD_ROOT
 %defattr(-, root, root, -)
 %doc LICENSE_1_0.txt
 %{_libdir}/openmpi/lib/libboost_mpi_python*.so.%{sonamever}
+%{_libdir}/openmpi/lib/mpi.so
 
 %files graph-openmpi
 %defattr(-, root, root, -)
 %doc LICENSE_1_0.txt
-%{_libdir}/openmpi/lib/libboost_graph_parallel.so.%{sonamever}
 %{_libdir}/openmpi/lib/libboost_graph_parallel-mt.so.%{sonamever}
 
 %endif
@@ -1050,7 +966,6 @@ rm -rf $RPM_BUILD_ROOT
 %files mpich2
 %defattr(-, root, root, -)
 %doc LICENSE_1_0.txt
-%{_libdir}/mpich2/lib/libboost_mpi.so.%{sonamever}
 %{_libdir}/mpich2/lib/libboost_mpi-mt.so.%{sonamever}
 
 %files mpich2-devel
@@ -1062,11 +977,11 @@ rm -rf $RPM_BUILD_ROOT
 %defattr(-, root, root, -)
 %doc LICENSE_1_0.txt
 %{_libdir}/mpich2/lib/libboost_mpi_python*.so.%{sonamever}
+%{_libdir}/mpich2/lib/mpi.so
 
 %files graph-mpich2
 %defattr(-, root, root, -)
 %doc LICENSE_1_0.txt
-%{_libdir}/mpich2/lib/libboost_graph_parallel.so.%{sonamever}
 %{_libdir}/mpich2/lib/libboost_graph_parallel-mt.so.%{sonamever}
 
 %endif
@@ -1083,6 +998,26 @@ rm -rf $RPM_BUILD_ROOT
 %{_mandir}/man1/bjam.1*
 
 %changelog
+* Thu Jul 26 2012 Petr Machata <pmachata@redhat.com> - 1.50.0-1
+- Upstream 1.50
+  - boost-cmake-soname.patch drop, upstream handles soname well, and
+    we haven't been doing manual numbering for several years now
+  - boost-1.48.0-cmakeify-full.patch drop, not necessary for bjam
+  - Rebase many patches, port others, courtesy of Denis Arnaud:
+    - boost-1.48.0-exceptions.patch drop
+    - boost-1.48.0-lexical_cast-incomplete.patch drop
+    - boost-1.48.0-gcc47-pthreads.patch drop
+    - boost-1.48.0-long-double.patch drop
+    - boost-1.48.0-xtime.patch drop
+    - boost-1.48.0-locale.patch drop
+    - boost-1.48.0-signals-erase.patch port
+    - boost-1.48.0-fix-non-utf8-files.patch port
+    - boost-1.48.0-foreach.patch port
+    - boost-1.48.0-attribute.patch port
+    - boost-1.48.0-long-double-1.patch port
+    - boost-1.48.0-polygon.patch port
+    - boost-1.48.0-pool.patch port
+
 * Wed Jul 18 2012 Fedora Release Engineering <rel-eng@lists.fedoraproject.org> - 1.48.0-17
 - Rebuilt for https://fedoraproject.org/wiki/Fedora_18_Mass_Rebuild
 
