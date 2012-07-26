@@ -612,7 +612,7 @@ echo ============================= install $MPI_COMPILER ==================
     variant=release threading=multi debug-symbols=on pch=off stage
 
 # Remove generic parts of boost that were built for dependencies.
-rm -f ${RPM_BUILD_ROOT}${MPI_HOME}/%{_lib}/libboost_{python,{w,}serialization}*
+rm -f ${RPM_BUILD_ROOT}${MPI_HOME}/lib/libboost_{python,{w,}serialization}*
 
 %{_openmpi_unload}
 export PATH=/bin${PATH:+:}$PATH
@@ -627,7 +627,7 @@ echo ============================= install $MPI_COMPILER ==================
     variant=release threading=multi debug-symbols=on pch=off stage
 
 # Remove generic parts of boost that were built for dependencies.
-rm -f ${RPM_BUILD_ROOT}${MPI_HOME}/%{_lib}/libboost_{python,{w,}serialization}*
+rm -f ${RPM_BUILD_ROOT}${MPI_HOME}/lib/libboost_{python,{w,}serialization}*
 
 %{_mpich2_unload}
 export PATH=/bin${PATH:+:}$PATH
@@ -645,6 +645,7 @@ echo ============================= install serial ==================
 ./b2 -d+2 -q %{?_smp_mflags} --layout=tagged \
     --without-mpi --without-graph_parallel --build-dir=serial \
     --prefix=$RPM_BUILD_ROOT%{_prefix} \
+    --libdir=$RPM_BUILD_ROOT%{_libdir} \
     variant=release threading=single,multi debug-symbols=on pch=off install
 
 echo ============================= install Boost.Build ==================
