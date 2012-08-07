@@ -19,15 +19,13 @@
 %endif
 
 # Configuration of Python 3
-# xxx note this is not supported with jam-based builds yet
-%bcond_with python3
-%define python3_version 3.2mu
+%bcond_without python3
 
 Name: boost
 Summary: The free peer-reviewed portable C++ source libraries
 Version: 1.50.0
 %define version_enc 1_50_0
-Release: 1%{?dist}
+Release: 2%{?dist}
 License: Boost and MIT and Python
 
 # The CMake build framework (set of CMakeLists.txt and module.cmake files) is
@@ -43,6 +41,7 @@ License: Boost and MIT and Python
 URL: http://www.boost.org
 Group: System Environment/Libraries
 Source0: http://downloads.sourceforge.net/%{name}/%{toplev_dirname}.tar.bz2
+Source1: ver.py
 
 # From the version 13 of Fedora, the Boost libraries are delivered
 # with sonames equal to the Boost version (e.g., 1.41.0). On EPEL versions
@@ -119,9 +118,6 @@ Patch10: boost-1.50.0-long-double-1.patch
 
 # https://bugzilla.redhat.com/show_bug.cgi?id=784654
 Patch12: boost-1.50.0-polygon.patch
-
-# https://bugzilla.redhat.com/show_bug.cgi?id=807780
-#Patch13: boost-1.48.0-python3.patch
 
 # https://bugzilla.redhat.com/show_bug.cgi?id=828856
 # https://bugzilla.redhat.com/show_bug.cgi?id=828857
@@ -505,12 +501,24 @@ a number of significant features and is now developed independently
 %patch9 -p1
 %patch10 -p1
 %patch12 -p3
-#%patch13 -p1
 %patch15 -p0
 
 %build
+
+PYTHON2_VERSION=$(/usr/bin/python2 %{SOURCE1})
+
+%if %{with python3}
+PYTHON3_VERSION=$(/usr/bin/python3 %{SOURCE1})
+PYTHON3_ABIFLAGS=$(/usr/bin/python3-config --abiflags)
+%endif
+
 cat >> ./tools/build/v2/user-config.jam << EOF
 using mpi ;
+%if %{with python3}
+# This _adds_ extra python version.  It doesn't replace whatever
+# python 2.X is default on the system.
+using python : ${PYTHON3_VERSION} : /usr/bin/python3 : /usr/include/python${PYTHON3_VERSION}${PYTHON3_ABIFLAGS} ;
+%endif
 EOF
 
 ./bootstrap.sh --with-toolset=gcc --with-icu
@@ -519,38 +527,33 @@ EOF
 # library in particular) end up being built second time during
 # installation.  Unsure why that is, but all sub-builds need to be
 # built with pch=off to avoid this.
+#
+# The "python=2.*" bit tells jam that we want to _also_ build 2.*, not
+# just 3.*.  When omitted, it just builds for python 3 twice, once
+# calling the library libbost_python and once libboost_python3.  I
+# assume this is for backward compatibility for apps that are used to
+# linking against -lboost_python, for when 2->3 transition is
+# eventually done.
 
 echo ============================= build serial ==================
 ./b2 -d+2 -q %{?_smp_mflags} --layout=tagged \
-  --without-mpi --without-graph_parallel --build-dir=serial \
-  variant=release threading=single,multi debug-symbols=on pch=off stage
-
-%if %{with python3}
-
-# Build boost-python for Python 3
-( echo ============================= build Python 3 ==================
-  mkdir serial-python3
-  cd serial-python3
-  %cmake -DCMAKE_BUILD_TYPE=RelWithDebInfo %{boost_testflags} \
-         -DENABLE_SINGLE_THREADED=YES -DINSTALL_VERSIONED=OFF \
-         -DBUILD_PROJECTS="python" -DWITH_MPI=OFF \
-	 -DPython_ADDITIONAL_VERSIONS=%{python3_version} \
-	 -DPYTHON_EXECUTABLE=python%{python3_version} \
-	 -DBOOST_PYTHON_SUFFIX=3 \
-         ..
-  make VERBOSE=1 %{?_smp_mflags}
-)
-
-%endif
+	--without-mpi --without-graph_parallel --build-dir=serial \
+	variant=release threading=single,multi debug-symbols=on pch=off \
+	python=${PYTHON2_VERSION} stage
 
 # Build MPI parts of Boost with OpenMPI support
+#
+# N.B. python=2.* here behaves differently: it exactly selects a
+# version that we want to build against.  Boost MPI is not portable to
+# Python 3 due to API changes in Python, so this suits us.
 %if %{with openmpi}
 %{_openmpi_load}
 echo ============================= build $MPI_COMPILER ==================
 # This doesn't seem to allow single-threaded builds anymore.
 ./b2 -d+2 -q %{?_smp_mflags} --layout=tagged \
 	--with-mpi --with-graph_parallel --build-dir=$MPI_COMPILER \
-	variant=release threading=multi debug-symbols=on pch=off stage
+	variant=release threading=multi debug-symbols=on pch=off \
+	python=${PYTHON2_VERSION} stage
 %{_openmpi_unload}
 export PATH=/bin${PATH:+:}$PATH
 %endif
@@ -561,7 +564,8 @@ export PATH=/bin${PATH:+:}$PATH
 echo ============================= build $MPI_COMPILER ==================
 ./b2 -d+2 -q %{?_smp_mflags} --layout=tagged \
 	--with-mpi --with-graph_parallel --build-dir=$MPI_COMPILER \
-	variant=release threading=multi debug-symbols=on pch=off stage
+	variant=release threading=multi debug-symbols=on pch=off \
+	python=${PYTHON2_VERSION} stage
 %{_mpich2_unload}
 export PATH=/bin${PATH:+:}$PATH
 %endif
@@ -600,6 +604,7 @@ cd %{_builddir}/%{toplev_dirname}
 
 %install
 rm -rf $RPM_BUILD_ROOT
+PYTHON2_VERSION=$(/usr/bin/python2 %{SOURCE1})
 
 cd %{_builddir}/%{toplev_dirname}
 
@@ -607,9 +612,10 @@ cd %{_builddir}/%{toplev_dirname}
 %{_openmpi_load}
 echo ============================= install $MPI_COMPILER ==================
 ./b2 -q %{?_smp_mflags} --layout=tagged \
-    --with-mpi --with-graph_parallel --build-dir=$MPI_COMPILER \
-    --stagedir=${RPM_BUILD_ROOT}${MPI_HOME} \
-    variant=release threading=multi debug-symbols=on pch=off stage
+	--with-mpi --with-graph_parallel --build-dir=$MPI_COMPILER \
+	--stagedir=${RPM_BUILD_ROOT}${MPI_HOME} \
+	variant=release threading=multi debug-symbols=on pch=off \
+	python=${PYTHON2_VERSION} stage
 
 # Remove generic parts of boost that were built for dependencies.
 rm -f ${RPM_BUILD_ROOT}${MPI_HOME}/lib/libboost_{python,{w,}serialization}*
@@ -622,9 +628,10 @@ export PATH=/bin${PATH:+:}$PATH
 %{_mpich2_load}
 echo ============================= install $MPI_COMPILER ==================
 ./b2 -q %{?_smp_mflags} --layout=tagged \
-    --with-mpi --with-graph_parallel --build-dir=$MPI_COMPILER \
-    --stagedir=${RPM_BUILD_ROOT}${MPI_HOME} \
-    variant=release threading=multi debug-symbols=on pch=off stage
+	--with-mpi --with-graph_parallel --build-dir=$MPI_COMPILER \
+	--stagedir=${RPM_BUILD_ROOT}${MPI_HOME} \
+	variant=release threading=multi debug-symbols=on pch=off \
+	python=${PYTHON2_VERSION} stage
 
 # Remove generic parts of boost that were built for dependencies.
 rm -f ${RPM_BUILD_ROOT}${MPI_HOME}/lib/libboost_{python,{w,}serialization}*
@@ -633,20 +640,13 @@ rm -f ${RPM_BUILD_ROOT}${MPI_HOME}/lib/libboost_{python,{w,}serialization}*
 export PATH=/bin${PATH:+:}$PATH
 %endif
 
-if false; then :
-%if %{with python3}
-echo ============================= install Python 3 ==================
-DESTDIR=$RPM_BUILD_ROOT make -C serial-python3 VERBOSE=1 install
-%endif
-
-fi
-
 echo ============================= install serial ==================
 ./b2 -d+2 -q %{?_smp_mflags} --layout=tagged \
-    --without-mpi --without-graph_parallel --build-dir=serial \
-    --prefix=$RPM_BUILD_ROOT%{_prefix} \
-    --libdir=$RPM_BUILD_ROOT%{_libdir} \
-    variant=release threading=single,multi debug-symbols=on pch=off install
+	--without-mpi --without-graph_parallel --build-dir=serial \
+	--prefix=$RPM_BUILD_ROOT%{_prefix} \
+	--libdir=$RPM_BUILD_ROOT%{_libdir} \
+	variant=release threading=single,multi debug-symbols=on pch=off \
+	python=${PYTHON2_VERSION} install
 
 echo ============================= install Boost.Build ==================
 (cd tools/build/v2
@@ -999,6 +999,10 @@ rm -rf $RPM_BUILD_ROOT
 %{_mandir}/man1/bjam.1*
 
 %changelog
+* Tue Aug  7 2012 Petr Machata <pmachata@redhat.com> - 1.50.0-2
+- Enable Python 3 builds.  This is still disabled in Boost MPI, which
+  doesn't seem to support Python 3
+
 * Thu Jul 26 2012 Petr Machata <pmachata@redhat.com> - 1.50.0-1
 - Upstream 1.50
   - boost-cmake-soname.patch drop, upstream handles soname well, and
