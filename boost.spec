@@ -562,28 +562,7 @@ echo ============================= build Boost.Build ==================
  ./bootstrap.sh --with-toolset=gcc)
 
 %check
-%if %{with tests}
-cd build
-if [ -f testing.log ]; then
-  echo "" >> testing.log
-  echo `date` >> testing.log
-  echo "" >> testing.log
-  echo `uname -a` >> testing.log
-  echo "" >> testing.log
-  echo `g++ --version` >> testing.log
-  echo "" >> testing.log
-  testdate=`date +%Y%m%d`
-  testarch=`uname -m`
-  email=benjamin.kosnik@gmail.com
-  bzip2 -f testing.log
-  echo "sending results starting"
-  echo | mutt -s "$testdate boost test $testarch" -a testing.log.bz2 $email
-  echo "sending results finished"
-else
-  echo "error with results"
-fi
-cd %{_builddir}/%{toplev_dirname}
-%endif
+:
 
 
 %install
