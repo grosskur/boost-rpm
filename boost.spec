@@ -25,7 +25,7 @@ Name: boost
 Summary: The free peer-reviewed portable C++ source libraries
 Version: 1.50.0
 %define version_enc 1_50_0
-Release: 2%{?dist}
+Release: 3%{?dist}
 License: Boost and MIT and Python
 
 %define toplev_dirname %{name}_%{version_enc}
@@ -35,16 +35,13 @@ Source0: http://downloads.sourceforge.net/%{name}/%{toplev_dirname}.tar.bz2
 Source1: ver.py
 
 # From the version 13 of Fedora, the Boost libraries are delivered
-# with sonames equal to the Boost version (e.g., 1.41.0). On EPEL versions
-# (e.g., EPEL 5), the Boost libraries are delivered with another scheme
-# for sonames (e.g., a soname of 3 for EPEL 5).
-# If for some reason you wish to set the sonamever yourself, you can do it here.
+# with sonames equal to the Boost version (e.g., 1.41.0).
 %define sonamever %{version}
 
 # boost is an "umbrella" package that pulls in all other boost
-# components, except for MPI sub-packages.  Those are "special": one
-# does not necessarily need them and the more typical scenario, I
-# think, will be that the developer wants to pick one MPI flavor.
+# components, except for MPI and Python 3 sub-packages.  Those are
+# special in that they are rarely necessary, and it's not a big burden
+# to have interested parties install them explicitly.
 Requires: boost-chrono = %{version}-%{release}
 Requires: boost-date-time = %{version}-%{release}
 Requires: boost-filesystem = %{version}-%{release}
@@ -63,9 +60,6 @@ Requires: boost-test = %{version}-%{release}
 Requires: boost-thread = %{version}-%{release}
 Requires: boost-timer = %{version}-%{release}
 Requires: boost-wave = %{version}-%{release}
-%if %{with python3}
-Requires: boost-python3 = %{version}-%{release}
-%endif
 
 BuildRequires: libstdc++-devel%{?_isa}
 BuildRequires: bzip2-devel%{?_isa}
@@ -962,6 +956,9 @@ rm -rf $RPM_BUILD_ROOT
 %{_mandir}/man1/bjam.1*
 
 %changelog
+* Wed Aug  8 2012 Petr Machata <pmachata@redhat.com> - 1.50.0-3
+- boost-python3 shouldn't be under the overall boost umbrella
+
 * Tue Aug  7 2012 Petr Machata <pmachata@redhat.com> - 1.50.0-2
 - Enable Python 3 builds.  This is still disabled in Boost MPI, which
   doesn't seem to support Python 3
