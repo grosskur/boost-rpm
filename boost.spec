@@ -28,15 +28,6 @@ Version: 1.50.0
 Release: 2%{?dist}
 License: Boost and MIT and Python
 
-# The CMake build framework (set of CMakeLists.txt and module.cmake files) is
-# added on top of the official Boost release (http://www.boost.org), thanks to
-# a dedicated patch. That CMake framework (and patch) is hosted and maintained
-# on GitHub, for now in the following Git repository:
-#   https://github.com/pocb/boost.git
-# A clone also exists on Gitorious, where CMake-related work was formely done:
-#   http://gitorious.org/boost/cmake
-# Upstream work is synchronised thanks to the Ryppl's hosted Git clone:
-#   https://github.com/ryppl/boost-svn/tree/trunk
 %define toplev_dirname %{name}_%{version_enc}
 URL: http://www.boost.org
 Group: System Environment/Libraries
@@ -76,7 +67,6 @@ Requires: boost-wave = %{version}-%{release}
 Requires: boost-python3 = %{version}-%{release}
 %endif
 
-BuildRequires: cmake
 BuildRequires: libstdc++-devel%{?_isa}
 BuildRequires: bzip2-devel%{?_isa}
 BuildRequires: zlib-devel%{?_isa}
@@ -324,9 +314,6 @@ Summary: The Boost C++ headers and shared development libraries
 Group: Development/Libraries
 Requires: boost = %{version}-%{release}
 Provides: boost-python-devel = %{version}-%{release}
-# for %%_datadir/cmake ownership, can consider making cmake-filesystem
-# if this dep is a problem
-Requires: cmake
 
 %description devel
 Headers and shared object symbolic links for the Boost C++ libraries.
@@ -577,9 +564,6 @@ echo ============================= build Boost.Build ==================
 %check
 %if %{with tests}
 cd build
-
-# Standard test with CMake, depends on installed boost-test.
-ctest --verbose --output-log testing.log
 if [ -f testing.log ]; then
   echo "" >> testing.log
   echo `date` >> testing.log
