@@ -484,13 +484,19 @@ a number of significant features and is now developed independently
 %patch12 -p3
 %patch15 -p0
 
-%build
-
-PYTHON2_VERSION=$(/usr/bin/python2 %{SOURCE1})
-
+# At least python2_version needs to be a macro so that it's visible in
+# %%install as well.
+%global python2_version %(/usr/bin/python2 %{SOURCE1})
 %if %{with python3}
-PYTHON3_VERSION=$(/usr/bin/python3 %{SOURCE1})
-PYTHON3_ABIFLAGS=$(/usr/bin/python3-config --abiflags)
+%global python3_version %(/usr/bin/python3 %{SOURCE1})
+%global python3_abiflags %(/usr/bin/python3-config --abiflags)
+%endif
+
+%build
+: PYTHON2_VERSION=%{python2_version}
+%if %{with python3}
+: PYTHON3_VERSION=%{python3_version}
+: PYTHON3_ABIFLAGS=%{python3_abiflags}
 %endif
 
 cat >> ./tools/build/v2/user-config.jam << EOF
@@ -498,7 +504,7 @@ using mpi ;
 %if %{with python3}
 # This _adds_ extra python version.  It doesn't replace whatever
 # python 2.X is default on the system.
-using python : ${PYTHON3_VERSION} : /usr/bin/python3 : /usr/include/python${PYTHON3_VERSION}${PYTHON3_ABIFLAGS} ;
+using python : %{python3_version} : /usr/bin/python3 : /usr/include/python%{python3_version}%{python3_abiflags} ;
 %endif
 EOF
 
@@ -520,7 +526,7 @@ echo ============================= build serial ==================
 ./b2 -d+2 -q %{?_smp_mflags} --layout=tagged \
 	--without-mpi --without-graph_parallel --build-dir=serial \
 	variant=release threading=single,multi debug-symbols=on pch=off \
-	python=${PYTHON2_VERSION} stage
+	python=%{python2_version} stage
 
 # Build MPI parts of Boost with OpenMPI support
 #
@@ -534,7 +540,7 @@ echo ============================= build $MPI_COMPILER ==================
 ./b2 -d+2 -q %{?_smp_mflags} --layout=tagged \
 	--with-mpi --with-graph_parallel --build-dir=$MPI_COMPILER \
 	variant=release threading=multi debug-symbols=on pch=off \
-	python=${PYTHON2_VERSION} stage
+	python=%{python2_version} stage
 %{_openmpi_unload}
 export PATH=/bin${PATH:+:}$PATH
 %endif
@@ -546,7 +552,7 @@ echo ============================= build $MPI_COMPILER ==================
 ./b2 -d+2 -q %{?_smp_mflags} --layout=tagged \
 	--with-mpi --with-graph_parallel --build-dir=$MPI_COMPILER \
 	variant=release threading=multi debug-symbols=on pch=off \
-	python=${PYTHON2_VERSION} stage
+	python=%{python2_version} stage
 %{_mpich2_unload}
 export PATH=/bin${PATH:+:}$PATH
 %endif
@@ -561,7 +567,6 @@ echo ============================= build Boost.Build ==================
 
 %install
 rm -rf $RPM_BUILD_ROOT
-PYTHON2_VERSION=$(/usr/bin/python2 %{SOURCE1})
 
 cd %{_builddir}/%{toplev_dirname}
 
@@ -572,7 +577,7 @@ echo ============================= install $MPI_COMPILER ==================
 	--with-mpi --with-graph_parallel --build-dir=$MPI_COMPILER \
 	--stagedir=${RPM_BUILD_ROOT}${MPI_HOME} \
 	variant=release threading=multi debug-symbols=on pch=off \
-	python=${PYTHON2_VERSION} stage
+	python=%{python2_version} stage
 
 # Remove generic parts of boost that were built for dependencies.
 rm -f ${RPM_BUILD_ROOT}${MPI_HOME}/lib/libboost_{python,{w,}serialization}*
@@ -588,7 +593,7 @@ echo ============================= install $MPI_COMPILER ==================
 	--with-mpi --with-graph_parallel --build-dir=$MPI_COMPILER \
 	--stagedir=${RPM_BUILD_ROOT}${MPI_HOME} \
 	variant=release threading=multi debug-symbols=on pch=off \
-	python=${PYTHON2_VERSION} stage
+	python=%{python2_version} stage
 
 # Remove generic parts of boost that were built for dependencies.
 rm -f ${RPM_BUILD_ROOT}${MPI_HOME}/lib/libboost_{python,{w,}serialization}*
@@ -603,7 +608,7 @@ echo ============================= install serial ==================
 	--prefix=$RPM_BUILD_ROOT%{_prefix} \
 	--libdir=$RPM_BUILD_ROOT%{_libdir} \
 	variant=release threading=single,multi debug-symbols=on pch=off \
-	python=${PYTHON2_VERSION} install
+	python=%{python2_version} install
 
 echo ============================= install Boost.Build ==================
 (cd tools/build/v2
