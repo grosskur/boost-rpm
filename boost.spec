@@ -25,7 +25,7 @@ Name: boost
 Summary: The free peer-reviewed portable C++ source libraries
 Version: 1.50.0
 %define version_enc 1_50_0
-Release: 3%{?dist}
+Release: 4%{?dist}
 License: Boost and MIT and Python
 
 %define toplev_dirname %{name}_%{version_enc}
@@ -33,6 +33,7 @@ URL: http://www.boost.org
 Group: System Environment/Libraries
 Source0: http://downloads.sourceforge.net/%{name}/%{toplev_dirname}.tar.bz2
 Source1: ver.py
+Source2: libboost_thread-mt.so
 
 # From the version 13 of Fedora, the Boost libraries are delivered
 # with sonames equal to the Boost version (e.g., 1.41.0).
@@ -517,7 +518,7 @@ EOF
 #
 # The "python=2.*" bit tells jam that we want to _also_ build 2.*, not
 # just 3.*.  When omitted, it just builds for python 3 twice, once
-# calling the library libbost_python and once libboost_python3.  I
+# calling the library libboost_python and once libboost_python3.  I
 # assume this is for backward compatibility for apps that are used to
 # linking against -lboost_python, for when 2->3 transition is
 # eventually done.
@@ -609,6 +610,12 @@ echo ============================= install serial ==================
 	--libdir=$RPM_BUILD_ROOT%{_libdir} \
 	variant=release threading=single,multi debug-symbols=on pch=off \
 	python=%{python2_version} install
+
+# Override DSO symlink with a linker script.  See the linker script
+# itself for details of why we need to do this.
+[ -f $RPM_BUILD_ROOT%{_libdir}/libboost_thread-mt.so ] # Must be present
+rm -f $RPM_BUILD_ROOT%{_libdir}/libboost_thread-mt.so
+install -p -m 644 %{SOURCE2} $RPM_BUILD_ROOT%{_libdir}/
 
 echo ============================= install Boost.Build ==================
 (cd tools/build/v2
@@ -961,6 +968,10 @@ rm -rf $RPM_BUILD_ROOT
 %{_mandir}/man1/bjam.1*
 
 %changelog
+* Wed Aug 15 2012 Petr Machata <pmachata@redhat.com> - 1.50.0-4
+- Override boost_thread-mt.so with a linker script that brings in
+  Boost.System DSO as well.
+
 * Wed Aug  8 2012 Petr Machata <pmachata@redhat.com> - 1.50.0-3
 - boost-python3 shouldn't be under the overall boost umbrella
 
