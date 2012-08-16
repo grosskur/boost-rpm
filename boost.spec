@@ -117,8 +117,9 @@ emphasis is on libraries which work well with the C++ Standard
 Library, in the hopes of establishing "existing practice" for
 extensions and providing reference implementations so that the Boost
 libraries are suitable for eventual standardization. (Some of the
-libraries have already been proposed for inclusion in the C++
-Standards Committee's upcoming C++ Standard Library Technical Report.)
+libraries have already been included in the C++ 2011 standard and
+others have been proposed to the C++ Standards Committee for inclusion
+in future standards.)
 
 %package chrono
 Summary: Run-Time component of boost chrono library
@@ -968,6 +969,10 @@ rm -rf $RPM_BUILD_ROOT
 %{_mandir}/man1/bjam.1*
 
 %changelog
+* Thu Aug 16 2012 Petr Machata <pmachata@redhat.com> - 1.50.0-5
+- Update %%description to reflect current state of C++
+  standardization.  Courtesy of Jonathan Wakely.  (#837813)
+
 * Wed Aug 15 2012 Petr Machata <pmachata@redhat.com> - 1.50.0-4
 - Override boost_thread-mt.so with a linker script that brings in
   Boost.System DSO as well.
