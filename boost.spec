@@ -102,6 +102,7 @@ Patch9: boost-1.50.0-attribute.patch
 Patch10: boost-1.50.0-long-double-1.patch
 
 # https://bugzilla.redhat.com/show_bug.cgi?id=784654
+# https://svn.boost.org/trac/boost/ticket/7154
 Patch12: boost-1.50.0-polygon.patch
 
 # https://bugzilla.redhat.com/show_bug.cgi?id=828856
