@@ -23,9 +23,9 @@
 
 Name: boost
 Summary: The free peer-reviewed portable C++ source libraries
-Version: 1.50.0
-%define version_enc 1_50_0
-Release: 7%{?dist}
+Version: 1.53.0
+%define version_enc 1_53_0_beta1
+Release: 0.1.beta1%{?dist}
 License: Boost and MIT and Python
 
 %define toplev_dirname %{name}_%{version_enc}
@@ -72,10 +72,6 @@ BuildRequires: python3-devel%{?_isa}
 BuildRequires: libicu-devel%{?_isa}
 BuildRequires: chrpath
 
-# The patch may break c++03, and there is therefore no plan yet to include
-# it upstream: https://svn.boost.org/trac/boost/ticket/4999
-Patch2: boost-1.50.0-signals-erase.patch
-
 # https://svn.boost.org/trac/boost/ticket/6150
 Patch4: boost-1.50.0-fix-non-utf8-files.patch
 
@@ -90,20 +86,14 @@ Patch7: boost-1.50.0-foreach.patch
 
 # https://bugzilla.redhat.com/show_bug.cgi?id=781859
 # The following tickets have still to be fixed by upstream.
-# https://svn.boost.org/trac/boost/ticket/6406 fixed, but only in Boost-1.51.0
 # https://svn.boost.org/trac/boost/ticket/6408
 # https://svn.boost.org/trac/boost/ticket/6410
 # https://svn.boost.org/trac/boost/ticket/6413
-# https://svn.boost.org/trac/boost/ticket/6415
-Patch9: boost-1.50.0-attribute.patch
+Patch9: boost-1.53.0-attribute.patch
 
 # https://bugzilla.redhat.com/show_bug.cgi?id=783660
 # https://svn.boost.org/trac/boost/ticket/6459 fixed
 Patch10: boost-1.50.0-long-double-1.patch
-
-# https://bugzilla.redhat.com/show_bug.cgi?id=784654
-# https://svn.boost.org/trac/boost/ticket/7154
-Patch12: boost-1.50.0-polygon.patch
 
 # https://bugzilla.redhat.com/show_bug.cgi?id=828856
 # https://bugzilla.redhat.com/show_bug.cgi?id=828857
@@ -478,13 +468,11 @@ a number of significant features and is now developed independently
 %setup -q -n %{toplev_dirname}
 
 # Fixes
-%patch2 -p1
 %patch4 -p1
 %patch5 -p1
 %patch7 -p2
 %patch9 -p1
 %patch10 -p1
-%patch12 -p3
 %patch15 -p0
 
 # At least python2_version needs to be a macro so that it's visible in
@@ -970,6 +958,12 @@ rm -rf $RPM_BUILD_ROOT
 %{_mandir}/man1/bjam.1*
 
 %changelog
+* Thu Jan 24 2013 Petr Machata <pmachata@redhat.com> - 1.53.0-0.1.beta1
+- Upstream 1.53.0 beta1
+  - Drop boost-1.50.0-signals-erase.patch
+  - Port boost-1.50.0-attribute.patch
+  - Drop boost-1.50.0-polygon.patch
+
 * Sat Jan 26 2013 Peter Robinson <pbrobinson@fedoraproject.org> 1.50.0-7
 - Rebuild for icu soname bump
 
