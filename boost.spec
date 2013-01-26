@@ -25,7 +25,7 @@ Name: boost
 Summary: The free peer-reviewed portable C++ source libraries
 Version: 1.50.0
 %define version_enc 1_50_0
-Release: 6%{?dist}
+Release: 7%{?dist}
 License: Boost and MIT and Python
 
 %define toplev_dirname %{name}_%{version_enc}
@@ -970,6 +970,9 @@ rm -rf $RPM_BUILD_ROOT
 %{_mandir}/man1/bjam.1*
 
 %changelog
+* Sat Jan 26 2013 Peter Robinson <pbrobinson@fedoraproject.org> 1.50.0-7
+- Rebuild for icu soname bump
+
 * Sat Nov 03 2012 Denis Arnaud <denis.arnaud_fedora@m4x.org> - 1.50.0-6
 - Rebuild for the new MPICH2 (and libmpich2 soname bump)
 
