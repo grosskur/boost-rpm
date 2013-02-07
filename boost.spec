@@ -24,8 +24,8 @@
 Name: boost
 Summary: The free peer-reviewed portable C++ source libraries
 Version: 1.53.0
-%define version_enc 1_53_0_beta1
-Release: 0.1.beta1%{?dist}
+%define version_enc 1_53_0
+Release: 1%{?dist}
 License: Boost and MIT and Python
 
 %define toplev_dirname %{name}_%{version_enc}
@@ -43,7 +43,9 @@ Source2: libboost_thread-mt.so
 # components, except for MPI and Python 3 sub-packages.  Those are
 # special in that they are rarely necessary, and it's not a big burden
 # to have interested parties install them explicitly.
+Requires: boost-atomic = %{version}-%{release}
 Requires: boost-chrono = %{version}-%{release}
+Requires: boost-context = %{version}-%{release}
 Requires: boost-date-time = %{version}-%{release}
 Requires: boost-filesystem = %{version}-%{release}
 Requires: boost-graph = %{version}-%{release}
@@ -112,6 +114,17 @@ libraries have already been included in the C++ 2011 standard and
 others have been proposed to the C++ Standards Committee for inclusion
 in future standards.)
 
+%package atomic
+Summary: Run-Time component of boost atomic library
+Group: System Environment/Libraries
+
+%description atomic
+
+Run-Time support for Boost.Atomic, a library that provides atomic data
+types and operations on these data types, as well as memory ordering
+constraints required for coordinating multiple threads through atomic
+variables.
+
 %package chrono
 Summary: Run-Time component of boost chrono library
 Group: System Environment/Libraries
@@ -119,6 +132,15 @@ Group: System Environment/Libraries
 %description chrono
 
 Run-Time support for Boost.Chrono, a set of useful time utilities.
+
+%package context
+Summary: Run-Time component of boost context switching library
+Group: System Environment/Libraries
+
+%description context
+
+Run-Time support for Boost.Context, a foundational library that
+provides a sort of cooperative multitasking on a single thread.
 
 %package date-time
 Summary: Run-Time component of boost date-time library
@@ -520,7 +542,13 @@ echo ============================= build serial ==================
 	python=%{python2_version} stage
 
 # Build MPI parts of Boost with OpenMPI support
-#
+
+%if %{with openmpi} || %{with mpich2}
+# First, purge all modules so that user environment doesn't conflict
+# with the build.
+module purge ||:
+%endif
+
 # N.B. python=2.* here behaves differently: it exactly selects a
 # version that we want to build against.  Boost MPI is not portable to
 # Python 3 due to API changes in Python, so this suits us.
@@ -560,6 +588,13 @@ echo ============================= build Boost.Build ==================
 rm -rf $RPM_BUILD_ROOT
 
 cd %{_builddir}/%{toplev_dirname}
+
+%if %{with openmpi} || %{with mpich2}
+module list
+# First, purge all modules so that user environment doesn't conflict
+# with the build.
+module purge ||:
+%endif
 
 %if %{with openmpi}
 %{_openmpi_load}
@@ -690,9 +725,17 @@ rm -rf $RPM_BUILD_ROOT
 # user after the relevant environment module has been loaded.
 # rpmlint will report that as errors, but it is fine.
 
+%post atomic -p /sbin/ldconfig
+
+%postun atomic -p /sbin/ldconfig
+
 %post chrono -p /sbin/ldconfig
 
 %postun chrono -p /sbin/ldconfig
+
+%post context -p /sbin/ldconfig
+
+%postun context -p /sbin/ldconfig
 
 %post date-time -p /sbin/ldconfig
 
@@ -768,10 +811,20 @@ rm -rf $RPM_BUILD_ROOT
 %defattr(-, root, root, -)
 %doc LICENSE_1_0.txt
 
+%files atomic
+%defattr(-, root, root, -)
+%doc LICENSE_1_0.txt
+%{_libdir}/libboost_atomic-mt.so.%{sonamever}
+
 %files chrono
 %defattr(-, root, root, -)
 %doc LICENSE_1_0.txt
 %{_libdir}/libboost_chrono*.so.%{sonamever}
+
+%files context
+%defattr(-, root, root, -)
+%doc LICENSE_1_0.txt
+%{_libdir}/libboost_context*.so.%{sonamever}
 
 %files date-time
 %defattr(-, root, root, -)
@@ -958,11 +1011,12 @@ rm -rf $RPM_BUILD_ROOT
 %{_mandir}/man1/bjam.1*
 
 %changelog
-* Thu Jan 24 2013 Petr Machata <pmachata@redhat.com> - 1.53.0-0.1.beta1
+* Thu Jan 24 2013 Petr Machata <pmachata@redhat.com> - 1.53.0-1
 - Upstream 1.53.0 beta1
   - Drop boost-1.50.0-signals-erase.patch
   - Port boost-1.50.0-attribute.patch
   - Drop boost-1.50.0-polygon.patch
+  - New sub-packages boost-atomic and boost-context
 
 * Sat Jan 26 2013 Peter Robinson <pbrobinson@fedoraproject.org> 1.50.0-7
 - Rebuild for icu soname bump
