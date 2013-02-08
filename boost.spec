@@ -1011,7 +1011,7 @@ rm -rf $RPM_BUILD_ROOT
 %{_mandir}/man1/bjam.1*
 
 %changelog
-* Thu Jan 24 2013 Petr Machata <pmachata@redhat.com> - 1.53.0-1
+* Fri Feb  8 2013 Petr Machata <pmachata@redhat.com> - 1.53.0-1
 - Upstream 1.53.0 beta1
   - Drop boost-1.50.0-signals-erase.patch
   - Port boost-1.50.0-attribute.patch
