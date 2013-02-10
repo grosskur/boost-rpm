@@ -2,9 +2,9 @@
 
    Boost.Thread header files pull in enough of Boost.System that
    symbols from the latter library are referenced by a compiled object
-   that includes Boost.Thread headers.  libbost_system-mt.so is among
-   libbost_thread-mt.so's DT_NEEDED, but program linker requires that
-   missing symbols are satisfied by direct dependency, not a
+   that includes Boost.Thread headers.  libboost_system-mt.so is among
+   libboost_thread-mt.so's DT_NEEDED, but program linker requires that
+   missing symbols are satisfied by direct dependency, not by a
    transitive one.  Hence this linker script, which brings in the
    Boost.System DSO.  */
 
