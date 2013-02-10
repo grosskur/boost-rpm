@@ -1242,13 +1242,13 @@ rm -rf $RPM_BUILD_ROOT
 - Split the CMake-buildable tar-ball into pristine upstream tar-ball
   and CMake framework patch
 
-* Fri Aug 16 2010 Denis Arnaud <denis.arnaud_fedora@m4x.org> - 1.44.0-0.6
+* Mon Aug 16 2010 Denis Arnaud <denis.arnaud_fedora@m4x.org> - 1.44.0-0.6
 - Merged the latest changes from the now final release of Boost-1.44
 
 * Fri Aug  6 2010 Denis Arnaud <denis.arnaud_fedora@m4x.org> - 1.44.0-0.5
 - Patched header file in boost/random/detail. Resolves: #621631
 
-* Fri Jul 31 2010 Denis Arnaud <denis.arnaud_fedora@m4x.org> - 1.44.0-0.4
+* Sat Jul 31 2010 Denis Arnaud <denis.arnaud_fedora@m4x.org> - 1.44.0-0.4
 - Added missing header files in boost/random/detail. Resolves: #619869
 
 * Tue Jul 27 2010 Orcan Ogetbil <oget[dot]fedora[at]gmail[dot]com> - 1.44.0-0.3
@@ -1433,7 +1433,7 @@ rm -rf $RPM_BUILD_ROOT
 - Fix rpmlint warnings on tabs and spaces.
 - Bump SONAME to 4
 
-* Tue Nov 17 2008 Benjamin Kosnik <bkoz@redhat.com> - 1.37.0-0.1
+* Mon Nov 17 2008 Benjamin Kosnik <bkoz@redhat.com> - 1.37.0-0.1
 - Rebase to 1.37.0.
 
 * Tue Oct 21 2008 Benjamin Kosnik <bkoz@redhat.com> - 1.36.0-1
