@@ -25,7 +25,7 @@ Name: boost
 Summary: The free peer-reviewed portable C++ source libraries
 Version: 1.53.0
 %define version_enc 1_53_0
-Release: 2%{?dist}
+Release: 3%{?dist}
 License: Boost and MIT and Python
 
 %define toplev_dirname %{name}_%{version_enc}
@@ -100,6 +100,9 @@ Patch10: boost-1.50.0-long-double-1.patch
 # https://bugzilla.redhat.com/show_bug.cgi?id=828856
 # https://bugzilla.redhat.com/show_bug.cgi?id=828857
 Patch15: boost-1.50.0-pool.patch
+
+# https://bugzilla.redhat.com/show_bug.cgi?id=909888
+Patch16: boost-1.53.0-context.patch
 
 %bcond_with tests
 %bcond_with docs_generated
@@ -496,6 +499,7 @@ a number of significant features and is now developed independently
 %patch9 -p1
 %patch10 -p1
 %patch15 -p0
+%patch16 -p1
 
 # At least python2_version needs to be a macro so that it's visible in
 # %%install as well.
@@ -522,6 +526,7 @@ using python : %{python3_version} : /usr/bin/python3 : /usr/include/python%{pyth
 EOF
 
 ./bootstrap.sh --with-toolset=gcc --with-icu
+sed 's/%%{version}/%{version}/g' %{SOURCE2} > $(basename %{SOURCE2})
 
 # N.B. When we build the following with PCH, parts of boost (math
 # library in particular) end up being built second time during
@@ -640,7 +645,7 @@ echo ============================= install serial ==================
 # itself for details of why we need to do this.
 [ -f $RPM_BUILD_ROOT%{_libdir}/libboost_thread-mt.so ] # Must be present
 rm -f $RPM_BUILD_ROOT%{_libdir}/libboost_thread-mt.so
-install -p -m 644 %{SOURCE2} $RPM_BUILD_ROOT%{_libdir}/
+install -p -m 644 $(basename %{SOURCE2}) $RPM_BUILD_ROOT%{_libdir}/
 
 echo ============================= install Boost.Build ==================
 (cd tools/build/v2
@@ -1011,6 +1016,10 @@ rm -rf $RPM_BUILD_ROOT
 %{_mandir}/man1/bjam.1*
 
 %changelog
+* Mon Feb 11 2013 Petr Machata <pmachata@redhat.com> - 1.53.0-3
+- Fix Boost.Context on ppc64
+- Future-proof the linker script boost_thread-mt.so
+
 * Sun Feb 10 2013 Denis Arnaud <denis.arnaud_fedora@m4x.org> - 1.53.0-2
 - Fixed the libboost_thread-mt.so script (which wrongly referred to Boost-1.50)
 
