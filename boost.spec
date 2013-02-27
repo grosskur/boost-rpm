@@ -5,12 +5,12 @@
 %define boost_docdir __tmp_docdir
 %define boost_examplesdir __tmp_examplesdir
 
-# Configuration of MPI back-ends
 %ifarch %{arm}
   %bcond_with mpich2
 %else
   %bcond_without mpich2
 %endif
+
 %ifarch s390 s390x %{arm}
   # No OpenMPI support on these arches
   %bcond_with openmpi
@@ -18,14 +18,23 @@
   %bcond_without openmpi
 %endif
 
-# Configuration of Python 3
+%ifnarch %{ix86} x86_64
+  # Avoid using Boost.Context on non-x86 arches.  s390 is not
+  # supported at all and there were _syntax errors_ in PPC code.  This
+  # should be enabled on a case-by-case basis as the arches are tested
+  # and fixed.
+  %bcond_with context
+%else
+  %bcond_without context
+%endif
+
 %bcond_without python3
 
 Name: boost
 Summary: The free peer-reviewed portable C++ source libraries
 Version: 1.53.0
 %define version_enc 1_53_0
-Release: 3%{?dist}
+Release: 4%{?dist}
 License: Boost and MIT and Python
 
 %define toplev_dirname %{name}_%{version_enc}
@@ -45,7 +54,9 @@ Source2: libboost_thread-mt.so
 # to have interested parties install them explicitly.
 Requires: boost-atomic = %{version}-%{release}
 Requires: boost-chrono = %{version}-%{release}
+%if %{with context}
 Requires: boost-context = %{version}-%{release}
+%endif
 Requires: boost-date-time = %{version}-%{release}
 Requires: boost-filesystem = %{version}-%{release}
 Requires: boost-graph = %{version}-%{release}
@@ -136,6 +147,7 @@ Group: System Environment/Libraries
 
 Run-Time support for Boost.Chrono, a set of useful time utilities.
 
+%if %{with context}
 %package context
 Summary: Run-Time component of boost context switching library
 Group: System Environment/Libraries
@@ -144,6 +156,7 @@ Group: System Environment/Libraries
 
 Run-Time support for Boost.Context, a foundational library that
 provides a sort of cooperative multitasking on a single thread.
+%endif
 
 %package date-time
 Summary: Run-Time component of boost date-time library
@@ -543,6 +556,9 @@ sed 's/%%{version}/%{version}/g' %{SOURCE2} > $(basename %{SOURCE2})
 echo ============================= build serial ==================
 ./b2 -d+2 -q %{?_smp_mflags} --layout=tagged \
 	--without-mpi --without-graph_parallel --build-dir=serial \
+%if !%{with context}
+    	--without-context \
+%endif
 	variant=release threading=single,multi debug-symbols=on pch=off \
 	python=%{python2_version} stage
 
@@ -595,7 +611,6 @@ rm -rf $RPM_BUILD_ROOT
 cd %{_builddir}/%{toplev_dirname}
 
 %if %{with openmpi} || %{with mpich2}
-module list
 # First, purge all modules so that user environment doesn't conflict
 # with the build.
 module purge ||:
@@ -636,6 +651,9 @@ export PATH=/bin${PATH:+:}$PATH
 echo ============================= install serial ==================
 ./b2 -d+2 -q %{?_smp_mflags} --layout=tagged \
 	--without-mpi --without-graph_parallel --build-dir=serial \
+%if !%{with context}
+    	--without-context \
+%endif
 	--prefix=$RPM_BUILD_ROOT%{_prefix} \
 	--libdir=$RPM_BUILD_ROOT%{_libdir} \
 	variant=release threading=single,multi debug-symbols=on pch=off \
@@ -738,9 +756,11 @@ rm -rf $RPM_BUILD_ROOT
 
 %postun chrono -p /sbin/ldconfig
 
+%if %{with context}
 %post context -p /sbin/ldconfig
 
 %postun context -p /sbin/ldconfig
+%endif
 
 %post date-time -p /sbin/ldconfig
 
@@ -826,10 +846,12 @@ rm -rf $RPM_BUILD_ROOT
 %doc LICENSE_1_0.txt
 %{_libdir}/libboost_chrono*.so.%{sonamever}
 
+%if %{with context}
 %files context
 %defattr(-, root, root, -)
 %doc LICENSE_1_0.txt
 %{_libdir}/libboost_context*.so.%{sonamever}
+%endif
 
 %files date-time
 %defattr(-, root, root, -)
@@ -1016,6 +1038,9 @@ rm -rf $RPM_BUILD_ROOT
 %{_mandir}/man1/bjam.1*
 
 %changelog
+* Wed Feb 27 2013 Petr Machata <pmachata@redhat.com> - 1.53.0-4
+- Make Boost.Context support conditional
+
 * Mon Feb 11 2013 Petr Machata <pmachata@redhat.com> - 1.53.0-3
 - Fix Boost.Context on ppc64
 - Future-proof the linker script boost_thread-mt.so
