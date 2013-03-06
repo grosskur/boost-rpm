@@ -34,7 +34,7 @@ Name: boost
 Summary: The free peer-reviewed portable C++ source libraries
 Version: 1.53.0
 %define version_enc 1_53_0
-Release: 5%{?dist}
+Release: 6%{?dist}
 License: Boost and MIT and Python
 
 %define toplev_dirname %{name}_%{version_enc}
@@ -981,7 +981,9 @@ rm -rf $RPM_BUILD_ROOT
 %{_includedir}/%{name}
 %{_libdir}/libboost_atomic-mt.so
 %{_libdir}/libboost_chrono*.so
+%if %{with context}
 %{_libdir}/libboost_context*.so
+%endif
 %{_libdir}/libboost_date_time*.so
 %{_libdir}/libboost_filesystem*.so
 %{_libdir}/libboost_graph.so
@@ -1079,6 +1081,10 @@ rm -rf $RPM_BUILD_ROOT
 %{_mandir}/man1/bjam.1*
 
 %changelog
+* Wed Mar  6 2013 Petr Machata <pmachata@redhat.com> - 1.53.0-6
+- libboost_context.so must be guarded by conditional in the expanded
+  filelist at boost-devel.
+
 * Tue Mar  5 2013 Petr Machata <pmachata@redhat.com> - 1.53.0-5
 - Split off Python 3 DSO symlink to a separate subpackage
   boost-python3-devel.  This makes it possible to install
