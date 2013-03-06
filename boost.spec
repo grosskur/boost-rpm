@@ -34,7 +34,7 @@ Name: boost
 Summary: The free peer-reviewed portable C++ source libraries
 Version: 1.53.0
 %define version_enc 1_53_0
-Release: 4%{?dist}
+Release: 5%{?dist}
 License: Boost and MIT and Python
 
 %define toplev_dirname %{name}_%{version_enc}
@@ -249,6 +249,16 @@ C++. It allows you to quickly and seamlessly expose C++ classes
 functions and objects to Python, and vice versa, using no special
 tools -- just your C++ compiler.  This package contains run-time
 support for Boost Python Library compiled for Python 3.
+
+%package python3-devel
+Summary: Shared object symbolic links for Boost.Python 3
+Group: System Environment/Libraries
+Requires: boost-python3 = %{version}-%{release}
+Requires: boost-devel = %{version}-%{release}
+
+%description python3-devel
+
+Shared object symbolic links for Python 3 variant of Boost.Python.
 
 %endif
 
@@ -530,6 +540,9 @@ a number of significant features and is now developed independently
 %endif
 
 cat >> ./tools/build/v2/user-config.jam << EOF
+# There are many strict aliasing warnings, and it's not feasible to go
+# through them all at this time.
+using gcc : : : <compileflags>-fno-strict-aliasing ;
 using mpi ;
 %if %{with python3}
 # This _adds_ extra python version.  It doesn't replace whatever
@@ -906,6 +919,11 @@ rm -rf $RPM_BUILD_ROOT
 %defattr(-, root, root, -)
 %doc LICENSE_1_0.txt
 %{_libdir}/libboost_python3*.so.%{sonamever}
+
+%files python3-devel
+%defattr(-, root, root, -)
+%doc LICENSE_1_0.txt
+%{_libdir}/libboost_python3*.so
 %endif
 
 %files random
@@ -961,7 +979,30 @@ rm -rf $RPM_BUILD_ROOT
 %defattr(-, root, root, -)
 %doc LICENSE_1_0.txt
 %{_includedir}/%{name}
-%{_libdir}/libboost_*.so
+%{_libdir}/libboost_atomic-mt.so
+%{_libdir}/libboost_chrono*.so
+%{_libdir}/libboost_context*.so
+%{_libdir}/libboost_date_time*.so
+%{_libdir}/libboost_filesystem*.so
+%{_libdir}/libboost_graph.so
+%{_libdir}/libboost_graph-mt.so
+%{_libdir}/libboost_iostreams*.so
+%{_libdir}/libboost_locale*.so
+%{_libdir}/libboost_math*.so
+%{_libdir}/libboost_prg_exec_monitor*.so
+%{_libdir}/libboost_unit_test_framework*.so
+%{_libdir}/libboost_program_options*.so
+%{_libdir}/libboost_python-mt.so
+%{_libdir}/libboost_python.so
+%{_libdir}/libboost_random*.so
+%{_libdir}/libboost_regex*.so
+%{_libdir}/libboost_serialization*.so
+%{_libdir}/libboost_wserialization*.so
+%{_libdir}/libboost_signals*.so
+%{_libdir}/libboost_system*.so
+%{_libdir}/libboost_thread-mt.so
+%{_libdir}/libboost_timer*.so
+%{_libdir}/libboost_wave*.so
 
 %files static
 %defattr(-, root, root, -)
@@ -1038,6 +1079,12 @@ rm -rf $RPM_BUILD_ROOT
 %{_mandir}/man1/bjam.1*
 
 %changelog
+* Tue Mar  5 2013 Petr Machata <pmachata@redhat.com> - 1.53.0-5
+- Split off Python 3 DSO symlink to a separate subpackage
+  boost-python3-devel.  This makes it possible to install
+  boost-devel separately, without Python 3 support.
+- Build with -fno-strict-aliasing
+
 * Wed Feb 27 2013 Petr Machata <pmachata@redhat.com> - 1.53.0-4
 - Make Boost.Context support conditional
 
