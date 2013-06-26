@@ -34,7 +34,7 @@ Name: boost
 Summary: The free peer-reviewed portable C++ source libraries
 Version: 1.53.0
 %define version_enc 1_53_0
-Release: 6%{?dist}
+Release: 7%{?dist}
 License: Boost and MIT and Python
 
 %define toplev_dirname %{name}_%{version_enc}
@@ -114,6 +114,10 @@ Patch15: boost-1.50.0-pool.patch
 
 # https://bugzilla.redhat.com/show_bug.cgi?id=909888
 Patch16: boost-1.53.0-context.patch
+
+# https://bugzilla.redhat.com/show_bug.cgi?id=977098
+# https://svn.boost.org/trac/boost/ticket/8731
+Patch17: boost-1.53.0-__GLIBC_HAVE_LONG_LONG.patch
 
 %bcond_with tests
 %bcond_with docs_generated
@@ -349,6 +353,7 @@ Summary: The Boost C++ headers and shared development libraries
 Group: Development/Libraries
 Requires: boost = %{version}-%{release}
 Provides: boost-python-devel = %{version}-%{release}
+Requires: libicu-devel%{?_isa}
 
 %description devel
 Headers and shared object symbolic links for the Boost C++ libraries.
@@ -523,6 +528,7 @@ a number of significant features and is now developed independently
 %patch10 -p1
 %patch15 -p0
 %patch16 -p1
+%patch17 -p0
 
 # At least python2_version needs to be a macro so that it's visible in
 # %%install as well.
@@ -1081,6 +1087,10 @@ rm -rf $RPM_BUILD_ROOT
 %{_mandir}/man1/bjam.1*
 
 %changelog
+* Wed Jun 26 2013 Petr Machata <pmachata@redhat.com> - 1.53.0-7
+- Fix detection of availability of {,u}int64_t in glibc headers.
+  (boost-1.53.0-__GLIBC_HAVE_LONG_LONG.patch)
+
 * Wed Mar  6 2013 Petr Machata <pmachata@redhat.com> - 1.53.0-6
 - libboost_context.so must be guarded by conditional in the expanded
   filelist at boost-devel.
