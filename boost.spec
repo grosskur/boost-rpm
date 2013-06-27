@@ -34,7 +34,7 @@ Name: boost
 Summary: The free peer-reviewed portable C++ source libraries
 Version: 1.53.0
 %define version_enc 1_53_0
-Release: 6%{?dist}
+Release: 7%{?dist}
 License: Boost and MIT and Python
 
 %define toplev_dirname %{name}_%{version_enc}
@@ -678,6 +678,15 @@ echo ============================= install serial ==================
 rm -f $RPM_BUILD_ROOT%{_libdir}/libboost_thread-mt.so
 install -p -m 644 $(basename %{SOURCE2}) $RPM_BUILD_ROOT%{_libdir}/
 
+# Add symlinks libboost_{thread,locale,atomic}.so -> *-mt.so
+#  https://bugzilla.redhat.com/show_bug.cgi?id=971956
+ln -s libboost_thread-mt.so $RPM_BUILD_ROOT%{_libdir}/libboost_thread.so
+ln -s libboost_locale-mt.so $RPM_BUILD_ROOT%{_libdir}/libboost_locale.so
+ln -s libboost_atomic-mt.so $RPM_BUILD_ROOT%{_libdir}/libboost_atomic.so
+# Check that we didn't forget about anything.
+find $RPM_BUILD_ROOT%{_libdir} -maxdepth 1 -name libboost_\*-mt.so \
+	| while read a; do test -e ${a/-mt/} || exit 1; done
+
 echo ============================= install Boost.Build ==================
 (cd tools/build/v2
  ./b2 --prefix=$RPM_BUILD_ROOT%{_prefix} install
@@ -979,7 +988,7 @@ rm -rf $RPM_BUILD_ROOT
 %defattr(-, root, root, -)
 %doc LICENSE_1_0.txt
 %{_includedir}/%{name}
-%{_libdir}/libboost_atomic-mt.so
+%{_libdir}/libboost_atomic*.so
 %{_libdir}/libboost_chrono*.so
 %if %{with context}
 %{_libdir}/libboost_context*.so
@@ -1002,7 +1011,7 @@ rm -rf $RPM_BUILD_ROOT
 %{_libdir}/libboost_wserialization*.so
 %{_libdir}/libboost_signals*.so
 %{_libdir}/libboost_system*.so
-%{_libdir}/libboost_thread-mt.so
+%{_libdir}/libboost_thread*.so
 %{_libdir}/libboost_timer*.so
 %{_libdir}/libboost_wave*.so
 
@@ -1081,6 +1090,9 @@ rm -rf $RPM_BUILD_ROOT
 %{_mandir}/man1/bjam.1*
 
 %changelog
+* Thu Jun 27 2013 Petr Machata <pmachata@redhat.com> - 1.53.0-7
+- Add symlinks for /usr/lib/libboost_{thread,locale}.so -> *-mt.so
+
 * Wed Mar  6 2013 Petr Machata <pmachata@redhat.com> - 1.53.0-6
 - libboost_context.so must be guarded by conditional in the expanded
   filelist at boost-devel.
