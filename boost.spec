@@ -83,7 +83,6 @@ BuildRequires: python-devel%{?_isa}
 BuildRequires: python3-devel%{?_isa}
 %endif
 BuildRequires: libicu-devel%{?_isa}
-BuildRequires: chrpath
 
 # https://svn.boost.org/trac/boost/ticket/6150
 Patch4: boost-1.50.0-fix-non-utf8-files.patch
