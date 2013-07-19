@@ -34,7 +34,7 @@ Name: boost
 Summary: The free peer-reviewed portable C++ source libraries
 Version: 1.53.0
 %define version_enc 1_53_0
-Release: 7%{?dist}
+Release: 8%{?dist}
 License: Boost and MIT and Python
 
 %define toplev_dirname %{name}_%{version_enc}
@@ -708,17 +708,21 @@ echo ============================= install documentation ==================
 # Prepare the place to temporary store the generated documentation
 rm -rf %{boost_docdir} && %{__mkdir_p} %{boost_docdir}/html
 DOCPATH=%{boost_docdir}
-find libs doc more -type f \( -name \*.htm -o -name \*.html \) \
+DOCREGEX='.*\.\(html?\|css\|png\|gif\)'
+
+find libs doc more -type f -regex $DOCREGEX \
     | sed -n '/\//{s,/[^/]*$,,;p}' \
     | sort -u > tmp-doc-directories
+
 sed "s:^:$DOCPATH/:" tmp-doc-directories \
     | xargs --no-run-if-empty %{__install} -d
+
 cat tmp-doc-directories | while read tobeinstalleddocdir; do
-    find $tobeinstalleddocdir -mindepth 1 -maxdepth 1 -name \*.htm\* \
+    find $tobeinstalleddocdir -mindepth 1 -maxdepth 1 -regex $DOCREGEX \
     | xargs %{__install} -p -m 644 -t $DOCPATH/$tobeinstalleddocdir
 done
 rm -f tmp-doc-directories
-%{__install} -p -m 644 -t $DOCPATH LICENSE_1_0.txt index.htm index.html
+%{__install} -p -m 644 -t $DOCPATH LICENSE_1_0.txt index.htm index.html boost.png rst.css boost.css
 
 echo ============================= install examples ==================
 # Fix a few non-standard issues (DOS and/or non-UTF8 files)
@@ -1090,6 +1094,10 @@ rm -rf $RPM_BUILD_ROOT
 %{_mandir}/man1/bjam.1*
 
 %changelog
+* Fri Jul 19 2013 Petr Machata <pmachata@redhat.com> - 1.53.0-8
+- Install supporting files (images etc.) for documentation
+  (courtesy Marcel Metz, bug 985593)
+
 * Thu Jun 27 2013 Petr Machata <pmachata@redhat.com> - 1.53.0-7
 - Add symlinks for /usr/lib/libboost_{thread,locale}.so -> *-mt.so
 
