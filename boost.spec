@@ -115,6 +115,48 @@ Patch15: boost-1.50.0-pool.patch
 # https://bugzilla.redhat.com/show_bug.cgi?id=909888
 Patch16: boost-1.53.0-context.patch
 
+# https://bugzilla.redhat.com/show_bug.cgi?id=984346
+# https://svn.boost.org/trac/boost/ticket/7242
+Patch17: boost-1.53.0-static_assert-unused_typedef.patch
+
+# https://svn.boost.org/trac/boost/ticket/8826
+Patch22: boost-1.54.0-context-execstack.patch
+
+# https://svn.boost.org/trac/boost/ticket/8844
+Patch23: boost-1.54.0-bind-static_assert.patch
+
+# https://svn.boost.org/trac/boost/ticket/8847
+Patch24: boost-1.54.0-concept-unused_typedef.patch
+
+# https://svn.boost.org/trac/boost/ticket/5637
+Patch25: boost-1.54.0-mpl-print.patch
+
+# https://svn.boost.org/trac/boost/ticket/8859
+Patch26: boost-1.54.0-static_warning-unused_typedef.patch
+
+# https://svn.boost.org/trac/boost/ticket/8855
+Patch27: boost-1.54.0-math-unused_typedef.patch
+Patch28: boost-1.54.0-math-unused_typedef-2.patch
+Patch29: boost-1.53.0-fpclassify-unused_typedef.patch
+
+# https://svn.boost.org/trac/boost/ticket/8853
+Patch30: boost-1.54.0-tuple-unused_typedef.patch
+
+# https://svn.boost.org/trac/boost/ticket/8854
+Patch31: boost-1.54.0-random-unused_typedef.patch
+
+# https://svn.boost.org/trac/boost/ticket/8856
+Patch32: boost-1.54.0-date_time-unused_typedef.patch
+
+# https://svn.boost.org/trac/boost/ticket/8870
+Patch33: boost-1.54.0-spirit-unused_typedef.patch
+
+# https://svn.boost.org/trac/boost/ticket/8871
+Patch34: boost-1.54.0-numeric-unused_typedef.patch
+
+# https://svn.boost.org/trac/boost/ticket/8872
+Patch35: boost-1.54.0-multiprecision-unused_typedef.patch
+
 %bcond_with tests
 %bcond_with docs_generated
 
@@ -523,6 +565,21 @@ a number of significant features and is now developed independently
 %patch10 -p1
 %patch15 -p0
 %patch16 -p1
+%patch17 -p1
+%patch22 -p1
+%patch23 -p1
+%patch24 -p1
+%patch25 -p0
+%patch26 -p1
+%patch27 -p1
+%patch28 -p0
+%patch29 -p1
+%patch30 -p0
+%patch31 -p0
+%patch32 -p0
+%patch33 -p1
+%patch34 -p1
+%patch35 -p1
 
 # At least python2_version needs to be a macro so that it's visible in
 # %%install as well.
@@ -1097,6 +1154,23 @@ rm -rf $RPM_BUILD_ROOT
 * Fri Jul 19 2013 Petr Machata <pmachata@redhat.com> - 1.53.0-8
 - Install supporting files (images etc.) for documentation
   (courtesy Marcel Metz, bug 985593)
+- Add several patches for silencing unused local typedef warnings
+  (boost-1.53.0-static_assert-unused_typedef.patch,
+  boost-1.54.0-bind-static_assert.patch,
+  boost-1.54.0-concept-unused_typedef.patch,
+  boost-1.54.0-static_warning-unused_typedef.patch,
+  boost-1.54.0-math-unused_typedef.patch,
+  boost-1.54.0-math-unused_typedef-2.patch,
+  boost-1.53.0-fpclassify-unused_typedef.patch,
+  boost-1.54.0-tuple-unused_typedef.patch,
+  boost-1.54.0-random-unused_typedef.patch,
+  boost-1.54.0-date_time-unused_typedef.patch,
+  boost-1.54.0-spirit-unused_typedef.patch,
+  boost-1.54.0-numeric-unused_typedef.patch,
+  boost-1.54.0-multiprecision-unused_typedef.patch)
+- Add a patch to turn off execstack in Boost.Context
+  (boost-1.54.0-context-execstack.patch)
+- Fix boost::mpl::print on GCC (boost-1.54.0-mpl-print.patch)
 
 * Thu Jun 27 2013 Petr Machata <pmachata@redhat.com> - 1.53.0-7
 - Add symlinks for /usr/lib/libboost_{thread,locale}.so -> *-mt.so
