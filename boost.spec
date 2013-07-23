@@ -160,30 +160,34 @@ Patch37: boost-1.54.0-numeric-unused_typedef.patch
 # https://svn.boost.org/trac/boost/ticket/8872
 Patch38: boost-1.54.0-multiprecision-unused_typedef.patch
 
-# Backported from 1.54.0:
+# These are already fixed in 1.54.0+
 Patch39: boost-1.53.0-lexical_cast-unused_typedef.patch
 Patch40: boost-1.53.0-regex-unused_typedef.patch
+Patch41: boost-1.53.0-thread-unused_typedef.patch
 
 # https://svn.boost.org/trac/boost/ticket/8874
-Patch41: boost-1.54.0-unordered-unused_typedef.patch
+Patch42: boost-1.54.0-unordered-unused_typedef.patch
 
 # https://svn.boost.org/trac/boost/ticket/8876
-Patch42: boost-1.54.0-algorithm-unused_typedef.patch
+Patch43: boost-1.54.0-algorithm-unused_typedef.patch
 
 # https://svn.boost.org/trac/boost/ticket/8877
-Patch43: boost-1.53.0-graph-unused_typedef.patch
+Patch44: boost-1.53.0-graph-unused_typedef.patch
 
 # https://svn.boost.org/trac/boost/ticket/8878
-Patch44: boost-1.54.0-locale-unused_typedef.patch
+Patch45: boost-1.54.0-locale-unused_typedef.patch
 
 # https://svn.boost.org/trac/boost/ticket/8879
-Patch45: boost-1.54.0-property_tree-unused_typedef.patch
+Patch46: boost-1.54.0-property_tree-unused_typedef.patch
 
 # https://svn.boost.org/trac/boost/ticket/8880
-Patch46: boost-1.54.0-xpressive-unused_typedef.patch
+Patch47: boost-1.54.0-xpressive-unused_typedef.patch
 
 # https://svn.boost.org/trac/boost/ticket/8881
-Patch47: boost-1.54.0-mpi-unused_typedef.patch
+Patch48: boost-1.54.0-mpi-unused_typedef.patch
+
+# https://svn.boost.org/trac/boost/ticket/8888
+Patch49: boost-1.54.0-python-unused_typedef.patch
 
 %bcond_with tests
 %bcond_with docs_generated
@@ -620,6 +624,8 @@ a number of significant features and is now developed independently
 %patch45 -p1
 %patch46 -p1
 %patch47 -p1
+%patch48 -p1
+%patch49 -p1
 
 # At least python2_version needs to be a macro so that it's visible in
 # %%install as well.
@@ -1213,13 +1219,15 @@ rm -rf $RPM_BUILD_ROOT
   boost-1.54.0-multiprecision-unused_typedef.patch,
   boost-1.53.0-lexical_cast-unused_typedef.patch,
   boost-1.53.0-regex-unused_typedef.patch,
+  boost-1.53.0-thread-unused_typedef.patch,
   boost-1.54.0-unordered-unused_typedef.patch,
   boost-1.54.0-algorithm-unused_typedef.patch,
   boost-1.53.0-graph-unused_typedef.patch,
   boost-1.54.0-locale-unused_typedef.patch,
   boost-1.54.0-property_tree-unused_typedef.patch,
   boost-1.54.0-xpressive-unused_typedef.patch,
-  boost-1.54.0-mpi-unused_typedef.patch)
+  boost-1.54.0-mpi-unused_typedef.patch,
+  boost-1.54.0-python-unused_typedef.patch)
 - Add a patch to turn off execstack in Boost.Context
   (boost-1.54.0-context-execstack.patch)
 - Fix boost::mpl::print on GCC (boost-1.54.0-mpl-print.patch)
