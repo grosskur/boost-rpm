@@ -34,7 +34,7 @@ Name: boost
 Summary: The free peer-reviewed portable C++ source libraries
 Version: 1.53.0
 %define version_enc 1_53_0
-Release: 7%{?dist}
+Release: 8%{?dist}
 License: Boost and MIT and Python
 
 %define toplev_dirname %{name}_%{version_enc}
@@ -115,9 +115,83 @@ Patch15: boost-1.50.0-pool.patch
 # https://bugzilla.redhat.com/show_bug.cgi?id=909888
 Patch16: boost-1.53.0-context.patch
 
+# https://bugzilla.redhat.com/show_bug.cgi?id=984346
+# https://svn.boost.org/trac/boost/ticket/7242
+Patch17: boost-1.53.0-static_assert-unused_typedef.patch
+
+# https://svn.boost.org/trac/boost/ticket/8826
+Patch22: boost-1.54.0-context-execstack.patch
+
+# https://svn.boost.org/trac/boost/ticket/8844
+Patch23: boost-1.54.0-bind-static_assert.patch
+
+# https://svn.boost.org/trac/boost/ticket/8847
+Patch24: boost-1.54.0-concept-unused_typedef.patch
+
+# https://svn.boost.org/trac/boost/ticket/5637
+Patch25: boost-1.54.0-mpl-print.patch
+
+# https://svn.boost.org/trac/boost/ticket/8859
+Patch26: boost-1.54.0-static_warning-unused_typedef.patch
+
+# https://svn.boost.org/trac/boost/ticket/8855
+Patch27: boost-1.54.0-math-unused_typedef.patch
+Patch28: boost-1.54.0-math-unused_typedef-2.patch
+Patch29: boost-1.53.0-fpclassify-unused_typedef.patch
+Patch30: boost-1.53.0-math-unused_typedef-3.patch
+
+# https://svn.boost.org/trac/boost/ticket/8853
+Patch31: boost-1.54.0-tuple-unused_typedef.patch
+
+# https://svn.boost.org/trac/boost/ticket/8854
+Patch32: boost-1.54.0-random-unused_typedef.patch
+
+# https://svn.boost.org/trac/boost/ticket/8856
+Patch33: boost-1.54.0-date_time-unused_typedef.patch
+Patch34: boost-1.54.0-date_time-unused_typedef-2.patch
+
+# https://svn.boost.org/trac/boost/ticket/8870
+Patch35: boost-1.54.0-spirit-unused_typedef.patch
+Patch36: boost-1.54.0-spirit-unused_typedef-2.patch
+
+# https://svn.boost.org/trac/boost/ticket/8871
+Patch37: boost-1.54.0-numeric-unused_typedef.patch
+
+# https://svn.boost.org/trac/boost/ticket/8872
+Patch38: boost-1.54.0-multiprecision-unused_typedef.patch
+
+# These are already fixed in 1.54.0+
+Patch39: boost-1.53.0-lexical_cast-unused_typedef.patch
+Patch40: boost-1.53.0-regex-unused_typedef.patch
+Patch41: boost-1.53.0-thread-unused_typedef.patch
+
+# https://svn.boost.org/trac/boost/ticket/8874
+Patch42: boost-1.54.0-unordered-unused_typedef.patch
+
+# https://svn.boost.org/trac/boost/ticket/8876
+Patch43: boost-1.54.0-algorithm-unused_typedef.patch
+
+# https://svn.boost.org/trac/boost/ticket/8877
+Patch44: boost-1.53.0-graph-unused_typedef.patch
+
+# https://svn.boost.org/trac/boost/ticket/8878
+Patch45: boost-1.54.0-locale-unused_typedef.patch
+
+# https://svn.boost.org/trac/boost/ticket/8879
+Patch46: boost-1.54.0-property_tree-unused_typedef.patch
+
+# https://svn.boost.org/trac/boost/ticket/8880
+Patch47: boost-1.54.0-xpressive-unused_typedef.patch
+
+# https://svn.boost.org/trac/boost/ticket/8881
+Patch48: boost-1.54.0-mpi-unused_typedef.patch
+
+# https://svn.boost.org/trac/boost/ticket/8888
+Patch49: boost-1.54.0-python-unused_typedef.patch
+
 # https://bugzilla.redhat.com/show_bug.cgi?id=977098
 # https://svn.boost.org/trac/boost/ticket/8731
-Patch17: boost-1.53.0-__GLIBC_HAVE_LONG_LONG.patch
+Patch50: boost-1.53.0-__GLIBC_HAVE_LONG_LONG.patch
 
 %bcond_with tests
 %bcond_with docs_generated
@@ -528,7 +602,36 @@ a number of significant features and is now developed independently
 %patch10 -p1
 %patch15 -p0
 %patch16 -p1
-%patch17 -p0
+%patch17 -p1
+%patch22 -p1
+%patch23 -p1
+%patch24 -p1
+%patch25 -p0
+%patch26 -p1
+%patch27 -p1
+%patch28 -p0
+%patch29 -p1
+%patch30 -p1
+%patch31 -p0
+%patch32 -p0
+%patch33 -p0
+%patch34 -p1
+%patch35 -p1
+%patch36 -p1
+%patch37 -p1
+%patch38 -p1
+%patch39 -p1
+%patch40 -p1
+%patch41 -p1
+%patch42 -p1
+%patch43 -p1
+%patch44 -p1
+%patch45 -p1
+%patch46 -p1
+%patch47 -p1
+%patch48 -p1
+%patch49 -p1
+%patch50 -p0
 
 # At least python2_version needs to be a macro so that it's visible in
 # %%install as well.
@@ -684,6 +787,15 @@ echo ============================= install serial ==================
 rm -f $RPM_BUILD_ROOT%{_libdir}/libboost_thread-mt.so
 install -p -m 644 $(basename %{SOURCE2}) $RPM_BUILD_ROOT%{_libdir}/
 
+# Add symlinks libboost_{thread,locale,atomic}.so -> *-mt.so
+#  https://bugzilla.redhat.com/show_bug.cgi?id=971956
+ln -s libboost_thread-mt.so $RPM_BUILD_ROOT%{_libdir}/libboost_thread.so
+ln -s libboost_locale-mt.so $RPM_BUILD_ROOT%{_libdir}/libboost_locale.so
+ln -s libboost_atomic-mt.so $RPM_BUILD_ROOT%{_libdir}/libboost_atomic.so
+# Check that we didn't forget about anything.
+find $RPM_BUILD_ROOT%{_libdir} -maxdepth 1 -name libboost_\*-mt.so \
+	| while read a; do test -e ${a/-mt/} || exit 1; done
+
 echo ============================= install Boost.Build ==================
 (cd tools/build/v2
  ./b2 --prefix=$RPM_BUILD_ROOT%{_prefix} install
@@ -705,17 +817,21 @@ echo ============================= install documentation ==================
 # Prepare the place to temporary store the generated documentation
 rm -rf %{boost_docdir} && %{__mkdir_p} %{boost_docdir}/html
 DOCPATH=%{boost_docdir}
-find libs doc more -type f \( -name \*.htm -o -name \*.html \) \
+DOCREGEX='.*\.\(html?\|css\|png\|gif\)'
+
+find libs doc more -type f -regex $DOCREGEX \
     | sed -n '/\//{s,/[^/]*$,,;p}' \
     | sort -u > tmp-doc-directories
+
 sed "s:^:$DOCPATH/:" tmp-doc-directories \
     | xargs --no-run-if-empty %{__install} -d
+
 cat tmp-doc-directories | while read tobeinstalleddocdir; do
-    find $tobeinstalleddocdir -mindepth 1 -maxdepth 1 -name \*.htm\* \
+    find $tobeinstalleddocdir -mindepth 1 -maxdepth 1 -regex $DOCREGEX \
     | xargs %{__install} -p -m 644 -t $DOCPATH/$tobeinstalleddocdir
 done
 rm -f tmp-doc-directories
-%{__install} -p -m 644 -t $DOCPATH LICENSE_1_0.txt index.htm index.html
+%{__install} -p -m 644 -t $DOCPATH LICENSE_1_0.txt index.htm index.html boost.png rst.css boost.css
 
 echo ============================= install examples ==================
 # Fix a few non-standard issues (DOS and/or non-UTF8 files)
@@ -985,7 +1101,7 @@ rm -rf $RPM_BUILD_ROOT
 %defattr(-, root, root, -)
 %doc LICENSE_1_0.txt
 %{_includedir}/%{name}
-%{_libdir}/libboost_atomic-mt.so
+%{_libdir}/libboost_atomic*.so
 %{_libdir}/libboost_chrono*.so
 %if %{with context}
 %{_libdir}/libboost_context*.so
@@ -1008,7 +1124,7 @@ rm -rf $RPM_BUILD_ROOT
 %{_libdir}/libboost_wserialization*.so
 %{_libdir}/libboost_signals*.so
 %{_libdir}/libboost_system*.so
-%{_libdir}/libboost_thread-mt.so
+%{_libdir}/libboost_thread*.so
 %{_libdir}/libboost_timer*.so
 %{_libdir}/libboost_wave*.so
 
@@ -1087,6 +1203,42 @@ rm -rf $RPM_BUILD_ROOT
 %{_mandir}/man1/bjam.1*
 
 %changelog
+* Fri Jul 19 2013 Petr Machata <pmachata@redhat.com> - 1.53.0-8
+- Install supporting files (images etc.) for documentation
+  (courtesy Marcel Metz, bug 985593)
+- Add many patches for silencing unused local typedef warnings
+  (boost-1.53.0-static_assert-unused_typedef.patch,
+  boost-1.54.0-bind-static_assert.patch,
+  boost-1.54.0-concept-unused_typedef.patch,
+  boost-1.54.0-static_warning-unused_typedef.patch,
+  boost-1.54.0-math-unused_typedef.patch,
+  boost-1.54.0-math-unused_typedef-2.patch,
+  boost-1.53.0-fpclassify-unused_typedef.patch,
+  boost-1.54.0-math-unused_typedef-3.patch,
+  boost-1.54.0-tuple-unused_typedef.patch,
+  boost-1.54.0-random-unused_typedef.patch,
+  boost-1.54.0-date_time-unused_typedef.patch,
+  boost-1.54.0-date_time-unused_typedef-2.patch,
+  boost-1.54.0-spirit-unused_typedef.patch,
+  boost-1.54.0-spirit-unused_typedef-2.patch,
+  boost-1.54.0-numeric-unused_typedef.patch,
+  boost-1.54.0-multiprecision-unused_typedef.patch,
+  boost-1.53.0-lexical_cast-unused_typedef.patch,
+  boost-1.53.0-regex-unused_typedef.patch,
+  boost-1.53.0-thread-unused_typedef.patch,
+  boost-1.54.0-unordered-unused_typedef.patch,
+  boost-1.54.0-algorithm-unused_typedef.patch,
+  boost-1.53.0-graph-unused_typedef.patch,
+  boost-1.54.0-locale-unused_typedef.patch,
+  boost-1.54.0-property_tree-unused_typedef.patch,
+  boost-1.54.0-xpressive-unused_typedef.patch,
+  boost-1.54.0-mpi-unused_typedef.patch,
+  boost-1.54.0-python-unused_typedef.patch)
+- Add a patch to turn off execstack in Boost.Context
+  (boost-1.54.0-context-execstack.patch)
+- Fix boost::mpl::print on GCC (boost-1.54.0-mpl-print.patch)
+- Add symlinks for /usr/lib/libboost_{thread,locale}.so -> *-mt.so
+
 * Wed Jun 26 2013 Petr Machata <pmachata@redhat.com> - 1.53.0-7
 - Fix detection of availability of {,u}int64_t in glibc headers.
   (boost-1.53.0-__GLIBC_HAVE_LONG_LONG.patch)
