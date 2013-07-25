@@ -34,7 +34,7 @@ Name: boost
 Summary: The free peer-reviewed portable C++ source libraries
 Version: 1.53.0
 %define version_enc 1_53_0
-Release: 9%{?dist}
+Release: 10%{?dist}
 License: Boost and MIT and Python
 
 %define toplev_dirname %{name}_%{version_enc}
@@ -544,6 +544,8 @@ Group: System Environment/Libraries
 Requires: mpich
 BuildRequires: mpich-devel
 Requires: boost-serialization = %{version}-%{release}
+Provides: %{name}-mpich2 = %{version}-%{release}
+Obsoletes: %{name}-mpich2 < 1.53.0-9
 
 %description mpich
 
@@ -557,6 +559,8 @@ Requires: boost-devel = %{version}-%{release}
 Requires: boost-mpich = %{version}-%{release}
 Requires: boost-mpich-python = %{version}-%{release}
 Requires: boost-graph-mpich = %{version}-%{release}
+Provides: %{name}-mpich2-devel = %{version}-%{release}
+Obsoletes: %{name}-mpich2-devel < 1.53.0-9
 
 %description mpich-devel
 
@@ -569,6 +573,8 @@ Group: System Environment/Libraries
 Requires: boost-mpich = %{version}-%{release}
 Requires: boost-python = %{version}-%{release}
 Requires: boost-serialization = %{version}-%{release}
+Provides: %{name}-mpich2-python = %{version}-%{release}
+Obsoletes: %{name}-mpich2-python < 1.53.0-9
 
 %description mpich-python
 
@@ -580,6 +586,8 @@ Summary: Run-Time component of parallel boost graph library
 Group: System Environment/Libraries
 Requires: boost-mpich = %{version}-%{release}
 Requires: boost-serialization = %{version}-%{release}
+Provides: %{name}-graph-mpich2 = %{version}-%{release}
+Obsoletes: %{name}-graph-mpich2 < 1.53.0-9
 
 %description graph-mpich
 
@@ -1225,6 +1233,9 @@ rm -rf $RPM_BUILD_ROOT
 %{_mandir}/man1/bjam.1*
 
 %changelog
+* Thu Jul 25 2013 Deji Akingunola <dakingun@gmail.com> - 1.53.0-10
+- Add Provides and Obsoletes for the mpich2->mpich renames
+
 * Wed Jul 24 2013 Petr Machata <pmachata@redhat.com> - 1.53.0-9
 - Add explicit dependencies between some of the boost sub-packages
 
