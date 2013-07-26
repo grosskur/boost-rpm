@@ -81,9 +81,9 @@ diff -up boost-1.54.0/libs/context/src/asm/make_mips32_o32_elf_gas.S~ boost-1.54
 diff -up boost-1.54.0/libs/context/src/asm/make_ppc32_sysv_elf_gas.S~ boost-1.54.0/libs/context/src/asm/make_ppc32_sysv_elf_gas.S
 --- boost-1.54.0/libs/context/src/asm/make_ppc32_sysv_elf_gas.S~	2013-05-08 22:40:43.000000000 -0700
 +++ boost-1.54.0/libs/context/src/asm/make_ppc32_sysv_elf_gas.S	2013-07-15 11:11:20.247400344 -0700
-@@ -108,3 +108,6 @@ finish:
+@@ -109,3 +109,6 @@ finish:
+     li      %r3,  0             # exit code is zero
      bl      _exit@plt           # exit application
-     .long   0                   # We should never get here, so SIGILL if we do
  .size make_fcontext, .-make_fcontext
 +
 +/* Mark that we don't need executable stack.  */
@@ -91,10 +91,30 @@ diff -up boost-1.54.0/libs/context/src/asm/make_ppc32_sysv_elf_gas.S~ boost-1.54
 diff -up boost-1.54.0/libs/context/src/asm/make_ppc64_sysv_elf_gas.S~ boost-1.54.0/libs/context/src/asm/make_ppc64_sysv_elf_gas.S
 --- boost-1.54.0/libs/context/src/asm/make_ppc64_sysv_elf_gas.S~	2013-05-08 22:40:43.000000000 -0700
 +++ boost-1.54.0/libs/context/src/asm/make_ppc64_sysv_elf_gas.S	2013-07-15 11:11:13.400363259 -0700
-@@ -130,3 +130,6 @@ finish:
-     nop                         # nop is required by the linker
-     .long   0                   # We should never get here, so SIGILL if we do
+@@ -131,3 +131,6 @@ finish:
+     bl      _exit               # exit application
+     nop
  .size .make_fcontext, .-.make_fcontext
++
++/* Mark that we don't need executable stack.  */
++.section .note.GNU-stack,"",@progbits
+diff -up boost-1.54.0/libs/context/src/asm/make_sparc64_sysv_elf_gas.S~ boost-1.54.0/libs/context/src/asm/make_sparc64_sysv_elf_gas.S
+--- boost-1.54.0/libs/context/src/asm/make_sparc64_sysv_elf_gas.S~	2013-02-12 04:55:22.000000000 -0800
++++ boost-1.54.0/libs/context/src/asm/make_sparc64_sysv_elf_gas.S	2013-07-15 11:12:41.643838416 -0700
+@@ -84,3 +84,6 @@ finish:
+      nop
+ 
+ .size make_fcontext,.-make_fcontext
++
++/* Mark that we don't need executable stack.  */
++.section .note.GNU-stack,"",@progbits
+diff -up boost-1.54.0/libs/context/src/asm/make_sparc_sysv_elf_gas.S~ boost-1.54.0/libs/context/src/asm/make_sparc_sysv_elf_gas.S
+--- boost-1.54.0/libs/context/src/asm/make_sparc_sysv_elf_gas.S~	2013-02-12 04:55:22.000000000 -0800
++++ boost-1.54.0/libs/context/src/asm/make_sparc_sysv_elf_gas.S	2013-07-15 11:12:48.733876794 -0700
+@@ -80,3 +80,6 @@ finish:
+      nop
+ 
+ .size make_fcontext,.-make_fcontext
 +
 +/* Mark that we don't need executable stack.  */
 +.section .note.GNU-stack,"",@progbits

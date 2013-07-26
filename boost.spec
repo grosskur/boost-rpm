@@ -32,14 +32,15 @@
 
 Name: boost
 Summary: The free peer-reviewed portable C++ source libraries
-Version: 1.53.0
-%define version_enc 1_53_0
-Release: 12%{?dist}
+Version: 1.54.0
+%define version_enc 1_54_0
+Release: 1%{?dist}
 License: Boost and MIT and Python
 
 %define toplev_dirname %{name}_%{version_enc}
 URL: http://www.boost.org
 Group: System Environment/Libraries
+
 Source0: http://downloads.sourceforge.net/%{name}/%{toplev_dirname}.tar.bz2
 Source1: ver.py
 Source2: libboost_thread.so
@@ -87,36 +88,29 @@ BuildRequires: libicu-devel%{?_isa}
 # https://svn.boost.org/trac/boost/ticket/6150
 Patch4: boost-1.50.0-fix-non-utf8-files.patch
 
-# Add a manual page for the sole executable, namely bjam, based on the
-# on-line documentation:
+# Add a manual page for bjam, based on the on-line documentation:
 # http://www.boost.org/boost-build2/doc/html/bbv2/overview.html
 Patch5: boost-1.48.0-add-bjam-man-page.patch
 
-# https://bugzilla.redhat.com/show_bug.cgi?id=756005
-# https://svn.boost.org/trac/boost/ticket/6131
-Patch7: boost-1.50.0-foreach.patch
-
 # https://bugzilla.redhat.com/show_bug.cgi?id=781859
-# The following tickets have still to be fixed by upstream.
-# https://svn.boost.org/trac/boost/ticket/6408
-# https://svn.boost.org/trac/boost/ticket/6410
+# The following tickets have yet to be fixed by upstream.
 # https://svn.boost.org/trac/boost/ticket/6413
+# https://svn.boost.org/trac/boost/ticket/8849
 Patch9: boost-1.53.0-attribute.patch
-
-# https://bugzilla.redhat.com/show_bug.cgi?id=783660
-# https://svn.boost.org/trac/boost/ticket/6459 fixed
-Patch10: boost-1.50.0-long-double-1.patch
 
 # https://bugzilla.redhat.com/show_bug.cgi?id=828856
 # https://bugzilla.redhat.com/show_bug.cgi?id=828857
 Patch15: boost-1.50.0-pool.patch
 
-# https://bugzilla.redhat.com/show_bug.cgi?id=909888
-Patch16: boost-1.53.0-context.patch
+# https://bugzilla.redhat.com/show_bug.cgi?id=977098
+# https://svn.boost.org/trac/boost/ticket/8731
+Patch18: boost-1.54.0-__GLIBC_HAVE_LONG_LONG.patch
 
-# https://bugzilla.redhat.com/show_bug.cgi?id=984346
-# https://svn.boost.org/trac/boost/ticket/7242
-Patch17: boost-1.53.0-static_assert-unused_typedef.patch
+# Upstream patches posted as release notes:
+# http://www.boost.org/users/history/version_1_54_0.html
+Patch19: 001-coroutine.patch
+Patch20: 002-date-time.patch
+Patch21: 003-log.patch
 
 # https://svn.boost.org/trac/boost/ticket/8826
 Patch22: boost-1.54.0-context-execstack.patch
@@ -136,8 +130,6 @@ Patch26: boost-1.54.0-static_warning-unused_typedef.patch
 # https://svn.boost.org/trac/boost/ticket/8855
 Patch27: boost-1.54.0-math-unused_typedef.patch
 Patch28: boost-1.54.0-math-unused_typedef-2.patch
-Patch29: boost-1.53.0-fpclassify-unused_typedef.patch
-Patch30: boost-1.53.0-math-unused_typedef-3.patch
 
 # https://svn.boost.org/trac/boost/ticket/8853
 Patch31: boost-1.54.0-tuple-unused_typedef.patch
@@ -159,11 +151,6 @@ Patch37: boost-1.54.0-numeric-unused_typedef.patch
 # https://svn.boost.org/trac/boost/ticket/8872
 Patch38: boost-1.54.0-multiprecision-unused_typedef.patch
 
-# These are already fixed in 1.54.0+
-Patch39: boost-1.53.0-lexical_cast-unused_typedef.patch
-Patch40: boost-1.53.0-regex-unused_typedef.patch
-Patch41: boost-1.53.0-thread-unused_typedef.patch
-
 # https://svn.boost.org/trac/boost/ticket/8874
 Patch42: boost-1.54.0-unordered-unused_typedef.patch
 
@@ -171,7 +158,7 @@ Patch42: boost-1.54.0-unordered-unused_typedef.patch
 Patch43: boost-1.54.0-algorithm-unused_typedef.patch
 
 # https://svn.boost.org/trac/boost/ticket/8877
-Patch44: boost-1.53.0-graph-unused_typedef.patch
+Patch44: boost-1.54.0-graph-unused_typedef.patch
 
 # https://svn.boost.org/trac/boost/ticket/8878
 Patch45: boost-1.54.0-locale-unused_typedef.patch
@@ -187,10 +174,6 @@ Patch48: boost-1.54.0-mpi-unused_typedef.patch
 
 # https://svn.boost.org/trac/boost/ticket/8888
 Patch49: boost-1.54.0-python-unused_typedef.patch
-
-# https://bugzilla.redhat.com/show_bug.cgi?id=977098
-# https://svn.boost.org/trac/boost/ticket/8731
-Patch50: boost-1.53.0-__GLIBC_HAVE_LONG_LONG.patch
 
 %bcond_with tests
 %bcond_with docs_generated
@@ -635,15 +618,14 @@ a number of significant features and is now developed independently
 %prep
 %setup -q -n %{toplev_dirname}
 
-# Fixes
 %patch4 -p1
 %patch5 -p1
-%patch7 -p2
 %patch9 -p1
-%patch10 -p1
 %patch15 -p0
-%patch16 -p1
-%patch17 -p1
+%patch18 -p1
+%patch19 -p1
+%patch20 -p1
+%patch21 -p1
 %patch22 -p1
 %patch23 -p1
 %patch24 -p1
@@ -651,8 +633,6 @@ a number of significant features and is now developed independently
 %patch26 -p1
 %patch27 -p1
 %patch28 -p0
-%patch29 -p1
-%patch30 -p1
 %patch31 -p0
 %patch32 -p0
 %patch33 -p0
@@ -661,9 +641,6 @@ a number of significant features and is now developed independently
 %patch36 -p1
 %patch37 -p1
 %patch38 -p1
-%patch39 -p1
-%patch40 -p1
-%patch41 -p1
 %patch42 -p1
 %patch43 -p1
 %patch44 -p1
@@ -672,7 +649,6 @@ a number of significant features and is now developed independently
 %patch47 -p1
 %patch48 -p1
 %patch49 -p1
-%patch50 -p0
 
 # At least python2_version needs to be a macro so that it's visible in
 # %%install as well.
@@ -720,7 +696,7 @@ echo ============================= build serial ==================
 ./b2 -d+2 -q %{?_smp_mflags} \
 	--without-mpi --without-graph_parallel --build-dir=serial \
 %if !%{with context}
-    	--without-context \
+	--without-context --without-coroutine \
 %endif
 	variant=release threading=multi debug-symbols=on pch=off \
 	python=%{python2_version} stage
@@ -769,7 +745,6 @@ echo ============================= build Boost.Build ==================
 
 %install
 rm -rf $RPM_BUILD_ROOT
-
 cd %{_builddir}/%{toplev_dirname}
 
 %if %{with openmpi} || %{with mpich}
@@ -780,6 +755,8 @@ module purge ||:
 
 %if %{with openmpi}
 %{_openmpi_load}
+# XXX We want to extract this from RPM flags
+# b2 instruction-set=i686 etc.
 echo ============================= install $MPI_COMPILER ==================
 ./b2 -q %{?_smp_mflags} \
 	--with-mpi --with-graph_parallel --build-dir=$MPI_COMPILER \
@@ -814,7 +791,7 @@ echo ============================= install serial ==================
 ./b2 -d+2 -q %{?_smp_mflags} \
 	--without-mpi --without-graph_parallel --build-dir=serial \
 %if !%{with context}
-    	--without-context \
+	--without-context --without-coroutine \
 %endif
 	--prefix=$RPM_BUILD_ROOT%{_prefix} \
 	--libdir=$RPM_BUILD_ROOT%{_libdir} \
@@ -826,15 +803,6 @@ echo ============================= install serial ==================
 [ -f $RPM_BUILD_ROOT%{_libdir}/libboost_thread.so ] # Must be present
 rm -f $RPM_BUILD_ROOT%{_libdir}/libboost_thread.so
 install -p -m 644 $(basename %{SOURCE2}) $RPM_BUILD_ROOT%{_libdir}/
-
-# Add symlinks libboost_{thread,locale,atomic}.so -> *-mt.so
-#  https://bugzilla.redhat.com/show_bug.cgi?id=971956
-ln -s libboost_thread-mt.so $RPM_BUILD_ROOT%{_libdir}/libboost_thread.so
-ln -s libboost_locale-mt.so $RPM_BUILD_ROOT%{_libdir}/libboost_locale.so
-ln -s libboost_atomic-mt.so $RPM_BUILD_ROOT%{_libdir}/libboost_atomic.so
-# Check that we didn't forget about anything.
-find $RPM_BUILD_ROOT%{_libdir} -maxdepth 1 -name libboost_\*-mt.so \
-	| while read a; do test -e ${a/-mt/} || exit 1; done
 
 echo ============================= install Boost.Build ==================
 (cd tools/build/v2
@@ -1249,6 +1217,25 @@ rm -rf $RPM_BUILD_ROOT
 %{_mandir}/man1/bjam.1*
 
 %changelog
+* Thu Jul 18 2013 Petr Machata <pmachata@redhat.com> - 1.54.0-1
+- Rebase to 1.54.0
+  - Boost.Coroutine is only enabled if Boost.Context is
+  - Drop boost-1.53-context.patch (interesting parts now upstream)
+  - Drop boost-1.50.0-foreach.patch (#define foreach now discouraged)
+  - Drop several unused typedef patches that are now upstream.
+    (boost-1.53.0-static_assert-unused_typedef.patch,
+    boost-1.53.0-fpclassify-unused_typedef.patch,
+    boost-1.53.0-math-unused_typedef-3.patch,
+    boost-1.53.0-lexical_cast-unused_typedef.patch,
+    boost-1.53.0-regex-unused_typedef.patch,
+    boost-1.53.0-thread-unused_typedef.patch)
+  - Add release notes patches (001-coroutine.patch,
+    002-date-time.patch, 003-log.patch)
+  - Add additional unused typedefs in Boost.Math
+    (boost-1.54.0-math-unused_typedef-2.patch)
+- Drop symlinks from libboost_{thread,locale,atomic}.so -> *-mt.so,
+  which we don't need anymore, as we ditched the tagged layout.
+
 * Fri Jul 26 2013 Petr Machata <pmachata@redhat.com> - 1.53.0-12
 - There's no physical difference between single-threaded and
   multi-threaded builds, except some libraries are only built in
