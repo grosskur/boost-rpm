@@ -1217,7 +1217,7 @@ rm -rf $RPM_BUILD_ROOT
 %{_mandir}/man1/bjam.1*
 
 %changelog
-* Thu Jul 18 2013 Petr Machata <pmachata@redhat.com> - 1.54.0-1
+* Fri Jul 26 2013 Petr Machata <pmachata@redhat.com> - 1.54.0-1
 - Rebase to 1.54.0
   - Boost.Coroutine is only enabled if Boost.Context is
   - Drop boost-1.53-context.patch (interesting parts now upstream)
