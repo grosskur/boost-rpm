@@ -63,6 +63,7 @@ Requires: boost-filesystem = %{version}-%{release}
 Requires: boost-graph = %{version}-%{release}
 Requires: boost-iostreams = %{version}-%{release}
 Requires: boost-locale = %{version}-%{release}
+Requires: boost-log = %{version}-%{release}
 Requires: boost-math = %{version}-%{release}
 Requires: boost-program-options = %{version}-%{release}
 Requires: boost-python = %{version}-%{release}
@@ -270,6 +271,16 @@ Requires: boost-thread = %{version}-%{release}
 
 Run-Time support for Boost.Locale, a set of localization and Unicode
 handling tools.
+
+%package log
+Summary: Run-Time component of boost logging library
+Group: System Environment/Libraries
+
+%description log
+
+Boost.Log library aims to make logging significantly easier for the
+application developer.  It provides a wide range of out-of-the-box
+tools along with public interfaces for extending the library.
 
 %package math
 Summary: Math functions for boost TR1 library
@@ -925,6 +936,10 @@ rm -rf $RPM_BUILD_ROOT
 
 %postun locale -p /sbin/ldconfig
 
+%post log -p /sbin/ldconfig
+
+%postun log -p /sbin/ldconfig
+
 %post math -p /sbin/ldconfig
 
 %postun math -p /sbin/ldconfig
@@ -1020,6 +1035,12 @@ rm -rf $RPM_BUILD_ROOT
 %defattr(-, root, root, -)
 %doc LICENSE_1_0.txt
 %{_libdir}/libboost_locale.so.%{sonamever}
+
+%files log
+%defattr(-, root, root, -)
+%doc LICENSE_1_0.txt
+%{_libdir}/libboost_log.so.%{sonamever}
+%{_libdir}/libboost_log_setup.so.%{sonamever}
 
 %files math
 %defattr(-, root, root, -)
@@ -1122,6 +1143,8 @@ rm -rf $RPM_BUILD_ROOT
 %{_libdir}/libboost_graph.so
 %{_libdir}/libboost_iostreams.so
 %{_libdir}/libboost_locale.so
+%{_libdir}/libboost_log.so
+%{_libdir}/libboost_log_setup.so
 %{_libdir}/libboost_math_tr1.so
 %{_libdir}/libboost_math_tr1f.so
 %{_libdir}/libboost_math_tr1l.so
@@ -1219,6 +1242,7 @@ rm -rf $RPM_BUILD_ROOT
 %changelog
 * Fri Jul 26 2013 Petr Machata <pmachata@redhat.com> - 1.54.0-1
 - Rebase to 1.54.0
+  - Add new sub-package boost-log
   - Boost.Coroutine is only enabled if Boost.Context is
   - Drop boost-1.53-context.patch (interesting parts now upstream)
   - Drop boost-1.50.0-foreach.patch (#define foreach now discouraged)
