@@ -34,7 +34,7 @@ Name: boost
 Summary: The free peer-reviewed portable C++ source libraries
 Version: 1.54.0
 %define version_enc 1_54_0
-Release: 1%{?dist}
+Release: 2%{?dist}
 License: Boost and MIT and Python
 
 %define toplev_dirname %{name}_%{version_enc}
@@ -175,6 +175,9 @@ Patch48: boost-1.54.0-mpi-unused_typedef.patch
 
 # https://svn.boost.org/trac/boost/ticket/8888
 Patch49: boost-1.54.0-python-unused_typedef.patch
+
+# https://svn.boost.org/trac/boost/ticket/8941
+Patch50: boost-1.54.0-lexical_cast-int128.patch
 
 %bcond_with tests
 %bcond_with docs_generated
@@ -660,6 +663,7 @@ a number of significant features and is now developed independently
 %patch47 -p1
 %patch48 -p1
 %patch49 -p1
+%patch50 -p0
 
 # At least python2_version needs to be a macro so that it's visible in
 # %%install as well.
@@ -1240,6 +1244,10 @@ rm -rf $RPM_BUILD_ROOT
 %{_mandir}/man1/bjam.1*
 
 %changelog
+* Tue Jul 30 2013 Petr Machata <pmachata@redhat.com> - 1.54.0-2
+- Fix detection of availability of 128-bit integers in
+  Boost.LexicalCast (boost-1.54.0-lexical_cast-int128.patch)
+
 * Fri Jul 26 2013 Petr Machata <pmachata@redhat.com> - 1.54.0-1
 - Rebase to 1.54.0
   - Add new sub-package boost-log
