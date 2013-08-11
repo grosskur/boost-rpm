@@ -1,7 +1,7 @@
-# Support for documentation installation
-# As the %%doc macro erases the target directory, namely
-# $RPM_BUILD_ROOT%%{_docdir}/%%{name}-%%{version}, manually installed
-# documentation must be saved into a temporary dedicated directory.
+# Support for documentation installation As the %%doc macro erases the
+# target directory ($RPM_BUILD_ROOT%%{_docdir}/%%{name}), manually
+# installed documentation must be saved into a temporary dedicated
+# directory.
 %define boost_docdir __tmp_docdir
 %define boost_examplesdir __tmp_examplesdir
 
