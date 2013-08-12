@@ -2,6 +2,8 @@
 # target directory ($RPM_BUILD_ROOT%%{_docdir}/%%{name}), manually
 # installed documentation must be saved into a temporary dedicated
 # directory.
+# XXX note that as of rpm 4.9.1, this shouldn't be necessary anymore.
+# We should be able to install directly.
 %define boost_docdir __tmp_docdir
 %define boost_examplesdir __tmp_examplesdir
 
