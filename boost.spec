@@ -190,6 +190,9 @@ Patch52: boost-1.54.0-thread-cond_variable_shadow.patch
 # This was already fixed upstream, so no tracking bug.
 Patch53: boost-1.54.0-pool-max_chunks_shadow.patch
 
+# https://svn.boost.org/trac/boost/ticket/9041
+Patch54: boost-1.54.0-thread-link_atomic.patch
+
 %bcond_with tests
 %bcond_with docs_generated
 
@@ -678,6 +681,7 @@ a number of significant features and is now developed independently
 %patch51 -p1
 %patch52 -p1
 %patch53 -p1
+%patch54 -p1
 
 # At least python2_version needs to be a macro so that it's visible in
 # %%install as well.
@@ -1263,8 +1267,10 @@ rm -rf $RPM_BUILD_ROOT
   (boost-1.54.0-pool-test_linking.patch)
 - Fix -Wshadow warnings in Boost.Pool
   (boost-1.54.0-pool-max_chunks_shadow.patch)
- -Wshadow warnings in Boost.Thread
+- -Wshadow warnings in Boost.Thread
   (boost-1.54.0-thread-cond_variable_shadow.patch)
+- libboost_thread.so.* lacks DT_NEEDED on libboost_atomic.so.* on
+  s390.  (boost-1.54.0-thread-link_atomic.patch)
 
 * Mon Aug 19 2013 Petr Machata <pmachata@redhat.com> - 1.54.0-3
 - Bump odeint obsoletes and provides a notch to cover a build that
