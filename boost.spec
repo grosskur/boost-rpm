@@ -36,7 +36,7 @@ Name: boost
 Summary: The free peer-reviewed portable C++ source libraries
 Version: 1.54.0
 %define version_enc 1_54_0
-Release: 3%{?dist}
+Release: 4%{?dist}
 License: Boost and MIT and Python
 
 %define toplev_dirname %{name}_%{version_enc}
@@ -180,6 +180,15 @@ Patch49: boost-1.54.0-python-unused_typedef.patch
 
 # https://svn.boost.org/trac/boost/ticket/8941
 Patch50: boost-1.54.0-lexical_cast-int128.patch
+
+# https://svn.boost.org/trac/boost/ticket/9038
+Patch51: boost-1.54.0-pool-test_linking.patch
+
+# https://svn.boost.org/trac/boost/ticket/9037
+Patch52: boost-1.54.0-thread-cond_variable_shadow.patch
+
+# This was already fixed upstream, so no tracking bug.
+Patch53: boost-1.54.0-pool-max_chunks_shadow.patch
 
 %bcond_with tests
 %bcond_with docs_generated
@@ -666,6 +675,9 @@ a number of significant features and is now developed independently
 %patch48 -p1
 %patch49 -p1
 %patch50 -p0
+%patch51 -p1
+%patch52 -p1
+%patch53 -p1
 
 # At least python2_version needs to be a macro so that it's visible in
 # %%install as well.
@@ -1246,6 +1258,14 @@ rm -rf $RPM_BUILD_ROOT
 %{_mandir}/man1/bjam.1*
 
 %changelog
+* Fri Aug 23 2013 Petr Machata <pmachata@redhat.com> - 1.54.0-4
+- Fix compilation of Boost.Pool test cases
+  (boost-1.54.0-pool-test_linking.patch)
+- Fix -Wshadow warnings in Boost.Pool
+  (boost-1.54.0-pool-max_chunks_shadow.patch)
+ -Wshadow warnings in Boost.Thread
+  (boost-1.54.0-thread-cond_variable_shadow.patch)
+
 * Mon Aug 19 2013 Petr Machata <pmachata@redhat.com> - 1.54.0-3
 - Bump odeint obsoletes and provides a notch to cover a build that
   sneaked into rawhide (bug 892850).
