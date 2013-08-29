@@ -36,7 +36,7 @@ Name: boost
 Summary: The free peer-reviewed portable C++ source libraries
 Version: 1.54.0
 %define version_enc 1_54_0
-Release: 4%{?dist}
+Release: 5%{?dist}
 License: Boost and MIT and Python
 
 %define toplev_dirname %{name}_%{version_enc}
@@ -192,6 +192,10 @@ Patch53: boost-1.54.0-pool-max_chunks_shadow.patch
 
 # https://svn.boost.org/trac/boost/ticket/9041
 Patch54: boost-1.54.0-thread-link_atomic.patch
+
+# https://bugzilla.redhat.com/show_bug.cgi?id=1002578
+# https://svn.boost.org/trac/boost/ticket/9065
+Patch55: boost-1.54.0-interprocess-atomic_cas32-ppc.patch
 
 %bcond_with tests
 %bcond_with docs_generated
@@ -682,6 +686,7 @@ a number of significant features and is now developed independently
 %patch52 -p1
 %patch53 -p1
 %patch54 -p1
+%patch55 -p1
 
 # At least python2_version needs to be a macro so that it's visible in
 # %%install as well.
@@ -1262,6 +1267,10 @@ rm -rf $RPM_BUILD_ROOT
 %{_mandir}/man1/bjam.1*
 
 %changelog
+* Thu Aug 29 2013 Petr Machata <pmachata@redhat.com> - 1.54.0-5
+- Fix atomic_cas32 (thanks Jaroslav Škarvada for figuring out where
+  the problem is) (boost-1.54.0-interprocess-atomic_cas32-ppc.patch)
+
 * Fri Aug 23 2013 Petr Machata <pmachata@redhat.com> - 1.54.0-4
 - Fix compilation of Boost.Pool test cases
   (boost-1.54.0-pool-test_linking.patch)
