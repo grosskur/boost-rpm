@@ -10,3 +10,12 @@
 
 INPUT(libboost_thread.so.%{version})
 INPUT(libboost_system.so.%{version})
+
+#ifndef HAS_ATOMIC_FLAG_LOCKFREE
+
+/* If the given architecture doesn't have lock-free implementation of
+   boost::atomic_flag, the dependency on Boost.Atomic may leak from
+   the header files to client binaries.  */
+
+INPUT(libboost_atomic.so.%{version})
+#endif

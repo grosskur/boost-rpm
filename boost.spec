@@ -36,7 +36,7 @@ Name: boost
 Summary: The free peer-reviewed portable C++ source libraries
 Version: 1.54.0
 %define version_enc 1_54_0
-Release: 5%{?dist}
+Release: 6%{?dist}
 License: Boost and MIT and Python
 
 %define toplev_dirname %{name}_%{version_enc}
@@ -716,7 +716,6 @@ using python : %{python3_version} : /usr/bin/python3 : /usr/include/python%{pyth
 EOF
 
 ./bootstrap.sh --with-toolset=gcc --with-icu
-sed 's/%%{version}/%{version}/g' %{SOURCE2} > $(basename %{SOURCE2})
 
 # N.B. When we build the following with PCH, parts of boost (math
 # library in particular) end up being built second time during
@@ -738,6 +737,17 @@ echo ============================= build serial ==================
 %endif
 	variant=release threading=multi debug-symbols=on pch=off \
 	python=%{python2_version} stage
+
+# See boost-1.54.0-thread-link_atomic.patch for where this file comes
+# from.
+if [ -e serial/boost/bin.v2/libs/thread/build/gcc-4.6.3/debug/threading-multi/has_atomic_flag_lockfree ]; then
+	DEF=D
+else
+	DEF=U
+fi
+
+sed 's/%%{version}/%{version}/g' %{SOURCE2} |
+	cpp -C -P -${DEF}HAS_ATOMIC_FLAG_LOCKFREE > $(basename %{SOURCE2})
 
 # Build MPI parts of Boost with OpenMPI support
 
@@ -870,11 +880,11 @@ find libs doc more -type f -regex $DOCREGEX \
     | sort -u > tmp-doc-directories
 
 sed "s:^:$DOCPATH/:" tmp-doc-directories \
-    | xargs --no-run-if-empty %{__install} -d
+    | xargs -P 0 --no-run-if-empty %{__install} -d
 
 cat tmp-doc-directories | while read tobeinstalleddocdir; do
     find $tobeinstalleddocdir -mindepth 1 -maxdepth 1 -regex $DOCREGEX \
-    | xargs %{__install} -p -m 644 -t $DOCPATH/$tobeinstalleddocdir
+    | xargs -P 0 %{__install} -p -m 644 -t $DOCPATH/$tobeinstalleddocdir
 done
 rm -f tmp-doc-directories
 %{__install} -p -m 644 -t $DOCPATH LICENSE_1_0.txt index.htm index.html boost.png rst.css boost.css
@@ -901,7 +911,7 @@ find libs -type d -name example -exec find {} -type f \; \
     | sed -n '/\//{s,/[^/]*$,,;p}' \
     | sort -u > tmp-doc-directories
 sed "s:^:$EXAMPLESPATH/:" tmp-doc-directories \
-    | xargs --no-run-if-empty %{__install} -d
+    | xargs -P 0 --no-run-if-empty %{__install} -d
 rm -f tmp-doc-files-to-be-installed && touch tmp-doc-files-to-be-installed
 cat tmp-doc-directories | while read tobeinstalleddocdir
 do
@@ -1267,6 +1277,10 @@ rm -rf $RPM_BUILD_ROOT
 %{_mandir}/man1/bjam.1*
 
 %changelog
+* Wed Nov 27 2013 Petr Machata <pmachata@redhat.com> - 1.54.0-6
+- Add libboost_atomic.so.* to the libboost_thread.so linker script on
+  architectures that need it.
+
 * Thu Aug 29 2013 Petr Machata <pmachata@redhat.com> - 1.54.0-5
 - Fix atomic_cas32 (thanks Jaroslav Škarvada for figuring out where
   the problem is) (boost-1.54.0-interprocess-atomic_cas32-ppc.patch)
