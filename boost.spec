@@ -36,7 +36,7 @@ Name: boost
 Summary: The free peer-reviewed portable C++ source libraries
 Version: 1.54.0
 %define version_enc 1_54_0
-Release: 6%{?dist}
+Release: 7%{?dist}
 License: Boost and MIT and Python
 
 %define toplev_dirname %{name}_%{version_enc}
@@ -79,6 +79,7 @@ Requires: boost-thread = %{version}-%{release}
 Requires: boost-timer = %{version}-%{release}
 Requires: boost-wave = %{version}-%{release}
 
+BuildRequires: m4
 BuildRequires: libstdc++-devel%{?_isa}
 BuildRequires: bzip2-devel%{?_isa}
 BuildRequires: zlib-devel%{?_isa}
@@ -740,14 +741,15 @@ echo ============================= build serial ==================
 
 # See boost-1.54.0-thread-link_atomic.patch for where this file comes
 # from.
-if [ -e serial/boost/bin.v2/libs/thread/build/gcc-4.6.3/debug/threading-multi/has_atomic_flag_lockfree ]; then
+if [ $(find serial -type f -name has_atomic_flag_lockfree \
+		-print -quit | wc -l) -ne 0 ]; then
 	DEF=D
 else
 	DEF=U
 fi
 
-sed 's/%%{version}/%{version}/g' %{SOURCE2} |
-	cpp -C -P -${DEF}HAS_ATOMIC_FLAG_LOCKFREE > $(basename %{SOURCE2})
+m4 -${DEF}HAS_ATOMIC_FLAG_LOCKFREE -DVERSION=%{version} \
+	%{SOURCE2} > $(basename %{SOURCE2})
 
 # Build MPI parts of Boost with OpenMPI support
 
@@ -1277,6 +1279,11 @@ rm -rf $RPM_BUILD_ROOT
 %{_mandir}/man1/bjam.1*
 
 %changelog
+* Sun Dec  1 2013 Petr Machata <pmachata@redhat.com> - 1.54.0-7
+- Fix shameful blunders in implementation of the previous fix: don't
+  hard-code path to has_atomic_flag_lockfree binary; use m4 instead of
+  cpp, cpp in F19+ prefixes output with a bunch of comments.
+
 * Wed Nov 27 2013 Petr Machata <pmachata@redhat.com> - 1.54.0-6
 - Add libboost_atomic.so.* to the libboost_thread.so linker script on
   architectures that need it.
