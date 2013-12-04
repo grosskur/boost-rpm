@@ -7,13 +7,13 @@
 %define boost_docdir __tmp_docdir
 %define boost_examplesdir __tmp_examplesdir
 
-%ifarch %{arm}
+%ifarch %{arm} aarch64
   %bcond_with mpich
 %else
   %bcond_without mpich
 %endif
 
-%ifarch s390 s390x %{arm}
+%ifarch s390 s390x %{arm} aarch64
   # No OpenMPI support on these arches
   %bcond_with openmpi
 %else
