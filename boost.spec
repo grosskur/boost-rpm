@@ -36,7 +36,7 @@ Name: boost
 Summary: The free peer-reviewed portable C++ source libraries
 Version: 1.54.0
 %define version_enc 1_54_0
-Release: 7%{?dist}
+Release: 8%{?dist}
 License: Boost and MIT and Python
 
 %define toplev_dirname %{name}_%{version_enc}
@@ -1279,6 +1279,9 @@ rm -rf $RPM_BUILD_ROOT
 %{_mandir}/man1/bjam.1*
 
 %changelog
+* Fri Dec 13 2013 Petr Machata <pmachata@redhat.com> - 1.54.0-8
+- Add aarch64 into the list of arches that OpenMPI doesn't support.
+
 * Sun Dec  1 2013 Petr Machata <pmachata@redhat.com> - 1.54.0-7
 - Fix shameful blunders in implementation of the previous fix: don't
   hard-code path to has_atomic_flag_lockfree binary; use m4 instead of
