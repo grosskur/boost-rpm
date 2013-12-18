@@ -7,13 +7,13 @@
 %define boost_docdir __tmp_docdir
 %define boost_examplesdir __tmp_examplesdir
 
-%ifarch %{arm} aarch64
+%ifarch aarch64
   %bcond_with mpich
 %else
   %bcond_without mpich
 %endif
 
-%ifarch s390 s390x %{arm} aarch64
+%ifarch s390 s390x aarch64
   # No OpenMPI support on these arches
   %bcond_with openmpi
 %else
@@ -36,7 +36,7 @@ Name: boost
 Summary: The free peer-reviewed portable C++ source libraries
 Version: 1.54.0
 %define version_enc 1_54_0
-Release: 8%{?dist}
+Release: 9%{?dist}
 License: Boost and MIT and Python
 
 %define toplev_dirname %{name}_%{version_enc}
@@ -1279,6 +1279,9 @@ rm -rf $RPM_BUILD_ROOT
 %{_mandir}/man1/bjam.1*
 
 %changelog
+* Wed Dec 18 2013 Peter Robinson <pbrobinson@fedoraproject.org> 1.54.0-9
+- Enable MPICH and OpenMPI support on ARM as it's long had them both
+
 * Fri Dec 13 2013 Petr Machata <pmachata@redhat.com> - 1.54.0-8
 - Add aarch64 into the list of arches that OpenMPI doesn't support.
 
