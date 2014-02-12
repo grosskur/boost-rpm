@@ -36,7 +36,7 @@ Name: boost
 Summary: The free peer-reviewed portable C++ source libraries
 Version: 1.54.0
 %define version_enc 1_54_0
-Release: 10%{?dist}
+Release: 11%{?dist}
 License: Boost and MIT and Python
 
 %define toplev_dirname %{name}_%{version_enc}
@@ -1279,6 +1279,9 @@ rm -rf $RPM_BUILD_ROOT
 %{_mandir}/man1/bjam.1*
 
 %changelog
+* Wed Feb 12 2014 Petr Machata <pmachata@redhat.com> - 1.54.0-11
+- Rebuild for ICU soname bump.
+
 * Thu Jan  9 2014 Petr Machata <pmachata@redhat.com> - 1.54.0-10
 - Add ppc64le to the list of arches that OpenMPI and MPICH don't
   support.
