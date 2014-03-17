@@ -7,13 +7,13 @@
 %define boost_docdir __tmp_docdir
 %define boost_examplesdir __tmp_examplesdir
 
-%ifarch aarch64 ppc64le
+%ifarch ppc64le
   %bcond_with mpich
 %else
   %bcond_without mpich
 %endif
 
-%ifarch s390 s390x aarch64 ppc64le
+%ifarch s390 s390x ppc64le
   # No OpenMPI support on these arches
   %bcond_with openmpi
 %else
@@ -36,7 +36,7 @@ Name: boost
 Summary: The free peer-reviewed portable C++ source libraries
 Version: 1.54.0
 %define version_enc 1_54_0
-Release: 11%{?dist}
+Release: 12%{?dist}
 License: Boost and MIT and Python
 
 %define toplev_dirname %{name}_%{version_enc}
@@ -1279,6 +1279,9 @@ rm -rf $RPM_BUILD_ROOT
 %{_mandir}/man1/bjam.1*
 
 %changelog
+* Mon Mar 17 2014 Peter Robinson <pbrobinson@fedoraproject.org> 1.54.0-12
+- Enable MPICH and OpenMPI support on aarch64
+
 * Wed Feb 12 2014 Petr Machata <pmachata@redhat.com> - 1.54.0-11
 - Rebuild for ICU soname bump.
 
