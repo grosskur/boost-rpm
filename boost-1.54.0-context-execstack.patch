@@ -7,7 +7,7 @@ diff -up boost-1.54.0/libs/context/src/asm/jump_arm_aapcs_elf_gas.S~ boost-1.54.
  .size jump_fcontext,.-jump_fcontext
 +
 +/* Mark that we don't need executable stack.  */
-+.section .note.GNU-stack,"",@progbits
++.section .note.GNU-stack,"",%progbits
 diff -up boost-1.54.0/libs/context/src/asm/jump_i386_sysv_elf_gas.S~ boost-1.54.0/libs/context/src/asm/jump_i386_sysv_elf_gas.S
 --- boost-1.54.0/libs/context/src/asm/jump_i386_sysv_elf_gas.S~	2012-09-18 02:06:47.000000000 -0700
 +++ boost-1.54.0/libs/context/src/asm/jump_i386_sysv_elf_gas.S	2013-07-15 11:10:32.829144835 -0700
@@ -57,7 +57,7 @@ diff -up boost-1.54.0/libs/context/src/asm/make_arm_aapcs_elf_gas.S~ boost-1.54.
  .size make_fcontext,.-make_fcontext
 +
 +/* Mark that we don't need executable stack.  */
-+.section .note.GNU-stack,"",@progbits
++.section .note.GNU-stack,"",%progbits
 diff -up boost-1.54.0/libs/context/src/asm/make_i386_sysv_elf_gas.S~ boost-1.54.0/libs/context/src/asm/make_i386_sysv_elf_gas.S
 --- boost-1.54.0/libs/context/src/asm/make_i386_sysv_elf_gas.S~	2013-06-07 08:38:10.000000000 -0700
 +++ boost-1.54.0/libs/context/src/asm/make_i386_sysv_elf_gas.S	2013-07-15 11:10:40.333185226 -0700

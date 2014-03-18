@@ -20,7 +20,7 @@
   %bcond_without openmpi
 %endif
 
-%ifnarch %{ix86} x86_64
+%ifnarch %{ix86} x86_64 %{arm}
   # Avoid using Boost.Context on non-x86 arches.  s390 is not
   # supported at all and there were _syntax errors_ in PPC code.  This
   # should be enabled on a case-by-case basis as the arches are tested
@@ -36,7 +36,7 @@ Name: boost
 Summary: The free peer-reviewed portable C++ source libraries
 Version: 1.54.0
 %define version_enc 1_54_0
-Release: 13%{?dist}
+Release: 14%{?dist}
 License: Boost and MIT and Python
 
 %define toplev_dirname %{name}_%{version_enc}
@@ -1279,6 +1279,10 @@ rm -rf $RPM_BUILD_ROOT
 %{_mandir}/man1/bjam.1*
 
 %changelog
+* Tue Mar 18 2014 Petr Machata <pmachata@redhat.com> - 1.54.0-14
+- Fix a noexecstack patch for ARM, enable Boost.Context on ARM.
+  (boost-1.54.0-context-execstack.patch)
+
 * Tue Mar 18 2014 Björn Esser <bjoern.esser@gmail.com> - 1.54.0-13
 - rebuilt for mpich-3.1
 
