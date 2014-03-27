@@ -10,7 +10,11 @@
 %ifarch ppc64le
   %bcond_with mpich
 %else
-  %bcond_without mpich
+  %if 0%{?rhel} && 0%{?rhel} < 7
+    %bcond_with mpich
+  %else
+    %bcond_without mpich
+  %endif
 %endif
 
 %ifarch s390 s390x ppc64le
@@ -30,7 +34,11 @@
   %bcond_without context
 %endif
 
-%bcond_without python3
+%if 0%{?rhel} && 0%{?rhel} < 7
+  %bcond_with python3
+%else
+  %bcond_without python3
+%endif
 
 Name: boost
 Summary: The free peer-reviewed portable C++ source libraries
