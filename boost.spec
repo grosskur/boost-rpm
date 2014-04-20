@@ -1,3 +1,48 @@
+%global p_vendor hhvm
+%global _name    boost
+%global debug_package %{nil}
+
+# JJM If the p_vendor variable is defined then we
+# should set the prefix to /opt and use the p_vendor
+# string as the prefix of the package names for both
+# this package and all requirements.
+#
+# This will allow this SPEC file to be used to install
+# to /opt/puppet or something similar by just defining
+# p_vendor at the top of the file.
+#
+# This also means this SPEC file should be used to replace
+# the puppet_rubygem_passenger spec file which is not so robust.
+%if 0%{?p_vendor:1}
+    %global name_prefix %{p_vendor}-
+
+    # The %{!?foo: ...} idiom is needed, because the spec gets re-evaluated for
+    # each package that is built.  This really messes with things that are only
+    # supposed to be evaluated at "definition time".
+
+    # Grab the "real" directories so we can reference the system's files.
+    %{!?_real_prefix:     %global _real_prefix     %{_prefix}}
+    %{!?_real_libdir:     %global _real_libdir     %{_libdir}}
+    %{!?_real_bindir:     %global _real_bindir     %{_bindir}}
+    %{!?_real_sbindir:    %global _real_sbindir    %{_sbindir}}
+    %{!?_real_sysconfdir: %global _real_sysconfdir %{_sysconfdir}}
+    %{!?_real_initrddir:  %global _real_initrddir  %{_initrddir}}
+
+    # Use the alternate locations for things.
+    %define _lib             lib
+    %global _sysconfdir      %{_real_sysconfdir}/hhvm
+
+    # Override the _prefix last, so we can get the _real_* locations.
+    %global _prefix /opt/hhvm
+    %global _libdir %{_prefix}/lib
+    %global _datadir %{_prefix}/share
+    %global _mandir %{_datadir}/man
+    %global _initrddir %{_real_initrddir}
+%endif
+
+# 11503 -- Don't provide un-namespaced libraries inside rpm database
+AutoReqProv: 0
+
 # Support for documentation installation As the %%doc macro erases the
 # target directory ($RPM_BUILD_ROOT%%{_docdir}/%%{name}), manually
 # installed documentation must be saved into a temporary dedicated
@@ -40,18 +85,18 @@
   %bcond_without python3
 %endif
 
-Name: boost
+Name: %{?name_prefix}%{_name}
 Summary: The free peer-reviewed portable C++ source libraries
 Version: 1.54.0
 %define version_enc 1_54_0
-Release: 14%{?dist}
+Release: 14.hhvm%{?dist}
 License: Boost and MIT and Python
 
-%define toplev_dirname %{name}_%{version_enc}
+%define toplev_dirname %{_name}_%{version_enc}
 URL: http://www.boost.org
 Group: System Environment/Libraries
 
-Source0: http://downloads.sourceforge.net/%{name}/%{toplev_dirname}.tar.bz2
+Source0: http://downloads.sourceforge.net/%{_name}/%{toplev_dirname}.tar.bz2
 Source1: ver.py
 Source2: libboost_thread.so
 
@@ -1179,7 +1224,7 @@ rm -rf $RPM_BUILD_ROOT
 %files devel
 %defattr(-, root, root, -)
 %doc LICENSE_1_0.txt
-%{_includedir}/%{name}
+%{_includedir}/%{_name}
 %{_libdir}/libboost_atomic.so
 %{_libdir}/libboost_chrono.so
 %if %{with context}
