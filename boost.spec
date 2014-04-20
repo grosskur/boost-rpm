@@ -66,7 +66,11 @@ AutoReqProv: 0
   # No OpenMPI support on these arches
   %bcond_with openmpi
 %else
-  %bcond_without openmpi
+  %if 0%{?rhel} && 0%{?rhel} < 7
+    %bcond_with openmpi
+  %else
+    %bcond_without openmpi
+  %endif
 %endif
 
 %ifnarch %{ix86} x86_64 %{arm}
