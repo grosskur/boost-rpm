@@ -1,47 +1,18 @@
-%global p_vendor hhvm
-%global _name    boost
-%global debug_package %{nil}
+%global p_vendor         hhvm
+%define _name            boost
 
-# JJM If the p_vendor variable is defined then we
-# should set the prefix to /opt and use the p_vendor
-# string as the prefix of the package names for both
-# this package and all requirements.
-#
-# This will allow this SPEC file to be used to install
-# to /opt/puppet or something similar by just defining
-# p_vendor at the top of the file.
-#
-# This also means this SPEC file should be used to replace
-# the puppet_rubygem_passenger spec file which is not so robust.
 %if 0%{?p_vendor:1}
-    %global name_prefix %{p_vendor}-
+  %global _orig_prefix   %{_prefix}
+  %global name_prefix    %{p_vendor}-
 
-    # The %{!?foo: ...} idiom is needed, because the spec gets re-evaluated for
-    # each package that is built.  This really messes with things that are only
-    # supposed to be evaluated at "definition time".
-
-    # Grab the "real" directories so we can reference the system's files.
-    %{!?_real_prefix:     %global _real_prefix     %{_prefix}}
-    %{!?_real_libdir:     %global _real_libdir     %{_libdir}}
-    %{!?_real_bindir:     %global _real_bindir     %{_bindir}}
-    %{!?_real_sbindir:    %global _real_sbindir    %{_sbindir}}
-    %{!?_real_sysconfdir: %global _real_sysconfdir %{_sysconfdir}}
-    %{!?_real_initrddir:  %global _real_initrddir  %{_initrddir}}
-
-    # Use the alternate locations for things.
-    %define _lib             lib
-    %global _sysconfdir      %{_real_sysconfdir}/hhvm
-
-    # Override the _prefix last, so we can get the _real_* locations.
-    %global _prefix /opt/hhvm
-    %global _libdir %{_prefix}/lib
-    %global _datadir %{_prefix}/share
-    %global _mandir %{_datadir}/man
-    %global _initrddir %{_real_initrddir}
+  # Use the alternate locations for things.
+  %define _lib            lib 
+  %global _real_initrddir %{_initrddir}
+  %global _sysconfdir     %{_sysconfdir}/hhvm
+  %define _prefix         /opt/hhvm
+  %define _libdir         %{_prefix}/lib
+  %define _mandir         %{_datadir}/man
 %endif
-
-# 11503 -- Don't provide un-namespaced libraries inside rpm database
-AutoReqProv: 0
 
 # Support for documentation installation As the %%doc macro erases the
 # target directory ($RPM_BUILD_ROOT%%{_docdir}/%%{name}), manually
@@ -112,29 +83,29 @@ Source2: libboost_thread.so
 # components, except for MPI and Python 3 sub-packages.  Those are
 # special in that they are rarely necessary, and it's not a big burden
 # to have interested parties install them explicitly.
-Requires: boost-atomic = %{version}-%{release}
-Requires: boost-chrono = %{version}-%{release}
+Requires: %{name}-atomic = %{version}-%{release}
+Requires: %{name}-chrono = %{version}-%{release}
 %if %{with context}
-Requires: boost-context = %{version}-%{release}
+Requires: %{name}-context = %{version}-%{release}
 %endif
-Requires: boost-date-time = %{version}-%{release}
-Requires: boost-filesystem = %{version}-%{release}
-Requires: boost-graph = %{version}-%{release}
-Requires: boost-iostreams = %{version}-%{release}
-Requires: boost-locale = %{version}-%{release}
-Requires: boost-log = %{version}-%{release}
-Requires: boost-math = %{version}-%{release}
-Requires: boost-program-options = %{version}-%{release}
-Requires: boost-python = %{version}-%{release}
-Requires: boost-random = %{version}-%{release}
-Requires: boost-regex = %{version}-%{release}
-Requires: boost-serialization = %{version}-%{release}
-Requires: boost-signals = %{version}-%{release}
-Requires: boost-system = %{version}-%{release}
-Requires: boost-test = %{version}-%{release}
-Requires: boost-thread = %{version}-%{release}
-Requires: boost-timer = %{version}-%{release}
-Requires: boost-wave = %{version}-%{release}
+Requires: %{name}-date-time = %{version}-%{release}
+Requires: %{name}-filesystem = %{version}-%{release}
+Requires: %{name}-graph = %{version}-%{release}
+Requires: %{name}-iostreams = %{version}-%{release}
+Requires: %{name}-locale = %{version}-%{release}
+Requires: %{name}-log = %{version}-%{release}
+Requires: %{name}-math = %{version}-%{release}
+Requires: %{name}-program-options = %{version}-%{release}
+Requires: %{name}-python = %{version}-%{release}
+Requires: %{name}-random = %{version}-%{release}
+Requires: %{name}-regex = %{version}-%{release}
+Requires: %{name}-serialization = %{version}-%{release}
+Requires: %{name}-signals = %{version}-%{release}
+Requires: %{name}-system = %{version}-%{release}
+Requires: %{name}-test = %{version}-%{release}
+Requires: %{name}-thread = %{version}-%{release}
+Requires: %{name}-timer = %{version}-%{release}
+Requires: %{name}-wave = %{version}-%{release}
 
 BuildRequires: m4
 BuildRequires: libstdc++-devel%{?_isa}
@@ -145,6 +116,8 @@ BuildRequires: python-devel%{?_isa}
 BuildRequires: python3-devel%{?_isa}
 %endif
 BuildRequires: libicu-devel%{?_isa}
+# Don't provide un-namespaced libraries inside rpm database
+AutoReqProv: 0
 
 # https://svn.boost.org/trac/boost/ticket/6150
 Patch4: boost-1.50.0-fix-non-utf8-files.patch
@@ -271,6 +244,8 @@ in future standards.)
 %package atomic
 Summary: Run-Time component of boost atomic library
 Group: System Environment/Libraries
+# Don't provide un-namespaced libraries inside rpm database
+AutoReqProv: 0
 
 %description atomic
 
@@ -282,7 +257,9 @@ variables.
 %package chrono
 Summary: Run-Time component of boost chrono library
 Group: System Environment/Libraries
-Requires: boost-system = %{version}-%{release}
+Requires: %{name}-system = %{version}-%{release}
+# Don't provide un-namespaced libraries inside rpm database
+AutoReqProv: 0
 
 %description chrono
 
@@ -292,6 +269,8 @@ Run-Time support for Boost.Chrono, a set of useful time utilities.
 %package context
 Summary: Run-Time component of boost context switching library
 Group: System Environment/Libraries
+# Don't provide un-namespaced libraries inside rpm database
+AutoReqProv: 0
 
 %description context
 
@@ -302,6 +281,8 @@ provides a sort of cooperative multitasking on a single thread.
 %package date-time
 Summary: Run-Time component of boost date-time library
 Group: System Environment/Libraries
+# Don't provide un-namespaced libraries inside rpm database
+AutoReqProv: 0
 
 %description date-time
 
@@ -311,7 +292,9 @@ on generic programming concepts.
 %package filesystem
 Summary: Run-Time component of boost filesystem library
 Group: System Environment/Libraries
-Requires: boost-system = %{version}-%{release}
+Requires: %{name}-system = %{version}-%{release}
+# Don't provide un-namespaced libraries inside rpm database
+AutoReqProv: 0
 
 %description filesystem
 
@@ -322,7 +305,9 @@ directories.
 %package graph
 Summary: Run-Time component of boost graph library
 Group: System Environment/Libraries
-Requires: boost-regex = %{version}-%{release}
+Requires: %{name}-regex = %{version}-%{release}
+# Don't provide un-namespaced libraries inside rpm database
+AutoReqProv: 0
 
 %description graph
 
@@ -333,6 +318,8 @@ Library (STL).
 %package iostreams
 Summary: Run-Time component of boost iostreams library
 Group: System Environment/Libraries
+# Don't provide un-namespaced libraries inside rpm database
+AutoReqProv: 0
 
 %description iostreams
 
@@ -342,9 +329,11 @@ stream buffers and i/o filters.
 %package locale
 Summary: Run-Time component of boost locale library
 Group: System Environment/Libraries
-Requires: boost-chrono = %{version}-%{release}
-Requires: boost-system = %{version}-%{release}
-Requires: boost-thread = %{version}-%{release}
+Requires: %{name}-chrono = %{version}-%{release}
+Requires: %{name}-system = %{version}-%{release}
+Requires: %{name}-thread = %{version}-%{release}
+# Don't provide un-namespaced libraries inside rpm database
+AutoReqProv: 0
 
 %description locale
 
@@ -354,6 +343,8 @@ handling tools.
 %package log
 Summary: Run-Time component of boost logging library
 Group: System Environment/Libraries
+# Don't provide un-namespaced libraries inside rpm database
+AutoReqProv: 0
 
 %description log
 
@@ -364,6 +355,8 @@ tools along with public interfaces for extending the library.
 %package math
 Summary: Math functions for boost TR1 library
 Group: System Environment/Libraries
+# Don't provide un-namespaced libraries inside rpm database
+AutoReqProv: 0
 
 %description math
 
@@ -373,6 +366,8 @@ portion of Boost.TR1.
 %package program-options
 Summary:  Run-Time component of boost program_options library
 Group: System Environment/Libraries
+# Don't provide un-namespaced libraries inside rpm database
+AutoReqProv: 0
 
 %description program-options
 
@@ -383,6 +378,8 @@ conventional methods such as command line and configuration file.
 %package python
 Summary: Run-Time component of boost python library
 Group: System Environment/Libraries
+# Don't provide un-namespaced libraries inside rpm database
+AutoReqProv: 0
 
 %description python
 
@@ -397,6 +394,8 @@ support for Boost Python Library.
 %package python3
 Summary: Run-Time component of boost python library for Python 3
 Group: System Environment/Libraries
+# Don't provide un-namespaced libraries inside rpm database
+AutoReqProv: 0
 
 %description python3
 
@@ -409,8 +408,10 @@ support for Boost Python Library compiled for Python 3.
 %package python3-devel
 Summary: Shared object symbolic links for Boost.Python 3
 Group: System Environment/Libraries
-Requires: boost-python3 = %{version}-%{release}
-Requires: boost-devel = %{version}-%{release}
+Requires: %{name}-python3 = %{version}-%{release}
+Requires: %{name}-devel = %{version}-%{release}
+# Don't provide un-namespaced libraries inside rpm database
+AutoReqProv: 0
 
 %description python3-devel
 
@@ -421,6 +422,8 @@ Shared object symbolic links for Python 3 variant of Boost.Python.
 %package random
 Summary: Run-Time component of boost random library
 Group: System Environment/Libraries
+# Don't provide un-namespaced libraries inside rpm database
+AutoReqProv: 0
 
 %description random
 
@@ -429,6 +432,8 @@ Run-Time support for boost random library.
 %package regex
 Summary: Run-Time component of boost regular expression library
 Group: System Environment/Libraries
+# Don't provide un-namespaced libraries inside rpm database
+AutoReqProv: 0
 
 %description regex
 
@@ -437,6 +442,8 @@ Run-Time support for boost regular expression library.
 %package serialization
 Summary: Run-Time component of boost serialization library
 Group: System Environment/Libraries
+# Don't provide un-namespaced libraries inside rpm database
+AutoReqProv: 0
 
 %description serialization
 
@@ -445,6 +452,8 @@ Run-Time support for serialization for persistence and marshaling.
 %package signals
 Summary: Run-Time component of boost signals and slots library
 Group: System Environment/Libraries
+# Don't provide un-namespaced libraries inside rpm database
+AutoReqProv: 0
 
 %description signals
 
@@ -453,6 +462,8 @@ Run-Time support for managed signals & slots callback implementation.
 %package system
 Summary: Run-Time component of boost system support library
 Group: System Environment/Libraries
+# Don't provide un-namespaced libraries inside rpm database
+AutoReqProv: 0
 
 %description system
 
@@ -463,6 +474,8 @@ library.
 %package test
 Summary: Run-Time component of boost test library
 Group: System Environment/Libraries
+# Don't provide un-namespaced libraries inside rpm database
+AutoReqProv: 0
 
 %description test
 
@@ -472,7 +485,9 @@ program execution monitoring.
 %package thread
 Summary: Run-Time component of boost thread library
 Group: System Environment/Libraries
-Requires: boost-system = %{version}-%{release}
+Requires: %{name}-system = %{version}-%{release}
+# Don't provide un-namespaced libraries inside rpm database
+AutoReqProv: 0
 
 %description thread
 
@@ -484,8 +499,10 @@ data specific to individual threads.
 %package timer
 Summary: Run-Time component of boost timer library
 Group: System Environment/Libraries
-Requires: boost-chrono = %{version}-%{release}
-Requires: boost-system = %{version}-%{release}
+Requires: %{name}-chrono = %{version}-%{release}
+Requires: %{name}-system = %{version}-%{release}
+# Don't provide un-namespaced libraries inside rpm database
+AutoReqProv: 0
 
 %description timer
 
@@ -496,11 +513,13 @@ with as little as one #include and one additional line of code.
 %package wave
 Summary: Run-Time component of boost C99/C++ pre-processing library
 Group: System Environment/Libraries
-Requires: boost-chrono = %{version}-%{release}
-Requires: boost-date-time = %{version}-%{release}
-Requires: boost-filesystem = %{version}-%{release}
-Requires: boost-system = %{version}-%{release}
-Requires: boost-thread = %{version}-%{release}
+Requires: %{name}-chrono = %{version}-%{release}
+Requires: %{name}-date-time = %{version}-%{release}
+Requires: %{name}-filesystem = %{version}-%{release}
+Requires: %{name}-system = %{version}-%{release}
+Requires: %{name}-thread = %{version}-%{release}
+# Don't provide un-namespaced libraries inside rpm database
+AutoReqProv: 0
 
 %description wave
 
@@ -511,9 +530,11 @@ pre-processor functionality.
 %package devel
 Summary: The Boost C++ headers and shared development libraries
 Group: Development/Libraries
-Requires: boost = %{version}-%{release}
-Provides: boost-python-devel = %{version}-%{release}
+Requires: %{name} = %{version}-%{release}
+Provides: %{name}-python-devel = %{version}-%{release}
 Requires: libicu-devel%{?_isa}
+# Don't provide un-namespaced libraries inside rpm database
+AutoReqProv: 0
 
 # Odeint was shipped in Fedora 18, but later became part of Boost.
 # Note we also obsolete odeint-doc down there.
@@ -529,9 +550,11 @@ Headers and shared object symbolic links for the Boost C++ libraries.
 %package static
 Summary: The Boost C++ static development libraries
 Group: Development/Libraries
-Requires: boost-devel = %{version}-%{release}
-Obsoletes: boost-devel-static < 1.34.1-14
-Provides: boost-devel-static = %{version}-%{release}
+Requires: %{name}-devel = %{version}-%{release}
+Obsoletes: %{name}-devel-static < 1.34.1-14
+Provides: %{name}-devel-static = %{version}-%{release}
+# Don't provide un-namespaced libraries inside rpm database
+AutoReqProv: 0
 
 %description static
 Static Boost C++ libraries.
@@ -542,7 +565,9 @@ Group: Documentation
 %if 0%{?fedora} >= 10 || 0%{?rhel} >= 6
 BuildArch: noarch
 %endif
-Provides: boost-python-docs = %{version}-%{release}
+Provides: %{name}-python-docs = %{version}-%{release}
+# Don't provide un-namespaced libraries inside rpm database
+AutoReqProv: 0
 
 # See the description above.
 Provides: odeint-doc = 2.2-5
@@ -559,7 +584,9 @@ Group: Documentation
 %if 0%{?fedora} >= 10 || 0%{?rhel} >= 6
 BuildArch: noarch
 %endif
-Requires: boost-devel = %{version}-%{release}
+Requires: %{name}-devel = %{version}-%{release}
+# Don't provide un-namespaced libraries inside rpm database
+AutoReqProv: 0
 
 %description examples
 This package contains example source files distributed with boost.
@@ -572,7 +599,9 @@ Summary: Run-Time component of Boost.MPI library
 Group: System Environment/Libraries
 Requires: openmpi
 BuildRequires: openmpi-devel
-Requires: boost-serialization = %{version}-%{release}
+Requires: %{name}-serialization = %{version}-%{release}
+# Don't provide un-namespaced libraries inside rpm database
+AutoReqProv: 0
 
 %description openmpi
 
@@ -582,10 +611,12 @@ API over the OpenMPI implementation of MPI.
 %package openmpi-devel
 Summary: Shared library symbolic links for Boost.MPI
 Group: System Environment/Libraries
-Requires: boost-devel = %{version}-%{release}
-Requires: boost-openmpi = %{version}-%{release}
-Requires: boost-openmpi-python = %{version}-%{release}
-Requires: boost-graph-openmpi = %{version}-%{release}
+Requires: %{name}-devel = %{version}-%{release}
+Requires: %{name}-openmpi = %{version}-%{release}
+Requires: %{name}-openmpi-python = %{version}-%{release}
+Requires: %{name}-graph-openmpi = %{version}-%{release}
+# Don't provide un-namespaced libraries inside rpm database
+AutoReqProv: 0
 
 %description openmpi-devel
 
@@ -595,9 +626,11 @@ API over the OpenMPI implementation of MPI.
 %package openmpi-python
 Summary: Python run-time component of Boost.MPI library
 Group: System Environment/Libraries
-Requires: boost-openmpi = %{version}-%{release}
-Requires: boost-python = %{version}-%{release}
-Requires: boost-serialization = %{version}-%{release}
+Requires: %{name}-openmpi = %{version}-%{release}
+Requires: %{name}-python = %{version}-%{release}
+Requires: %{name}-serialization = %{version}-%{release}
+# Don't provide un-namespaced libraries inside rpm database
+AutoReqProv: 0
 
 %description openmpi-python
 
@@ -607,8 +640,10 @@ API over the OpenMPI implementation of MPI.
 %package graph-openmpi
 Summary: Run-Time component of parallel boost graph library
 Group: System Environment/Libraries
-Requires: boost-openmpi = %{version}-%{release}
-Requires: boost-serialization = %{version}-%{release}
+Requires: %{name}-openmpi = %{version}-%{release}
+Requires: %{name}-serialization = %{version}-%{release}
+# Don't provide un-namespaced libraries inside rpm database
+AutoReqProv: 0
 
 %description graph-openmpi
 
@@ -627,9 +662,11 @@ Summary: Run-Time component of Boost.MPI library
 Group: System Environment/Libraries
 Requires: mpich
 BuildRequires: mpich-devel
-Requires: boost-serialization = %{version}-%{release}
+Requires: %{name}-serialization = %{version}-%{release}
 Provides: %{name}-mpich2 = %{version}-%{release}
 Obsoletes: %{name}-mpich2 < 1.53.0-9
+# Don't provide un-namespaced libraries inside rpm database
+AutoReqProv: 0
 
 %description mpich
 
@@ -639,12 +676,14 @@ API over the MPICH implementation of MPI.
 %package mpich-devel
 Summary: Shared library symbolic links for Boost.MPI
 Group: System Environment/Libraries
-Requires: boost-devel = %{version}-%{release}
-Requires: boost-mpich = %{version}-%{release}
-Requires: boost-mpich-python = %{version}-%{release}
-Requires: boost-graph-mpich = %{version}-%{release}
+Requires: %{name}-devel = %{version}-%{release}
+Requires: %{name}-mpich = %{version}-%{release}
+Requires: %{name}-mpich-python = %{version}-%{release}
+Requires: %{name}-graph-mpich = %{version}-%{release}
 Provides: %{name}-mpich2-devel = %{version}-%{release}
 Obsoletes: %{name}-mpich2-devel < 1.53.0-9
+# Don't provide un-namespaced libraries inside rpm database
+AutoReqProv: 0
 
 %description mpich-devel
 
@@ -654,11 +693,13 @@ API over the MPICH implementation of MPI.
 %package mpich-python
 Summary: Python run-time component of Boost.MPI library
 Group: System Environment/Libraries
-Requires: boost-mpich = %{version}-%{release}
-Requires: boost-python = %{version}-%{release}
-Requires: boost-serialization = %{version}-%{release}
+Requires: %{name}-mpich = %{version}-%{release}
+Requires: %{name}-python = %{version}-%{release}
+Requires: %{name}-serialization = %{version}-%{release}
 Provides: %{name}-mpich2-python = %{version}-%{release}
 Obsoletes: %{name}-mpich2-python < 1.53.0-9
+# Don't provide un-namespaced libraries inside rpm database
+AutoReqProv: 0
 
 %description mpich-python
 
@@ -668,10 +709,12 @@ API over the MPICH implementation of MPI.
 %package graph-mpich
 Summary: Run-Time component of parallel boost graph library
 Group: System Environment/Libraries
-Requires: boost-mpich = %{version}-%{release}
-Requires: boost-serialization = %{version}-%{release}
+Requires: %{name}-mpich = %{version}-%{release}
+Requires: %{name}-serialization = %{version}-%{release}
 Provides: %{name}-graph-mpich2 = %{version}-%{release}
 Obsoletes: %{name}-graph-mpich2 < 1.53.0-9
+# Don't provide un-namespaced libraries inside rpm database
+AutoReqProv: 0
 
 %description graph-mpich
 
@@ -685,8 +728,10 @@ back-end to do the parallel work.
 %package build
 Summary: Cross platform build system for C++ projects
 Group: Development/Tools
-Requires: boost-jam
+Requires: %{name}-jam
 BuildArch: noarch
+# Don't provide un-namespaced libraries inside rpm database
+AutoReqProv: 0
 
 %description build
 Boost.Build is an easy way to build C++ projects, everywhere. You name
@@ -699,6 +744,8 @@ C++ compilers -- on Windows, OSX, Linux and commercial UNIX systems.
 %package jam
 Summary: A low-level build tool
 Group: Development/Tools
+# Don't provide un-namespaced libraries inside rpm database
+AutoReqProv: 0
 
 %description jam
 Boost.Jam (BJam) is the low-level build engine tool for Boost.Build.
